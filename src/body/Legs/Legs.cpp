@@ -30,15 +30,9 @@ void Legs::Draw() const
     rightThigh.Draw();
 }
 
-void Legs::SetAnchorPoint(Vector2 anchorPoint)
+void Legs::SetTransform(MyTransform parentTransform)
 {
-    //leftThigh.SetAnchorPoint(anchorPoint);
-    //rightThigh.SetAnchorPoint(anchorPoint); 
-}
-
-void Legs::SetRotation(float rotation)
-{
-    leftThigh.SetRotation(rotation);
-    rightThigh.SetRotation(rotation);
+    leftThigh.SetTransform(parentTransform);
+    rightThigh.SetTransform(parentTransform);
 }
 

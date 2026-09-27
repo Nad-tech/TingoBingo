@@ -41,6 +41,7 @@ void Pelvis::SetTransform(MyTransform parentTransform)
     };
 
     Shape::SetTransform(transform);
+    legs.SetTransform(transform);
 }
 
 void Pelvis::Shutdown()

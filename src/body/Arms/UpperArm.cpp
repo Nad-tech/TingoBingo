@@ -19,7 +19,7 @@ void UpperArm::Initialise()
     dimensions.upperArmWidth = 50.0f;
     dimensions.upperArmHeight = 200.0f;
 
-    SetDimensions(
+    Shape::SetDimensions(
         dimensions.upperArmWidth,
         dimensions.upperArmHeight
     );

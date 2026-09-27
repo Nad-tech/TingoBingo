@@ -3,6 +3,7 @@
 #include "body/Legs/Thigh.h"
 #include "BodyDimensions.h"
 #include "Shape.h"
+#include "MyTransform.h"
 
 class Legs : Shape
 {
@@ -10,10 +11,11 @@ class Legs : Shape
         Legs(BodyDimensions& dimensions);
         void Initialise();
         void Shutdown();
+        
         void Update(float dt);
         void Draw() const;
-        void SetAnchorPoint(Vector2 anchorPoint);
-        void SetRotation(float rotation);
+
+        void SetTransform(MyTransform parentTransform);
 
     private:
         BodyDimensions& dimensions;
