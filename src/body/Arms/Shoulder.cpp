@@ -16,8 +16,8 @@ Shoulder::Shoulder(BodyDimensions& dimensions, std::string side) :
 
 void Shoulder::Initialise()
 {
-    dimensions.shoulderWidth = 75.0f;
-    dimensions.shoulderHeight = 75.0f;
+    dimensions.shoulderWidth = 70.0f;
+    dimensions.shoulderHeight = 70.0f;
     SetDimensions(dimensions.shoulderWidth, dimensions.shoulderHeight);
 
     upperArm.Initialise();
@@ -47,8 +47,8 @@ void Shoulder::Update(float dt)
 
 void Shoulder::Draw() const 
 {
-    Shape::Draw();
     upperArm.Draw();
+    Shape::Draw();
 }
 
 void Shoulder::SetTransform(MyTransform parentTransform)

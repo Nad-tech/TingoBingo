@@ -1,27 +1,30 @@
 #pragma once
 
-#include "Sprite.h"
+#include "Shape.h"
 #include "ForeArm.h"
 #include "BodyDimensions.h"
 
 #include <string>
 
-class Elbow : public Sprite
+class Elbow : public Shape
 {
     public:
         Elbow(BodyDimensions& dimensions, std::string side);
+        
         void Initialise() override;
-        void Update(float dt) override;
-        void Draw() const override;
         
-        int GetFrame() const;
-        
-        void SetRotation(float rotation);
+        void Update(float dt);
+        void Draw() const;
+
+        void SetTransform(MyTransform parentTransform);
 
     private:
         BodyDimensions& dimensions;
+        Vector2 positionOffset;
+
         float localRotation = 0.0f;
         float homeRotation = 0.0f;
+
         std::string side = "";
 
         ForeArm foreArm;

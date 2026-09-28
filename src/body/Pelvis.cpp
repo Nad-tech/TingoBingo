@@ -7,7 +7,7 @@ Pelvis::Pelvis(BodyDimensions& dimensions) :
 {}
 void Pelvis::Initialise()
 {
-    dimensions.pelvisWidth = 260.0f;
+    dimensions.pelvisWidth = 240.0f;
     dimensions.pelvisHeight = 70.0f;
     SetDimensions(dimensions.pelvisWidth, dimensions.pelvisHeight);
 
@@ -26,8 +26,8 @@ void Pelvis::Update(float dt)
 
 void Pelvis::Draw() const 
 {
-    Shape::Draw();
     legs.Draw();
+    Shape::Draw();
 }
 
 void Pelvis::SetTransform(MyTransform parentTransform)

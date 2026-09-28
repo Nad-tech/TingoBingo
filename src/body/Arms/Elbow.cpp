@@ -10,47 +10,48 @@ Elbow::Elbow(BodyDimensions& dimensions, std::string side) :
 
 void Elbow::Initialise()
 {
-    dimensions.elbowWidth = 50.0f;
-    dimensions.elbowHeight = 50.0f;
+    dimensions.elbowWidth = 65.0f;
+    dimensions.elbowHeight = 65.0f;
 
-    //rotation = 0.0f;
+    Shape::SetDimensions(
+        dimensions.elbowWidth, 
+        dimensions.elbowHeight
+    );
 
-    //scale = SCALE;
+    foreArm.Initialise();
+
+    if(side == "left")
+    {
+        positionOffset = 
+        {
+            0,
+            -dimensions.upperArmHeight / 2.0f
+        };
+    }
+
+    if(side == "right")
+    {
+        positionOffset = 
+        {
+            0,
+            -dimensions.upperArmHeight / 2.0f
+        };
+    }
 }
 
 void Elbow::Update(float dt)
 {
-    Sprite::Update(dt);
+    foreArm.Update(dt);
 }
 
-void Elbow::Draw()const 
+void Elbow::Draw() const 
 {
-    /*Rectangle elbow = {
-        anchorPoint.x,
-        anchorPoint.y,
-        dimensions.elbowWidth * SCALE,
-        dimensions.elbowHeight * SCALE
-    };
-
-    Vector2 localPivot =
-    {
-        dimensions.elbowWidth / 2.0f,
-        0
-    };
-
-    DrawRectanglePro(
-        elbow,
-        localPivot,
-        rotation + localRotation,
-        WHITE
-    );*/
+    Shape::Draw();
+    foreArm.Draw();
 }
 
-int Elbow::GetFrame() const
+void Elbow::SetTransform(MyTransform parentTransform)
 {
-    return 0;
-}
-
-void Elbow::SetRotation(float rotation) {
-    //this->rotation = rotation;
+    Shape::transform = MakeChildTransform(parentTransform, positionOffset);
+    foreArm.SetTransform(transform);
 }

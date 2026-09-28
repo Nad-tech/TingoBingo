@@ -17,7 +17,7 @@ UpperArm::UpperArm(BodyDimensions& dimensions, std::string side) :
 void UpperArm::Initialise()
 {
     dimensions.upperArmWidth = 50.0f;
-    dimensions.upperArmHeight = 200.0f;
+    dimensions.upperArmHeight = 150.0f;
 
     Shape::SetDimensions(
         dimensions.upperArmWidth,
@@ -59,6 +59,7 @@ void UpperArm::Update(float dt)
 void UpperArm::Draw() const
 {
     Shape::Draw();
+    elbow.Draw();
 }
 
 
@@ -118,4 +119,6 @@ void UpperArm::SetTransform(MyTransform parentTransform)
 {
     Shape::transform = MakeChildTransform(parentTransform, positionOffset);
     Shape::transform.rotation += localRotation;
+
+    elbow.SetTransform(Shape::transform);
 }
