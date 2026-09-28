@@ -1,4 +1,4 @@
-#include "body/Legs/Thigh.h"
+#include "Body/Legs/Thigh.h"
 #include "Constants.h"
 #include <string>
 
@@ -6,7 +6,8 @@
 Thigh::Thigh(BodyDimensions& dimensions, std::string side) :
     Shape(CARDBOARD),
     dimensions(dimensions),
-    side(side)
+    side(side),
+    knee(dimensions)
 {}
 
 void Thigh::Initialise()

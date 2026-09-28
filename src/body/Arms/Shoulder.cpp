@@ -1,4 +1,4 @@
-#include "body/Arms/Shoulder.h"
+#include "Body/Arms/Shoulder.h"
 #include "Constants.h"
 #include <cmath>
 #include <iostream>
@@ -53,20 +53,10 @@ void Shoulder::Draw() const
 
 void Shoulder::SetTransform(MyTransform parentTransform)
 {
-    Shape::transform.position = {
-        parentTransform.position.x + positionOffset.x,
-        parentTransform.position.y + positionOffset.y
-    };
+    transform = MakeChildTransform(parentTransform, positionOffset);
 
-    Shape::transform.pivot = {
-        -positionOffset.x,
-        -positionOffset.y
-    };
-
-    Shape::transform.rotation = parentTransform.rotation;
-    Shape::transform.scale = parentTransform.scale;
-
-    upperArm.SetTransform(Shape::transform);
+    Shape::SetTransform(transform);
+    upperArm.SetTransform(transform);
 }
 
 void Shoulder::SwingArm(

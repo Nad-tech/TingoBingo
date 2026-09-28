@@ -217,7 +217,7 @@ void SpeechController::Speak(const std::string& text)
         //================================================
 
         bool success =
-            Speech::GenerateSpeech(text, stopRequested);
+            SpeechGenerator::GenerateSpeech(text, stopRequested);
 
         //================================================
         // GENERATION RESULT

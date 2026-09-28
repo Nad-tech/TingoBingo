@@ -1,4 +1,4 @@
-#include "body/Arms/Arms.h"
+#include "Body/Arms/Arms.h"
 
 Arms::Arms(BodyDimensions& dimensions)
     : dimensions(dimensions),

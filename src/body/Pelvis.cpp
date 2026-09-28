@@ -32,13 +32,7 @@ void Pelvis::Draw() const
 
 void Pelvis::SetTransform(MyTransform parentTransform)
 {
-    transform = parentTransform;
-    transform.position.x += positionOffset.x;
-    transform.position.y += positionOffset.y;
-    transform.pivot = {
-        0,
-        -positionOffset.y
-    };
+    transform = MakeChildTransform(parentTransform, positionOffset);
 
     Shape::SetTransform(transform);
     legs.SetTransform(transform);

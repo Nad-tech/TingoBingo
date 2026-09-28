@@ -1,4 +1,4 @@
-#include "body/Arms/UpperArm.h"
+#include "Body/Arms/UpperArm.h"
 #include "Constants.h"
 #include <cmath>
 #include <iostream>

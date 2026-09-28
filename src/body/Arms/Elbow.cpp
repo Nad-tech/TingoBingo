@@ -4,7 +4,8 @@
 
 Elbow::Elbow(BodyDimensions& dimensions, std::string side) :
     dimensions(dimensions),
-    side(side)
+    side(side),
+    foreArm(dimensions, side)
 {}
 
 void Elbow::Initialise()

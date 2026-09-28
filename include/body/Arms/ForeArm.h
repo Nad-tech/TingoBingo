@@ -1,5 +1,6 @@
 #pragma once
 
+#include "BodyDimensions.h"
 #include <string>
 
 #include "Sprite.h"
@@ -8,6 +9,7 @@
 class ForeArm : public Sprite
 {
     public:
+        ForeArm(BodyDimensions& dimensions, std::string side);
         void Initialise() override;
         void Update(float dt) override;
         void Draw() const override;
@@ -15,16 +17,13 @@ class ForeArm : public Sprite
         int GetFrame() const;
         
         void SetRotation(float rotation);
-        void SetBodyDimensions(float width, float height, std::string side);
 
     private:
+        BodyDimensions& dimensions;
         Vector2 localPositionOffset = {0, 0};
         float localRotation = 0.0f;
         float homeRotation = 0.0f;
-        float bodyWidth = 0;
-        float bodyHeight = 0;
         std::string side = "";
 
-        Hand leftHand;
-        Hand rightHand;
+        Hand hand;
 };

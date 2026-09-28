@@ -1,5 +1,5 @@
 #pragma once
-#include "body/Legs/Legs.h"
+#include "Body/Legs/Legs.h"
 #include "Shape.h"
 #include "BodyDimensions.h"
 class Pelvis : Shape

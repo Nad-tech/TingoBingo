@@ -1,4 +1,4 @@
-#include "body/BodyBase.h"
+#include "Body/BodyBase.h"
 
 #include "Constants.h"
 #include <iostream>

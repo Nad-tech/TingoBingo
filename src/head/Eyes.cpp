@@ -99,7 +99,7 @@ void Eyes::LookForward()
     pupils.LookForward();
 }
 
-void Eyes::ShutDown()
+void Eyes::Shutdown()
 {
     pupils.Shutdown();
     Sprite::Shutdown();

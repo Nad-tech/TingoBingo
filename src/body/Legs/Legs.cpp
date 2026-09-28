@@ -1,4 +1,4 @@
-#include "body/Legs/Legs.h"
+#include "Body/Legs/Legs.h"
 
 Legs::Legs(BodyDimensions& dimensions) :
     dimensions(dimensions),

@@ -10,7 +10,7 @@ class Eyes : public Sprite
         Eyes(BodyDimensions& dimensions);
         
         void Initialise() override;
-        void ShutDown();
+        void Shutdown();
 
         void Update(float dt) override;
         void Draw() const;

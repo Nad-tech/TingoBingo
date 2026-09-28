@@ -3,7 +3,7 @@
 #include <string>
 #include <atomic>
 
-class Speech
+class SpeechGenerator
 {
 public:
     static bool GenerateSpeech

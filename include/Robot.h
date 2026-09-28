@@ -6,7 +6,7 @@
 #include "Emotion.h"
 #include "Object.h"
 #include "SfxController.h"
-#include "body/Body.h"
+#include "Body/Body.h"
 #include "BodyDimensions.h"
 #include "MyTransform.h"
 

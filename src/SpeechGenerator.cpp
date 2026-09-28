@@ -65,7 +65,7 @@ static void CloseProcessHandles(PROCESS_INFORMATION& process)
 //             requested.
 //====================================================
 
-bool Speech::GenerateSpeech
+bool SpeechGenerator::GenerateSpeech
 (
     const std::string& text,
     const std::atomic<bool>& stopRequested

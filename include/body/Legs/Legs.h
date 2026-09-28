@@ -1,6 +1,6 @@
 #pragma once
 
-#include "body/Legs/Thigh.h"
+#include "Body/Legs/Thigh.h"
 #include "BodyDimensions.h"
 #include "Shape.h"
 #include "MyTransform.h"

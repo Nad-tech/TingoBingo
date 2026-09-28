@@ -34,20 +34,7 @@ void Neck::Draw() const
 
 void Neck::SetTransform(MyTransform parentTransform)
 {
-    transform.position =
-    {
-        parentTransform.position.x + positionOffset.x,
-        parentTransform.position.y + positionOffset.y
-    };
-
-    transform.pivot =
-    {
-        0,
-        -positionOffset.y
-    };
-    
-    transform.rotation = parentTransform.rotation;
-    transform.scale = parentTransform.scale;
+    transform = MakeChildTransform(parentTransform, positionOffset);
 
     Shape::SetTransform(transform);
     head.SetTransform(transform);

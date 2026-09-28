@@ -1,4 +1,4 @@
-#include "body/Body.h"
+#include "Body/Body.h"
 #include <cmath>
 #include "Emotion.h"
 
