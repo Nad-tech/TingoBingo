@@ -3,6 +3,7 @@
 #include <iostream>
 
 Elbow::Elbow(BodyDimensions& dimensions, std::string side) :
+    Shape(CARDBOARD_DARK),
     dimensions(dimensions),
     side(side),
     foreArm(dimensions, side)
@@ -46,8 +47,8 @@ void Elbow::Update(float dt)
 
 void Elbow::Draw() const 
 {
-    Shape::Draw();
     foreArm.Draw();
+    Shape::Draw();
 }
 
 void Elbow::SetTransform(MyTransform parentTransform)

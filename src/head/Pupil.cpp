@@ -89,6 +89,5 @@ void Pupil::SetRotation(float rotation)
 
 void Pupil::SetTransform(MyTransform parentTransform) 
 {
-    transform = parentTransform;
-    SetPosition(parentTransform.position);
+    Sprite::transform = MakeChildTransform(parentTransform, positionOffset);
 }

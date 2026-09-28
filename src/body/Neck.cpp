@@ -34,9 +34,8 @@ void Neck::Draw() const
 
 void Neck::SetTransform(MyTransform parentTransform)
 {
-    transform = MakeChildTransform(parentTransform, positionOffset);
-
-    Shape::SetTransform(transform);
+    Shape::transform = MakeChildTransform(parentTransform, positionOffset);
+    
     head.SetTransform(transform);
 }
 

@@ -13,7 +13,7 @@
 
 #include "raylib.h"
 
-constexpr int SCREEN_WIDTH = 700;
+constexpr int SCREEN_WIDTH = 1000;
 constexpr int SCREEN_HEIGHT = 700;
 constexpr char WINDOW_TITLE[] = "Tingo Bingo";
 constexpr int TARGET_FPS = 60;

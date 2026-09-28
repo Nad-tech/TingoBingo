@@ -6,7 +6,7 @@
 // Construct the upper arm using the shared body dimensions
 // and the side of the body that the arm belongs to.
 UpperArm::UpperArm(BodyDimensions& dimensions, std::string side) :
-    Shape(CARDBOARD),
+    Shape(CARDBOARD_LIGHT),
     dimensions(dimensions),
     side(side),
     elbow(dimensions, side)
@@ -17,7 +17,7 @@ UpperArm::UpperArm(BodyDimensions& dimensions, std::string side) :
 void UpperArm::Initialise()
 {
     dimensions.upperArmWidth = 50.0f;
-    dimensions.upperArmHeight = 150.0f;
+    dimensions.upperArmHeight = 120.0f;
 
     Shape::SetDimensions(
         dimensions.upperArmWidth,

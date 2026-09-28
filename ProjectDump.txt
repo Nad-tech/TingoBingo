@@ -171,6 +171,7 @@ private:
 
 #include "Shoulder.h"
 #include "BodyDimensions.h"
+#include "MyTransform.h"
 
 class Arms
 {
@@ -178,13 +179,15 @@ class Arms
         Arms(BodyDimensions& dimensions);
 
         void Initialise();
-        void Update(float dt);
-        void Draw() const;
-        void SetAnchorPoint(Vector2 anchorPoint);
-        void SetRotation(float rotation);
-        void SwingArm(std::string side, bool swing);
         void Shutdown();
 
+        void Update(float dt);
+        void Draw() const;
+        
+        void SetTransform(MyTransform parentTransform);
+        
+        void SwingArm(std::string side, bool swing);
+        
     private:
         BodyDimensions& dimensions;
 
@@ -204,28 +207,28 @@ class Arms
 
 #pragma once
 
-#include "Sprite.h"
+#include "Shape.h"
 #include "ForeArm.h"
 #include "BodyDimensions.h"
 
 #include <string>
 
-class Elbow : public Sprite
+class Elbow : public Shape
 {
     public:
         Elbow(BodyDimensions& dimensions, std::string side);
+        
         void Initialise() override;
-        void Update(float dt) override;
-        void Draw() const override;
         
-        int GetFrame() const;
-        
-        void SetRotation(float rotation);
+        void Update(float dt);
+        void Draw() const;
+
+        void SetTransform(MyTransform parentTransform);
 
     private:
         BodyDimensions& dimensions;
-        float localRotation = 0.0f;
-        float homeRotation = 0.0f;
+        Vector2 positionOffset;
+
         std::string side = "";
 
         ForeArm foreArm;
@@ -238,33 +241,34 @@ class Elbow : public Sprite
 
 #pragma once
 
+#include "BodyDimensions.h"
 #include <string>
 
-#include "Sprite.h"
+#include "Shape.h"
 #include "Hand.h"
 
-class ForeArm : public Sprite
+class ForeArm : public Shape
 {
     public:
-        void Initialise() override;
-        void Update(float dt) override;
-        void Draw() const override;
+        ForeArm(BodyDimensions& dimensions, std::string side);
         
-        int GetFrame() const;
+        void Initialise();
         
-        void SetRotation(float rotation);
-        void SetBodyDimensions(float width, float height, std::string side);
+        void Update(float dt);
+        void Draw() const;
+        
+        void SetTransform(MyTransform parentTransform);
 
     private:
-        Vector2 localPositionOffset = {0, 0};
+        BodyDimensions& dimensions;
+        Vector2 positionOffset;
+        
         float localRotation = 0.0f;
         float homeRotation = 0.0f;
-        float bodyWidth = 0;
-        float bodyHeight = 0;
+        
         std::string side = "";
 
-        Hand leftHand;
-        Hand rightHand;
+        Hand hand;
 };
 
 
@@ -274,27 +278,26 @@ class ForeArm : public Sprite
 
 #pragma once
 
-#include "Sprite.h"
+#include "BodyDimensions.h"
+#include "Shape.h"
 #include <string>
 
-class Hand : public Sprite
+class Hand : public Shape
 {
     public:
+        Hand(BodyDimensions& dimensions, std::string side);
+        
         void Initialise() override;
-        void Update(float dt) override;
-        void Draw() const override;
         
-        int GetFrame() const;
+        void Update(float dt);
+        void Draw() const;
         
-        void SetRotation(float rotation);
-        void SetBodyDimensions(float width, float height, std::string side);
+        void SetTransform(MyTransform parentTransform);
         
     private:
-        Vector2 localPositionOffset = {0, 0};
-        float localRotation = 0.0f;
-        float homeRotation = 0.0f;
-        float bodyWidth = 0;
-        float bodyHeight = 0;
+        BodyDimensions& dimensions;
+        Vector2 positionOffset;
+        
         std::string side = "";
 };
 
@@ -305,28 +308,27 @@ class Hand : public Sprite
 
 #pragma once 
 
-#include "Sprite.h"
+#include "Shape.h"
 #include "UpperArm.h"
 #include "BodyDimensions.h"
 
-class Shoulder : public Sprite
+class Shoulder : public Shape
 {
     public:
         Shoulder(BodyDimensions& dimensions, std::string side);
 
         void Initialise() override;
-        void Update(float dt) override;
-        void Draw() const override;
+
+        void Update(float dt);
+        void Draw() const;
         
-        int GetFrame() const;
-        void SetAnchorPoint(Vector2 anchorPoint);
-        void SetRotation(float rotation);
+        void SetTransform(MyTransform parentTransform);
 
         void SwingArm(float dt, float swingMinAngle, float swingMaxAngle);
 
     private:
         BodyDimensions& dimensions;
-        Vector2 armAnchorPosition;
+        Vector2 positionOffset = {0, 0};
 
         std::string side = "";
         UpperArm upperArm;
@@ -339,29 +341,27 @@ class Shoulder : public Sprite
 
 #pragma once
 #include <string>
-
-#include "Sprite.h"
+#include "Shape.h"
 #include "Body/Arms/Elbow.h"
 #include "BodyDimensions.h"
 
-class UpperArm : public Sprite
+class UpperArm : public Shape
 {
     public:
         UpperArm(BodyDimensions& dimensions, std::string side);
 
         void Initialise() override;
-        void Update(float dt) override;
-        void Draw() const override;
+     
+        void Update(float dt);
+        void Draw() const;
         
-        int GetFrame() const;
-        
-        void SetRotation(float rotation);
+        void SetTransform(MyTransform parentTransform);
 
         void SwingArm(float dt, float swingMinAngle, float swingMaxAngle);
 
     private:
         BodyDimensions& dimensions;
-        Vector2 armAnchorPosition;
+        Vector2 positionOffset;
         float localRotation = 0.0f;
         std::string side = "";
 
@@ -408,7 +408,7 @@ public:
     void PlayIdleBodyTransform(float dt);
     void PlayBodyWiggle(float dt);
     void PlayBodyBob(float dt);
-    //void SwingArm(std::string side, bool swing);
+    void SwingArm(std::string side, bool swing);
 
 private:
     BodyDimensions &dimensions;
@@ -478,9 +478,11 @@ class Antenna : public Sprite
         Antenna(BodyDimensions& dimensions);
         void Initialise() override;
         void Update(float dt) override;
+        void SetTransform(MyTransform parentTransform);
 
     private:
         BodyDimensions& dimensions;
+        Vector2 positionOffset;
         float antennaAnimationTimer = 0.0f;
         float nextAntennaAnimation = 3.0f;
         float topOfHeadOffset = 46.0f;
@@ -502,9 +504,11 @@ class Ears : public Sprite
         Ears(BodyDimensions& dimensions);
         void Initialise() override;
         void Update(float dt) override;
+        void SetTransform(MyTransform parentTransform);
 
     private:
         BodyDimensions& dimensions;
+        Vector2 positionOffset;
 
         float idleAnimationTimer = 0.0f;
         float nextIdleAnimation = 0.0;
@@ -525,11 +529,15 @@ class Eyebrows : public Sprite
 {
     public:
         Eyebrows(BodyDimensions& dimensions);
+        
         void Initialise() override;
-        void UpdateEyebrows(float dt, bool speaking, Emotion emotion);
-       
+
+        void Update(float dt, bool speaking, Emotion emotion);
+        void SetTransform(MyTransform transform);
+
     private:
         BodyDimensions& dimensions;
+        Vector2 positionOffset;
 
         float foreheadOffset = 65; 
 
@@ -551,16 +559,30 @@ class Eyebrows : public Sprite
 
 #include "Sprite.h"
 #include "BodyDimensions.h"
+#include "Pupils.h"
 
 class Eyes : public Sprite
 {
     public:
         Eyes(BodyDimensions& dimensions);
+        
         void Initialise() override;
+        void Shutdown();
+
         void Update(float dt) override;
+        void Draw() const;
+
+        void SetTransform(MyTransform parentTransform);
+
+        Pupils& GetPupils();
+
+        void LookAt(Vector2 point);
+        void LookForward();
 
     private:
         BodyDimensions& dimensions;
+        Vector2 positionOffset;
+        Pupils pupils;
 
         // TODO: make pupils child of Eyes
         float idleAnimationTimer = 0.0f;
@@ -614,7 +636,6 @@ public:
     void SetTransform(MyTransform parentTransform);
 
     void LookAt(Vector2 point);
-
     void LookForward();
     
 private:
@@ -629,7 +650,6 @@ private:
     Eyebrows eyebrows;
     Mouth mouth;
     Nose nose;
-    Pupils pupils;
 };
 
 
@@ -669,6 +689,7 @@ class Mouth : public Sprite
         Mouth(BodyDimensions& dimensions);
         void Initialise() override;
         void UpdateMouth(float dt, bool speaking, Emotion emotion);
+        void SetTransform(MyTransform parentTransform);
 
     private:
         BodyDimensions& dimensions;
@@ -677,7 +698,7 @@ class Mouth : public Sprite
         float frameTimer = 0.0f;
         const float FRAME_DURATION = 0.3f;
 
-        Vector2 localPositionOffset = {};
+        Vector2 positionOffset = {};
         float mouthDisplayOffset = 28.0f;
 };
 
@@ -699,11 +720,13 @@ class Nose : public Sprite
         void Initialise() override;
         void Update(float dt) override;
         void Draw() const override;
+        void SetTransform(MyTransform parentTransform);
 
     private:
         BodyDimensions& dimensions;
+        Vector2 positionOffset;
         float slightPositionOffset = 5.0f;
-        
+
         //Idle
         float localRotation = 0.0f;
         float idleTimer = 0.0f;
@@ -712,7 +735,7 @@ class Nose : public Sprite
         float noseRotateTimer = 0;
         
         //Wiggle
-        Vector2 homeAnchorPoint = {0,0};
+        Vector2 homePosition = {0,0};
         float wiggleTimer = 0.0f;
         bool noseWiggling = false;
         float nextNoseWiggle = 0;
@@ -740,6 +763,7 @@ class Nose : public Sprite
 #include "Sprite.h"
 #include <string>
 #include "BodyDimensions.h"
+#include "MyTransform.h"
 
 class Pupil : public Sprite
 {
@@ -749,9 +773,13 @@ class Pupil : public Sprite
         void Update(float dt) override;
         void SetSide(std::string side);
         float GetSideOffset();
+        void SetPosition(Vector2 position);
+        void SetRotation(float rotation);
+        void SetTransform(MyTransform parentTransform);
 
     private:
         BodyDimensions& dimensions;
+        Vector2 positionOffset;
 
         std::string side; // "left" or "right"
         float sideOffset = 40;
@@ -768,6 +796,7 @@ class Pupil : public Sprite
 #include "raylib.h"
 #include "Constants.h"
 #include "BodyDimensions.h"
+#include "MyTransform.h"
 
 
 //====================================================
@@ -785,54 +814,30 @@ class Pupils
 public:
     Pupils(BodyDimensions& dimensions);
 
-    // Load the pupil resources.
     void Initialise();
-
-    // Release the pupil resources.
     void Shutdown();
 
-    // Update both pupils.
     void Update(float dt);
-
-    // Draw both pupils.
     void Draw() const;
 
+    void SetTransform(MyTransform parentTransform);
 
-    // Set the anchor point of both pupils.
-    void SetAnchorPoint(Vector2 anchorPoint);
-
-    // Set the rotation of both pupils.
     void SetRotation(float rotation);
-
-
-    // Rotate a vector around the anchor point.
-    //
-    // Used when calculating pupil positions relative
-    // to the head's rotation.
     Vector2 RotateVector(Vector2 v, float rotation);
 
-
-    // Make both pupils look towards a target point.
     void LookAt(Vector2 point);
-
-    // Return both pupils to their normal forward-facing
-    // anchor point.
     void LookForward();
     
 private:
     BodyDimensions& dimensions;
+    MyTransform transform;
 
-    // The two independently rendered pupils.
     Pupil leftPupil;
     Pupil rightPupil;
 
     // Maximum distance a pupil can move from the centre of the eye.
     const float LOOK_DISTANCE = 10.0f;
 
-    // Current anchor point of the head in world space.
-    Vector2 headAnchorPoint = {0, 0};
-
-    // Current look offsets applied to each pupil.
     Vector2 leftLookOffset  = {0.0f, 0.0f};
     Vector2 rightLookOffset = {0.0f, 0.0f};
 };
@@ -844,24 +849,24 @@ private:
 
 #pragma once
 
+#include "BodyDimensions.h"
 #include "Sprite.h"
 
 class Foot : public Sprite
 {
     public:
         public:
+        explicit Foot(BodyDimensions& dimensions);
         void Initialise() override;
         void Update(float dt) override;
         void Draw() const;
         void SetRotation(float rotation);
-        void SetBodyDimensions(float bW, float bH);
         void SetAnchorPoint(Vector2 anchorPoint);
         void Shutdown();
 
     private:
+        BodyDimensions& dimensions;
         Vector2 localPositionOffset = {};
-        float bodyWidth = 0;
-        float bodyHeight = 0;
 };
 
 
@@ -871,27 +876,26 @@ class Foot : public Sprite
 
 #pragma once
 
+#include "BodyDimensions.h"
 #include "Sprite.h"
 #include "Shin.h"
 class Knee : public Sprite
 {
     public:
         public:
+        explicit Knee(BodyDimensions& dimensions);
         void Initialise() override;
         void Update(float dt) override;
         void Draw() const;
         void SetRotation(float rotation);
-        void SetBodyDimensions(float bW, float bH);
         void SetAnchorPoint(Vector2 anchorPoint);
         void Shutdown();
 
     private:
+        BodyDimensions& dimensions;
         Vector2 localPositionOffset = {};
-        float bodyWidth = 0;
-        float bodyHeight = 0;
 
-        Shin leftShin;
-        Shin rightShin;
+        Shin shin;
 };
 
 
@@ -901,19 +905,22 @@ class Knee : public Sprite
 
 #pragma once
 
-#include "body/Legs/Thigh.h"
+#include "Body/Legs/Thigh.h"
 #include "BodyDimensions.h"
+#include "Shape.h"
+#include "MyTransform.h"
 
-class Legs
+class Legs : Shape
 {
     public:
         Legs(BodyDimensions& dimensions);
         void Initialise();
         void Shutdown();
+        
         void Update(float dt);
         void Draw() const;
-        void SetAnchorPoint(Vector2 anchorPoint);
-        void SetRotation(float rotation);
+
+        void SetTransform(MyTransform parentTransform);
 
     private:
         BodyDimensions& dimensions;
@@ -927,6 +934,7 @@ class Legs
 =====================================
 
 #pragma once
+#include "BodyDimensions.h"
 #include "Sprite.h"
 
 #include "Foot.h"
@@ -934,22 +942,19 @@ class Shin : public Sprite
 {
     public:
         public:
+        explicit Shin(BodyDimensions& dimensions);
         void Initialise() override;
         void Update(float dt) override;
         void Draw() const;
         void SetRotation(float rotation);
-        void SetBodyDimensions(float bW, float bH);
         void SetAnchorPoint(Vector2 anchorPoint);
         void Shutdown();
 
     private:
+        BodyDimensions& dimensions;
         Vector2 localPositionOffset = {};
-        
-        float bodyWidth = 0;
-        float bodyHeight = 0;
 
-        Foot leftFoot;
-        Foot rightFoot;
+        Foot foot;
 };
 
 
@@ -959,23 +964,27 @@ class Shin : public Sprite
 
 #pragma once
 
-#include "Sprite.h"
+#include "Shape.h"
 #include "Knee.h"
 #include "BodyDimensions.h"
+#include "MyTransform.h"
 
 #include <string>
 
-class Thigh : public Sprite
+class Thigh : public Shape
 {
     public:
         Thigh(BodyDimensions& dimensions, std::string side);
         void Initialise() override;
+        
+        void Update(float dt);
         void Draw() const;
-        int GetFrame() const;
-        void SetRotation(float rotation);
 
+        void SetTransform(MyTransform parentTransform);
+        
     private:
         BodyDimensions& dimensions;
+        Vector2 positionOffset;
         std::string side;
         Knee knee;
 };
@@ -1001,12 +1010,14 @@ class Neck : public Shape
         void Shutdown();
         
         void Update(float dt, bool speaking, Emotion emotion);
+        void Draw() const override;
         
         void SetTransform(MyTransform parentTransform);
         
         Head& GetHead();
         
     private:
+        BodyDimensions& dimensions;
         Vector2 positionOffset;
         Head head;
 };
@@ -1017,23 +1028,24 @@ class Neck : public Shape
 =====================================
 
 #pragma once
-#include "body/Legs/Legs.h"
-#include "Sprite.h"
+#include "Body/Legs/Legs.h"
+#include "Shape.h"
 #include "BodyDimensions.h"
-class Pelvis : Sprite
+class Pelvis : Shape
 {
     public:
         Pelvis(BodyDimensions& dimensions);
         void Initialise() override;
-        void Update(float dt) override;
-        void Draw() const;
-        void SetRotation(float rotation);
-        void SetAnchorPoint(Vector2 anchorPoint);
         void Shutdown();
+        
+        void Update(float dt);
+        void Draw() const;
+        
+        void SetTransform(MyTransform parentTransform);
 
     private:
         BodyDimensions& dimensions;
-        Vector2 localPositionOffset = {};
+        Vector2 positionOffset = {};
         Legs legs;
 };
 
@@ -1127,12 +1139,12 @@ public:
 
 #include "raylib.h"
 
-constexpr int SCREEN_WIDTH = 700;
+constexpr int SCREEN_WIDTH = 1000;
 constexpr int SCREEN_HEIGHT = 700;
 constexpr char WINDOW_TITLE[] = "Tingo Bingo";
 constexpr int TARGET_FPS = 60;
 
-constexpr float SCALE = 0.7f;
+constexpr float SCALE = 0.8f;
 
 constexpr Color CARDBOARD_LIGHT = { 181, 150, 105, 255 };
 constexpr Color CARDBOARD = { 150, 120, 80, 255 };
@@ -1185,6 +1197,7 @@ private:
 	void HandleInput();
 	void Update(const float dt);
 	void Draw();
+	void DrawDebugOverlay() const;
 	
 	Robot robot;
 	Vector2 robotWorldPos;
@@ -1193,6 +1206,7 @@ private:
 	Object banana;
 	Texture2D background;
 	std::vector<Object*> objects; 
+	bool drawDebugOverlay = false;
 };
 
 
@@ -1223,14 +1237,270 @@ public:
 #pragma once
 
 #include "raylib.h"
+#include <cmath>
 
 struct MyTransform
 {
-    Vector2 position = {0,0};
-    Vector2 pivot = {0,0};
+    Vector2 position = { 0.0f, 0.0f };
+    Vector2 pivot = { 0.0f, 0.0f };
     float rotation = 0.0f;
     float scale = 1.0f;
 };
+
+
+// ------------------------------------------------------------
+// Create a child transform from a parent's transform.
+// ------------------------------------------------------------
+//
+// A child transform needs to know where it sits relative to
+// its parent, while still following the parent's movement,
+// rotation and scale.
+//
+// positionOffset describes the child's local position relative
+// to the parent joint.
+//
+// For example:
+//
+//     PARENT JOINT
+//          ●
+//          │
+//          │ positionOffset
+//          │
+//          ●
+//     CHILD CENTRE
+//
+// The child's position must be calculated in world space so
+// that it continues to follow the parent when the parent rotates.
+//
+inline MyTransform MakeChildTransform(
+    const MyTransform& parentTransform,
+    Vector2 positionOffset)
+{
+    MyTransform child;
+
+
+    // ------------------------------------------------------------
+    // 1. Convert the parent's rotation from degrees to radians.
+    // ------------------------------------------------------------
+    //
+    // Our transforms store angles in degrees because that is
+    // convenient for the rest of the robot.
+    //
+    // sinf() and cosf() expect radians.
+    //
+    float globalRadians = parentTransform.rotation * DEG2RAD;
+
+
+    // ------------------------------------------------------------
+    // 2. Find the vector from the parent's rotation centre
+    //    to the parent joint.
+    // ------------------------------------------------------------
+    //
+    // parentTransform.pivot points from the parent joint back
+    // toward the parent's rotation centre.
+    //
+    // We need the opposite direction when calculating the
+    // joint's offset from the parent's rotation centre.
+    //
+    // So we negate the pivot.
+    //
+    // Conceptually:
+    //
+    //     PARENT ROTATION CENTRE
+    //             ●
+    //             │
+    //             │
+    //             ▼
+    //         PARENT JOINT
+    //
+    // parentTransform.pivot points toward the rotation centre.
+    // Negating it gives the offset back to the parent joint.
+    //
+    Vector2 parentOffset =
+    {
+        -parentTransform.pivot.x,
+        -parentTransform.pivot.y
+    };
+
+
+    // ------------------------------------------------------------
+    // 3. Recover the parent's rotation centre.
+    // ------------------------------------------------------------
+    //
+    // parentTransform.position is the centre of the parent.
+    //
+    // parentTransform.pivot points from the parent centre back
+    // toward the parent's rotation centre.
+    //
+    // Therefore:
+    //
+    //     parent position + parent pivot
+    //
+    // gives us the parent's rotation centre.
+    //
+    // This is important because the parent joint must rotate
+    // around the parent's rotation centre when the parent turns.
+    //
+    Vector2 parentPosition =
+    {
+        parentTransform.position.x + parentTransform.pivot.x,
+        parentTransform.position.y + parentTransform.pivot.y
+    };
+
+
+    // ------------------------------------------------------------
+    // 4. Rotate the parent's offset around the parent.
+    // ------------------------------------------------------------
+    //
+    // At this point we know:
+    //
+    //     parentPosition
+    //         = parent's rotation centre
+    //
+    //     parentOffset
+    //         = vector from the parent's rotation centre
+    //           to the parent joint
+    //
+    // When the parent rotates, that vector must rotate as well.
+    //
+    // This is the standard 2D rotation formula:
+    //
+    //     x' = x * cos(angle) - y * sin(angle)
+    //     y' = x * sin(angle) + y * cos(angle)
+    //
+    // The result is the parent joint's new offset after the
+    // parent has rotated.
+    //
+    Vector2 rotatedParentOffset =
+    {
+        parentOffset.x * cosf(globalRadians) -
+        parentOffset.y * sinf(globalRadians),
+
+        parentOffset.x * sinf(globalRadians) +
+        parentOffset.y * cosf(globalRadians)
+    };
+
+
+    // ------------------------------------------------------------
+    // 5. Convert the rotated offset back into a world position.
+    // ------------------------------------------------------------
+    //
+    // rotatedParentOffset tells us where the parent joint is
+    // relative to the parent's rotation centre.
+    //
+    // Add that offset to the parent's rotation centre to get
+    // the joint's new world position.
+    //
+    Vector2 parentJointPosition =
+    {
+        parentPosition.x + rotatedParentOffset.x,
+        parentPosition.y + rotatedParentOffset.y
+    };
+
+
+    // ------------------------------------------------------------
+    // 6. Position the centre of the child.
+    // ------------------------------------------------------------
+    //
+    // We now know where the parent joint is.
+    //
+    // positionOffset tells us where the centre of the child is
+    // relative to that joint.
+    //
+    // So:
+    //
+    //     parent joint position
+    //             +
+    //     child position offset
+    //             =
+    //     child centre
+    //
+    // This keeps the child attached to the parent joint.
+    //
+    child.position =
+    {
+        parentJointPosition.x + positionOffset.x,
+        parentJointPosition.y + positionOffset.y
+    };
+
+
+    // ------------------------------------------------------------
+    // 7. Set the child's pivot to the parent joint.
+    // ------------------------------------------------------------
+    //
+    // child.position is the centre of the child.
+    //
+    // We don't want the child to rotate around its centre.
+    //
+    // We want it to rotate around the parent joint.
+    //
+    // positionOffset points:
+    //
+    //     parent joint → child centre
+    //
+    // Therefore the negative of positionOffset points:
+    //
+    //     child centre → parent joint
+    //
+    // That is exactly the pivot we need.
+    //
+    // Example:
+    //
+    //     positionOffset = (0, -100)
+    //
+    // means:
+    //
+    //     child centre is 100 units below the parent joint.
+    //
+    // Therefore:
+    //
+    //     pivot = (0, +100)
+    //
+    // places the rotation point at the parent joint.
+    //
+    child.pivot =
+    {
+        -positionOffset.x,
+        -positionOffset.y
+    };
+
+
+    // ------------------------------------------------------------
+    // 8. Inherit the parent's rotation.
+    // ------------------------------------------------------------
+    //
+    // The child is attached to the parent, so it follows the
+    // parent's rotation.
+    //
+    // Any additional local rotation can be added by the child
+    // after this transform has been created.
+    //
+    child.rotation = parentTransform.rotation;
+
+
+    // ------------------------------------------------------------
+    // 9. Inherit the parent's scale.
+    // ------------------------------------------------------------
+    //
+    // All parts of the robot use the same scale so that the
+    // hierarchy remains visually consistent.
+    //
+    child.scale = parentTransform.scale;
+
+
+    // ------------------------------------------------------------
+    // 10. Return the completed child transform.
+    // ------------------------------------------------------------
+    //
+    // At this point we have calculated everything the child needs:
+    //
+    //     position -> where the child centre is
+    //     pivot    -> where the parent joint is
+    //     rotation -> inherited from the parent
+    //     scale    -> inherited from the parent
+    //
+    return child;
+}
 
 
 =====================================
@@ -1290,7 +1560,7 @@ class Object : public Sprite
 #include "Emotion.h"
 #include "Object.h"
 #include "SfxController.h"
-#include "body/Body.h"
+#include "Body/Body.h"
 #include "BodyDimensions.h"
 #include "MyTransform.h"
 
@@ -1305,7 +1575,7 @@ public:
     void Draw() const;
     
     void SetTransform(MyTransform transform);
-    MyTransform GetTransform();
+    MyTransform GetTransform() const;
     
     void LookAt(Vector2 point);
     
@@ -1318,8 +1588,8 @@ public:
     
     void LookForward();
     
-    Vector2 GetSearchRayOrigin();
-    Vector2 GetSearchRayEnd();
+    Vector2 GetSearchRayOrigin() const;
+    Vector2 GetSearchRayEnd() const;
     
     void SetObjectPointers(std::vector<Object*> objects);
     void PlaySfx(std::string sound);
@@ -1378,8 +1648,8 @@ class RobotBrain
         void OnObjectPickedUp(Object& object);
         
         void Search(float dt);
-        Vector2 GetSearchRayOrigin();
-        Vector2 GetSearchRayEnd();
+        Vector2 GetSearchRayOrigin() const;
+        Vector2 GetSearchRayEnd() const;
 
         void SetObjectPointers(std::vector<Object*> objects);
 
@@ -1450,16 +1720,19 @@ class SfxController
 class Shape
 {
 protected:
-    BodyDimensions& dimensions;
     MyTransform transform;
+    float width = 0.0f;
+    float height = 0.0f;
+    Color color;
 
 public:
-    Shape(BodyDimensions& dimensions);
+    explicit Shape(Color color = CARDBOARD_DARK) : color(color) {}
     virtual void Initialise() = 0;
     void Shutdown();
     
     virtual void Draw() const;
     
+    void SetDimensions(float width, float height);
     void SetTransform(MyTransform transform);
 
     virtual ~Shape() = default;
@@ -1643,7 +1916,7 @@ private:
 #include <string>
 #include <atomic>
 
-class Speech
+class SpeechGenerator
 {
 public:
     static bool GenerateSpeech
@@ -1879,7 +2152,7 @@ void Animation::Stop()
 .\src\body\Arms\Arms.cpp
 =====================================
 
-#include "body/Arms/Arms.h"
+#include "Body/Arms/Arms.h"
 
 Arms::Arms(BodyDimensions& dimensions)
     : dimensions(dimensions),
@@ -1922,16 +2195,10 @@ void Arms::Draw() const
     rightShoulder.Draw();
 }
 
-void Arms::SetAnchorPoint(Vector2 anchorPoint)
+void Arms::SetTransform(MyTransform parentTransform)
 {
-    leftShoulder.SetAnchorPoint(anchorPoint);
-    rightShoulder.SetAnchorPoint(anchorPoint);
-}
-
-void Arms::SetRotation(float rotation) 
-{
-    leftShoulder.SetRotation(rotation);
-    rightShoulder.SetRotation(rotation);
+    leftShoulder.SetTransform(parentTransform);
+    rightShoulder.SetTransform(parentTransform);
 }
 
 void Arms::SwingArm(std::string side, bool swing)
@@ -1965,55 +2232,58 @@ void Arms::SwingArm(std::string side, bool swing)
 #include <iostream>
 
 Elbow::Elbow(BodyDimensions& dimensions, std::string side) :
+    Shape(CARDBOARD_DARK),
     dimensions(dimensions),
-    side(side)
+    side(side),
+    foreArm(dimensions, side)
 {}
 
 void Elbow::Initialise()
 {
-    dimensions.elbowWidth = 50.0f;
-    dimensions.elbowHeight = 50.0f;
+    dimensions.elbowWidth = 65.0f;
+    dimensions.elbowHeight = 65.0f;
 
-    //rotation = 0.0f;
+    Shape::SetDimensions(
+        dimensions.elbowWidth, 
+        dimensions.elbowHeight
+    );
 
-    //scale = SCALE;
+    foreArm.Initialise();
+
+    if(side == "left")
+    {
+        positionOffset = 
+        {
+            0,
+            -dimensions.upperArmHeight / 2.0f
+        };
+    }
+
+    if(side == "right")
+    {
+        positionOffset = 
+        {
+            0,
+            -dimensions.upperArmHeight / 2.0f
+        };
+    }
 }
 
 void Elbow::Update(float dt)
 {
-    Sprite::Update(dt);
+    foreArm.Update(dt);
 }
 
-void Elbow::Draw()const 
+void Elbow::Draw() const 
 {
-    /*Rectangle elbow = {
-        anchorPoint.x,
-        anchorPoint.y,
-        dimensions.elbowWidth * SCALE,
-        dimensions.elbowHeight * SCALE
-    };
-
-    Vector2 localPivot =
-    {
-        dimensions.elbowWidth / 2.0f,
-        0
-    };
-
-    DrawRectanglePro(
-        elbow,
-        localPivot,
-        rotation + localRotation,
-        WHITE
-    );*/
+    foreArm.Draw();
+    Shape::Draw();
 }
 
-int Elbow::GetFrame() const
+void Elbow::SetTransform(MyTransform parentTransform)
 {
-    return 0;
-}
-
-void Elbow::SetRotation(float rotation) {
-    //this->rotation = rotation;
+    Shape::transform = MakeChildTransform(parentTransform, positionOffset);
+    foreArm.SetTransform(transform);
 }
 
 
@@ -2023,14 +2293,51 @@ void Elbow::SetRotation(float rotation) {
 
 #include "Body/Arms/ForeArm.h"
 
-void ForeArm::Initialise(){}
-void ForeArm::Update(float dt){}
-void ForeArm::Draw() const {}
+ForeArm::ForeArm(BodyDimensions& dimensions, std::string side) :
+	Shape(CARDBOARD_LIGHT),
+    dimensions(dimensions),
+	side(side),
+	hand(dimensions, side)
+{}
 
-int ForeArm::GetFrame() const{}
+void ForeArm::Initialise()
+{
+    dimensions.forearmWidth = 50.0f;
+    dimensions.forearmHeight = 120.0f;
 
-void ForeArm::SetRotation(float rotation){}
-void ForeArm::SetBodyDimensions(float width, float height, std::string side){}
+    Shape::SetDimensions(
+        dimensions.forearmWidth,
+        dimensions.forearmHeight
+    );
+
+    hand.Initialise();
+
+    positionOffset = 
+    {
+        0,
+        -dimensions.forearmHeight / 2.0f
+    };
+}
+
+float rt = 0.0f;
+void ForeArm::Update(float dt)
+{
+    hand.Update(dt);
+    rt += dt*50.0f;
+}
+
+void ForeArm::Draw() const 
+{
+    Shape::Draw();
+    hand.Draw();
+}
+
+void ForeArm::SetTransform(MyTransform parentTransform)
+{
+    Shape::transform = MakeChildTransform(parentTransform, positionOffset);
+    transform.rotation += rt;
+    hand.SetTransform(Shape::transform);
+}
 
 
 =====================================
@@ -2039,21 +2346,52 @@ void ForeArm::SetBodyDimensions(float width, float height, std::string side){}
 
 #include "Body/Arms/Hand.h"
 
-void Hand::Initialise(){}
-void Hand::Update(float dt){}
-void Hand::Draw() const {}
-        
-int Hand::GetFrame() const{}
-        
-void Hand::SetRotation(float rotation){}
-void Hand::SetBodyDimensions(float width, float height, std::string side){}
+Hand::Hand(BodyDimensions& dimensions, std::string side) :
+	Shape(CARDBOARD_DARK),
+    dimensions(dimensions),
+	side(side)
+{}
+
+void Hand::Initialise()
+{
+    dimensions.handWidth = 55.0f;
+    dimensions.handHeight = 50.0f;
+
+    Shape::SetDimensions(
+        dimensions.handWidth,
+        dimensions.handHeight
+    );
+
+    positionOffset = {
+        0,
+        -dimensions.forearmHeight / 2.0f
+    };
+}
+
+float r = 0.0f;
+void Hand::Update(float dt)
+{
+    r += dt*50.0;
+}
+
+void Hand::Draw() const 
+{
+    Shape::Draw();
+}
+
+void Hand::SetTransform(MyTransform parentTransform)
+{
+    Shape::transform = MakeChildTransform(parentTransform, positionOffset);
+
+    
+}
 
 
 =====================================
 .\src\body\Arms\Shoulder.cpp
 =====================================
 
-#include "body/Arms/Shoulder.h"
+#include "Body/Arms/Shoulder.h"
 #include "Constants.h"
 #include <cmath>
 #include <iostream>
@@ -2061,206 +2399,60 @@ void Hand::SetBodyDimensions(float width, float height, std::string side){}
 
 // Construct a shoulder using the shared body dimensions
 // and the side of the body that the shoulder belongs to.
-Shoulder::Shoulder(BodyDimensions& dimensions, std::string side)
-    : dimensions(dimensions),
-      side(side),
-      upperArm(dimensions, side)
+Shoulder::Shoulder(BodyDimensions& dimensions, std::string side) :
+    Shape(CARDBOARD_DARK),
+    dimensions(dimensions),
+    side(side),
+    upperArm(dimensions, side)
 {
 }
 
-// Initialise the shoulder and its child upper arm.
 void Shoulder::Initialise()
 {
-    // Texture loading is currently disabled because
-    // the shoulder is being drawn as a rectangle while
-    // the body articulation system is being developed.
-    // texture = LoadTexture("assets/images/TingoBingo/body/Arm.png");
+    dimensions.shoulderWidth = 65.0f;
+    dimensions.shoulderHeight = 65.0f;
+    
+    Shape::SetDimensions(dimensions.shoulderWidth, dimensions.shoulderHeight);
 
-    // Sprite sheet layout.
-    // The shoulder currently consists of a single frame.
-    const int COLUMNS = 1;
-    const int ROWS = 1;
+    upperArm.Initialise();
 
-    // Set the shoulder dimensions.
-    // These values are stored in the shared BodyDimensions object
-    // so other body parts can use the shoulder's dimensions when
-    // calculating their own positions.
-    dimensions.shoulderWidth = 75.0f;
-    dimensions.shoulderHeight = 75.0f;
-
-    // Calculate the total number of animation frames.
-    const int TOTAL_FRAMES = COLUMNS * ROWS;
-
-    // Default shoulder rotation.
-    const float ROTATION = 0.0f;
-
-    // Duration of each animation frame.
-    const float FRAME_DURATION = 0.02f;
-
-    // Initialise the shoulder animation using the shared dimensions.
-    animation.Initialise
-    (
-        dimensions.shoulderWidth,
-        dimensions.shoulderHeight,
-        TOTAL_FRAMES,
-        COLUMNS,
-        FRAME_DURATION
-    );
-
-    // Set the initial rotation and drawing scale.
-    /*rotation = ROTATION;
-    scale = SCALE;
-
-    // Calculate the shoulder's local position relative to the body.
-    //
-    // The shoulder is positioned at the upper-left or upper-right
-    // edge of the body depending on which side it belongs to.
-    //
-    // The X position places the centre of the shoulder just outside
-    // the corresponding edge of the body.
-    //
-    // The Y position places the top of the shoulder at the top of
-    // the body.
-    if(side == "left")
+    if(side == "left") 
     {
-        anchorOffset = {
-            (dimensions.bodyWidth / 2.0f) +
-            (dimensions.shoulderWidth / 2.0f),
-
-            -dimensions.bodyHeight / 2.0f
-        }; 
-    }
-    else if(side == "right")
-    {
-        anchorOffset = {
-            (-dimensions.bodyWidth / 2.0f) -
-            (dimensions.shoulderWidth / 2.0f),
-
-            -dimensions.bodyHeight / 2.0f
-        }; 
+        positionOffset = {
+            dimensions.bodyWidth / 2.0f + dimensions.shoulderWidth / 2.0f,
+            dimensions.bodyHeight / 2.0f - dimensions.shoulderHeight / 2.0f
+        };
     }
 
-    // Initialise the upper arm.
-    // The upper arm is a child of the shoulder and receives
-    // the same shared BodyDimensions object.
-    upperArm.Initialise();*/
+    if(side == "right") 
+    {
+        positionOffset = {
+            -dimensions.bodyWidth / 2.0f - dimensions.shoulderWidth / 2.0f,
+            dimensions.bodyHeight / 2.0f - dimensions.shoulderHeight / 2.0f
+        };
+    }
 }
 
 // Update the shoulder and its child upper arm.
 void Shoulder::Update(float dt)
 {
-    // Update the base Sprite state, including animation
-    // and any rotation-related state.
-    Sprite::Update(dt);
-
-    // Start with the shoulder's local position relative to the body.
-   /* Vector2 offset = anchorOffset;
-
-    // Convert the shoulder's rotation from degrees to radians
-    // for use with the trigonometric functions.
-    float radians = rotation * DEG2RAD;
-
-    // Rotate the local offset around the body's anchor point.
-    //
-    // This allows the shoulder to maintain its correct position
-    // relative to the body when the body or shoulder is rotated.
-    Vector2 rotatedOffset =
-    {
-        (offset.x * cosf(radians) -
-         offset.y * sinf(radians)) * scale,
-
-        (offset.x * sinf(radians) +
-         offset.y * cosf(radians)) * scale
-    };
-
-    // Convert the rotated local position into a world-space position.
-    //
-    // armAnchorPosition represents the shoulder's actual position
-    // in the world and is used as the anchor point for the upper arm.
-    armAnchorPosition =
-    {
-        anchorPoint.x + rotatedOffset.x,
-        anchorPoint.y + rotatedOffset.y
-    };
-
-    // Pass the shoulder's world-space position to the upper arm.
-    //
-    // This establishes the parent-child relationship:
-    //
-    // Body -> Shoulder -> UpperArm
-    //
-    // The upper arm can now position itself relative to the shoulder
-    // instead of calculating its position directly from the body.
-    upperArm.SetAnchorPoint(armAnchorPosition);
-
-    // Update the child upper arm.
-    upperArm.Update(dt);*/
+    upperArm.Update(dt);
 }
 
-// Return the current shoulder animation frame.
-int Shoulder::GetFrame() const
+void Shoulder::Draw() const 
 {
-    return animation.GetFrame();
-}
-
-// Set the shoulder rotation and pass the rotation
-// down to the child upper arm.
-void Shoulder::SetRotation(float rotation)
-{
-    //Sprite::SetRotation(rotation);
-
-    // Keep the upper arm aligned with the shoulder's rotation.
-   // upperArm.SetRotation(rotation);
-}
-
-// Draw the shoulder and its child upper arm.
-void Shoulder::Draw() const
-{
-    // Define the shoulder's destination rectangle.
-    //
-    // armAnchorPosition represents the top-centre of the shoulder
-    // because the drawing origin is positioned at the top-centre below.
-    /*Rectangle shoulder =
-    {
-        armAnchorPosition.x,
-        armAnchorPosition.y,
-        dimensions.shoulderWidth * scale,
-        dimensions.shoulderHeight * scale
-    };
-    
-    // Set the drawing origin to the top-centre of the shoulder.
-    //
-    // This makes the shoulder rotate around its attachment point
-    // rather than around its centre.
-    Vector2 origin =
-    {
-        dimensions.shoulderWidth * scale / 2.0f,
-        0
-    };
-
-    // Draw the upper arm first so that the shoulder is rendered
-    // over the top of it.
     upperArm.Draw();
-
-    // Draw the shoulder on top of the upper arm.
-    DrawRectanglePro(
-        shoulder,
-        origin,
-        rotation,
-        BROWN
-    );*/
+    Shape::Draw();
 }
 
-// Set the body's anchor point used by the shoulder.
-//
-// The shoulder uses this point as the parent position from which
-// its local offset is calculated.
-void Shoulder::SetAnchorPoint(Vector2 anchorPoint)
+void Shoulder::SetTransform(MyTransform parentTransform)
 {
-    //this->anchorPoint = anchorPoint;
+    transform = MakeChildTransform(parentTransform, positionOffset);
+
+    Shape::SetTransform(transform);
+    upperArm.SetTransform(transform);
 }
 
-// Start or control the upper arm's swinging movement.
 void Shoulder::SwingArm(
     float dt,
     float swingMinAngle,
@@ -2275,181 +2467,70 @@ void Shoulder::SwingArm(
 .\src\body\Arms\UpperArm.cpp
 =====================================
 
-#include "body/Arms/UpperArm.h"
+#include "Body/Arms/UpperArm.h"
 #include "Constants.h"
 #include <cmath>
 #include <iostream>
 
 // Construct the upper arm using the shared body dimensions
 // and the side of the body that the arm belongs to.
-UpperArm::UpperArm(BodyDimensions& dimensions, std::string side)
-    : dimensions(dimensions),
-      side(side),
-      elbow(dimensions, side)
+UpperArm::UpperArm(BodyDimensions& dimensions, std::string side) :
+    Shape(CARDBOARD_LIGHT),
+    dimensions(dimensions),
+    side(side),
+    elbow(dimensions, side)
 {
 }
 
 // Initialise the upper arm and its animation.
 void UpperArm::Initialise()
 {
-    // Load the upper arm texture.
-    texture = LoadTexture("assets/images/TingoBingo/body/Arm.png");
+    dimensions.upperArmWidth = 50.0f;
+    dimensions.upperArmHeight = 120.0f;
 
-    // Sprite sheet layout.
-    // The upper arm currently consists of a single frame.
-    const int COLUMNS = 1;
-    const int ROWS = 1;
-
-    // Calculate the dimensions of a single animation frame
-    // from the loaded texture.
-    dimensions.upperArmWidth = texture.width / COLUMNS;
-    dimensions.upperArmHeight = texture.height / ROWS;
-
-    // Debug output for checking the calculated dimensions.
-     std::cout << dimensions.upperArmWidth << " * "
-               << dimensions.upperArmHeight << "\n";
-
-    // Calculate the total number of animation frames.
-    const int TOTAL_FRAMES = COLUMNS * ROWS;
-
-    // Animation settings.
-    const float ROTATION = 0.0f;
-    const float FRAME_DURATION = 0.02f;
-
-    // Initialise the animation using the calculated frame dimensions.
-    animation.Initialise
-    (
+    Shape::SetDimensions(
         dimensions.upperArmWidth,
-        dimensions.upperArmHeight,
-        TOTAL_FRAMES,
-        COLUMNS,
-        FRAME_DURATION
+        dimensions.upperArmHeight
     );
 
-    // Set the initial rotation and drawing scale.
-    /*rotation = ROTATION;
-    scale = SCALE;
+    elbow.Initialise();
 
-    // Position the upper arm relative to its parent shoulder.
+    // positionOffset describes where the centre of the upper arm
+    // is relative to the shoulder.
     //
-    // The Shoulder passes its world-space position to the
-    // UpperArm through SetAnchorPoint().
+    // The shoulder is at the top of the upper arm, so the centre
+    // of the arm is half its height below the shoulder.
     //
-    // localPositionOffset therefore represents the upper arm's
-    // position relative to the shoulder rather than the body.
+    // This gives us:
     //
-    // X:
-    //     Move the anchor to the centre of the upper arm.
-    //
-    // Y:
-    //     Position the upper arm below the shoulder using the
-    //     shared shoulder height.
-    anchorOffset = {
-        dimensions.upperArmWidth / 2.0f,
-        dimensions.shoulderHeight / 2.0f
-    };
-
-    elbow.Initialise();*/
-}
-
-// Update the upper arm and its animation state.
-void UpperArm::Update(float dt)
-{
-    Sprite::Update(dt);
-
-    /*Vector2 offset = anchorOffset;
-
-    float radians = rotation * DEG2RAD;
-
-    Vector2 rotatedOffset =
-    {
-        (offset.x * cosf(radians) -
-         offset.y * sinf(radians)),
-
-        offset.x * sinf(radians) +
-        offset.y * cosf(radians)
-    };
-
-    armAnchorPosition =
-    {
-        anchorPoint.x + rotatedOffset.x * scale,
-        anchorPoint.y + rotatedOffset.y * scale
-    };
-
-    Vector2 elbowOffset =
+    //             SHOULDER
+    //                 ●
+    //                 │
+    //                 │  positionOffset
+    //                 │
+    //                 ●
+    //             ARM CENTRE
+    positionOffset =
     {
         0,
-        dimensions.upperArmHeight
+        -dimensions.upperArmHeight / 2.0f
     };
-
-    Vector2 rotatedElbowOffset =
-    {
-        elbowOffset.x * cosf(radians) -
-        elbowOffset.y * sinf(radians),
-
-        elbowOffset.x * sinf(radians) +
-        elbowOffset.y * cosf(radians)
-    };
-
-    Vector2 elbowAnchorPosition =
-    {
-        armAnchorPosition.x + rotatedElbowOffset.x * scale,
-        armAnchorPosition.y + rotatedElbowOffset.y * scale
-    };
-
-    //elbow.SetAnchorPoint(elbowAnchorPosition);
-
-    elbow.Update(dt);*/
 }
 
-// Return the current animation frame of the upper arm.
-int UpperArm::GetFrame() const
+// Update the upper arm and its child elbow.
+void UpperArm::Update(float dt)
 {
-    return animation.GetFrame();
+    elbow.Update(dt);
 }
 
-// Set the upper arm's base rotation.
-void UpperArm::SetRotation(float rotation)
-{
-   // Sprite::SetRotation(rotation);
-    elbow.SetRotation(rotation + localRotation);
-}
 
 // Draw the upper arm.
 void UpperArm::Draw() const
 {
-    // Get the source rectangle for the current animation frame.
-    Rectangle source = animation.GetSourceRectangle();
-/*
-    // Calculate the scaled dimensions of the current frame.
-    float width = animation.GetFrameWidth() * scale;
-    float height = animation.GetFrameHeight() * scale;
-
-    Rectangle destination =
-    {
-        armAnchorPosition.x - width / 2.0f,
-        armAnchorPosition.y,
-        width,
-        height
-    };
-
-    Vector2 origin =
-    {
-        width / 2.0f,
-        0
-    };
-
-    DrawTexturePro(
-        texture,
-        source,
-        destination,
-        origin,
-        rotation + localRotation,
-        WHITE
-    );
-
-    elbow.Draw();*/
+    Shape::Draw();
+    elbow.Draw();
 }
+
 
 // Swing the upper arm between the supplied minimum
 // and maximum angles.
@@ -2459,44 +2540,56 @@ void UpperArm::SwingArm(
     float swingMaxAngle
 )
 {
-    // Advance the swing timer based on elapsed time
-    // and the configured swing speed.
+    // Advance the animation timer.
     swingTime += dt * SWING_SPEED;
 
-    // Keep the timer within one complete sine-wave cycle.
+    // Keep the timer inside one complete sine-wave cycle.
     if (swingTime >= 2.0f * PI)
     {
         swingTime -= 2.0f * PI;
     }
 
-    // Normalised value used to convert the sine wave
-    // into the requested swing angle range.
+    // sinf() produces a value between -1 and +1.
+    //
+    // Convert that into a value between 0 and 1.
+    //
+    // This gives us a percentage that represents where we are
+    // between the minimum and maximum swing angles.
     float unitAngle = 0;
 
-    // Reverse the swing direction for the left arm.
+    // The left arm uses the normal direction of the sine wave.
     if(side == "left")
-    {
-        unitAngle = -(sinf(swingTime) + 1.0f) / 2.0f;
-    }
-
-    // Use the normal swing direction for the right arm.
-    if(side == "right")
     {
         unitAngle = (sinf(swingTime) + 1.0f) / 2.0f;
     }
 
-    // Convert the normalised sine-wave value into the
-    // requested rotation range.
+    // The right arm swings in the opposite direction.
+    if(side == "right")
+    {
+        unitAngle = -(sinf(swingTime) + 1.0f) / 2.0f;
+    }
+
+    // Convert the 0-to-1 value into the requested angle range.
     //
     // For example:
     //
-    // swingMinAngle = 0
-    // swingMaxAngle = 180
+    //     unitAngle = 0   -> swingMinAngle
+    //     unitAngle = 0.5 -> halfway between the two
+    //     unitAngle = 1   -> swingMaxAngle
     //
-    // produces a smooth swing between 0 and 180 degrees.
+    // The result becomes the arm's local rotation.
     localRotation =
         swingMinAngle +
         unitAngle * (swingMaxAngle - swingMinAngle);
+}
+
+
+void UpperArm::SetTransform(MyTransform parentTransform)
+{
+    Shape::transform = MakeChildTransform(parentTransform, positionOffset);
+    Shape::transform.rotation += localRotation;
+
+    elbow.SetTransform(Shape::transform);
 }
 
 
@@ -2504,7 +2597,7 @@ void UpperArm::SwingArm(
 .\src\body\Body.cpp
 =====================================
 
-#include "body/Body.h"
+#include "Body/Body.h"
 #include <cmath>
 #include "Emotion.h"
 
@@ -2554,16 +2647,18 @@ void Body::Update(float dt, bool speaking, Emotion emotion)
     bodyBase.Update(dt);
     arms.Update(dt);
     pelvis.Update(dt);
-    
+
     PlayIdleBodyTransform(dt);
+    SetTransform(transform);
 }
 
 void Body::Draw() const
 {
-    //pelvis.Draw();
+    
     bodyBase.Draw();
-    //arms.Draw();
+    arms.Draw();
     neck.Draw();
+    pelvis.Draw();
 }
 
 void Body::SetTransform(MyTransform transform)
@@ -2571,8 +2666,8 @@ void Body::SetTransform(MyTransform transform)
     this->transform = transform;
     bodyBase.SetTransform(this->transform);
     neck.SetTransform(this->transform);
-    //arms.SetTransform(this->transform);
-    //pelvis.SetTransform(this->transform);
+    arms.SetTransform(this->transform);
+    pelvis.SetTransform(this->transform);
 }
 
 void Body::PlayIdleBodyTransform(float dt)
@@ -2608,8 +2703,6 @@ void Body::PlayBodyWiggle(float dt)
             bodyWiggling = false;
             transform.rotation = homeTransform.rotation;
         }
-        bodyBase.SetTransform(transform);
-        neck.SetTransform(transform);
     }
 }
 
@@ -2635,9 +2728,6 @@ void Body::PlayBodyBob(float dt)
 
     transform.position.x = homeTransform.position.x + bodyBobOffset.x;
     transform.position.y = homeTransform.position.y + bodyBobOffset.y;
-
-    bodyBase.SetTransform(transform);
-    neck.SetTransform(transform);
 }
 
 Head& Body::GetHead()
@@ -2645,11 +2735,10 @@ Head& Body::GetHead()
     return neck.GetHead();
 }
 
-/*
 void Body::SwingArm(std::string side,  bool swing)
 {
     arms.SwingArm(side, swing);
-}*/
+}
 
 
 
@@ -2658,7 +2747,7 @@ void Body::SwingArm(std::string side,  bool swing)
 .\src\body\BodyBase.cpp
 =====================================
 
-#include "body/BodyBase.h"
+#include "Body/BodyBase.h"
 
 #include "Constants.h"
 #include <iostream>
@@ -2703,11 +2792,14 @@ void BodyBase::Initialise()
 
 #include "Body/Legs/Foot.h"
 
+Foot::Foot(BodyDimensions& dimensions) :
+	dimensions(dimensions)
+{}
+
 void Foot::Initialise(){}
 void Foot::Update(float dt){}
 void Foot::Draw() const{}
 void Foot::SetRotation(float rotation){}
-void Foot::SetBodyDimensions(float bW, float bH){}
 void Foot::SetAnchorPoint(Vector2 anchorPoint){}
 void Foot::Shutdown(){}
 
@@ -2718,11 +2810,15 @@ void Foot::Shutdown(){}
 
 #include "Body/Legs/Knee.h"
 
+Knee::Knee(BodyDimensions& dimensions) :
+	dimensions(dimensions),
+	shin(dimensions)
+{}
+
 void Knee::Initialise(){}
 void Knee::Update(float dt){}
 void Knee::Draw() const{}
 void Knee::SetRotation(float rotation){}
-void Knee::SetBodyDimensions(float bW, float bH){}
 void Knee::SetAnchorPoint(Vector2 anchorPoint){}
 void Knee::Shutdown(){}
 
@@ -2731,7 +2827,7 @@ void Knee::Shutdown(){}
 .\src\body\Legs\Legs.cpp
 =====================================
 
-#include "body/Legs/Legs.h"
+#include "Body/Legs/Legs.h"
 
 Legs::Legs(BodyDimensions& dimensions) :
     dimensions(dimensions),
@@ -2763,16 +2859,10 @@ void Legs::Draw() const
     rightThigh.Draw();
 }
 
-void Legs::SetAnchorPoint(Vector2 anchorPoint)
+void Legs::SetTransform(MyTransform parentTransform)
 {
-    //leftThigh.SetAnchorPoint(anchorPoint);
-    //rightThigh.SetAnchorPoint(anchorPoint); 
-}
-
-void Legs::SetRotation(float rotation)
-{
-    leftThigh.SetRotation(rotation);
-    rightThigh.SetRotation(rotation);
+    leftThigh.SetTransform(parentTransform);
+    rightThigh.SetTransform(parentTransform);
 }
 
 
@@ -2783,11 +2873,15 @@ void Legs::SetRotation(float rotation)
 
 #include "Body/Legs/Shin.h"
 
+Shin::Shin(BodyDimensions& dimensions) :
+	dimensions(dimensions),
+	foot(dimensions)
+{}
+
 void Shin::Initialise(){}
 void Shin::Update(float dt){}
 void Shin::Draw() const{}
 void Shin::SetRotation(float rotation){}
-void Shin::SetBodyDimensions(float bW, float bH){}
 void Shin::SetAnchorPoint(Vector2 anchorPoint){}
 void Shin::Shutdown(){}
 
@@ -2796,99 +2890,64 @@ void Shin::Shutdown(){}
 .\src\body\Legs\Thigh.cpp
 =====================================
 
-#include "body/Legs/Thigh.h"
+#include "Body/Legs/Thigh.h"
 #include "Constants.h"
 #include <string>
 
 // Load the head sprite and initialise its animation.
 Thigh::Thigh(BodyDimensions& dimensions, std::string side) :
+    Shape(CARDBOARD),
     dimensions(dimensions),
-    side(side)
+    side(side),
+    knee(dimensions)
 {}
 
 void Thigh::Initialise()
 {
-    //texture = LoadTexture("assets/images/TingoBingo/body/Leg.png");
-
-    // Sprite sheet layout.
-    const int COLUMNS = 1;
-    const int ROWS = 1;
-
     // Calculate the size of a single animation frame.
-    dimensions.thighWidth = 80.0f; //texture.width / COLUMNS;
-    dimensions.thighHeight = 250.0f; //texture.height / ROWS;
+    dimensions.thighWidth = 80.0f; 
+    dimensions.thighHeight = 250.0f;
 
-    const int TOTAL_FRAMES = COLUMNS * ROWS;
-
-    // Animation settings.
-    //const float ROTATION = 0.0f;
-    const float FRAME_DURATION = 0.02f;
-
-    // Initialise the animation using the sprite sheet information.
-    animation.Initialise
-    (
-        dimensions.thighWidth,
-        dimensions.thighHeight,
-        TOTAL_FRAMES,
-        COLUMNS,
-        FRAME_DURATION
+    Shape::SetDimensions(
+        dimensions.thighWidth, 
+        dimensions.thighHeight
     );
-
-    /*
-    rotation = ROTATION;
-    scale = SCALE;
 
     if(side == "left")
     {
-        anchorOffset = {
-            dimensions.bodyWidth / 2.0f - dimensions.thighWidth / 2.0f, 
-            dimensions.bodyHeight + dimensions.pelvisHeight / 2.0f
+        positionOffset = {
+            dimensions.pelvisWidth / 2.0f - 
+            dimensions.thighWidth / 2.0f,
+            -dimensions.thighHeight / 2.0f
         };
     }
-    else if(side == "right")
+
+    if(side == "right")
     {
-        anchorOffset = {
-            -dimensions.bodyWidth / 2.0f + dimensions.thighWidth / 2.0f, 
-            dimensions.bodyHeight + dimensions.pelvisHeight / 2.0f
+        positionOffset = {
+            -dimensions.pelvisWidth / 2.0f + 
+            dimensions.thighWidth / 2.0f,
+            -dimensions.thighHeight / 2.0f
         };
-    }*/
+    }
+    
+
 }
 
-// Return the current head animation frame.
-int Thigh::GetFrame() const
+void Thigh::Update(float dt)
 {
-    return animation.GetFrame();
-}
-
-// Apply a rotation transform to the head sprite.
-void Thigh::SetRotation(float rotation)
-{
-    //Sprite::SetRotation(rotation);
+    knee.Update(dt);
 }
 
 void Thigh::Draw() const
-{/*
-    Rectangle thigh =
-    {
-        anchorPoint.x,
-        anchorPoint.y,
-        dimensions.thighWidth * scale,
-        dimensions.thighHeight * scale
-    };
+{
+    Shape::Draw();
+}
 
-    Vector2 drawAnchorOffset = {
-        dimensions.thighWidth * scale / 2.0f - anchorOffset.x * scale,
-        dimensions.thighHeight * scale / 2.0f - anchorOffset.y * scale
-    };
-
-    DrawRectanglePro(
-        thigh,
-        drawAnchorOffset,
-        rotation,
-        CARDBOARD_DARK
-    ); 
-
-    DrawCircle(anchorPoint.x, anchorPoint.y, 10, RED);*/
+void Thigh::SetTransform(MyTransform parentTransform)
+{
+    transform = MakeChildTransform(parentTransform, positionOffset);
+    knee.SetAnchorPoint({0,0});
 }
 
 
@@ -2899,8 +2958,8 @@ void Thigh::Draw() const
 #include "Body/Neck.h"
 #include "raylib.h"
 
-Neck::Neck(BodyDimensions& dimensions) : 
-    Shape(dimensions),
+Neck::Neck(BodyDimensions& dimensions) :
+    dimensions(dimensions),
     positionOffset(),
     head(dimensions)
 {
@@ -2910,6 +2969,7 @@ void Neck::Initialise()
 {
     dimensions.neckWidth = 50.0f;
     dimensions.neckHeight = 30.0f;
+    SetDimensions(dimensions.neckWidth, dimensions.neckHeight);
 
     head.Initialise();
 
@@ -2923,22 +2983,15 @@ void Neck::Update(float dt, bool speaking, Emotion emotion) {
     head.Update(dt, speaking, emotion);
 }
 
+void Neck::Draw() const
+{
+    Shape::Draw();
+    head.Draw();
+}
+
 void Neck::SetTransform(MyTransform parentTransform)
 {
-    transform.position =
-    {
-        parentTransform.position.x + positionOffset.x,
-        parentTransform.position.y + positionOffset.y
-    };
-
-    transform.pivot =
-    {
-        0,
-        -positionOffset.y
-    };
-    
-    transform.rotation = parentTransform.rotation;
-    transform.scale = parentTransform.scale;
+    transform = MakeChildTransform(parentTransform, positionOffset);
 
     Shape::SetTransform(transform);
     head.SetTransform(transform);
@@ -2968,65 +3021,35 @@ Pelvis::Pelvis(BodyDimensions& dimensions) :
 {}
 void Pelvis::Initialise()
 {
-    dimensions.pelvisWidth = 260.0f;
+    dimensions.pelvisWidth = 240.0f;
     dimensions.pelvisHeight = 70.0f;
-
-    /*rotation = 0;
-    scale = SCALE;
-
-    anchorOffset = {
-        0,
-        dimensions.bodyHeight / 2.0f +
-        dimensions.pelvisHeight / 2.0f
-    };*/
+    SetDimensions(dimensions.pelvisWidth, dimensions.pelvisHeight);
 
     legs.Initialise();
+
+    positionOffset = {
+        0,
+        -dimensions.bodyHeight / 2.0f - dimensions.pelvisHeight / 2.0f
+    };
 }
 
 void Pelvis::Update(float dt)
 {
-    Sprite::Update(dt);
     legs.Update(dt);
 }
 
-void Pelvis::Draw() const
+void Pelvis::Draw() const 
 {
-    /*Rectangle pelvis =
-    {
-        anchorPoint.x,
-        anchorPoint.y,
-        dimensions.pelvisWidth * scale,
-        dimensions.pelvisHeight * scale
-    };
-
-    Vector2 drawAnchorOffset = {
-        dimensions.pelvisWidth * scale / 2.0f - anchorOffset.x * scale,
-        dimensions.pelvisHeight * scale / 2.0f - anchorOffset.y * scale
-    };
-
     legs.Draw();
-
-    DrawRectanglePro(
-        pelvis,
-        drawAnchorOffset,
-        rotation,
-        BROWN
-    );*/
-    //DrawCircle(anchorPoint.x + anchorOffset.x*scale, anchorPoint.y + anchorOffset.y*scale, 10, RED);
+    Shape::Draw();
 }
 
-void Pelvis::SetRotation(float rotation)
+void Pelvis::SetTransform(MyTransform parentTransform)
 {
-    //this->rotation = rotation;
-    legs.SetRotation(rotation);
+    transform = MakeChildTransform(parentTransform, positionOffset);
 
-}
-
-void Pelvis::SetAnchorPoint(Vector2 anchorPoint)
-{
-    //this->anchorPoint = anchorPoint;
-
-    legs.SetAnchorPoint(anchorPoint);
+    Shape::SetTransform(transform);
+    legs.SetTransform(transform);
 }
 
 void Pelvis::Shutdown()
@@ -3148,6 +3171,11 @@ void Game::Initialise()
 // Process keyboard input.
 void Game::HandleInput()
 {
+	if (IsKeyPressed(KEY_F3))
+	{
+		drawDebugOverlay = !drawDebugOverlay;
+	}
+
 	if (input.SpacePressed())
 	{
 		robot.Speak("Hello Alby, my name is tingo bingo");
@@ -3214,6 +3242,53 @@ void Game::Draw()
 	if(drawGrid) {
 		DrawDebugGrid();
 	}
+
+	if (drawDebugOverlay)
+	{
+		DrawDebugOverlay();
+	}
+}
+
+void Game::DrawDebugOverlay() const
+{
+	MyTransform robotTransform = robot.GetTransform();
+
+	Vector2 robotScreenPosition =
+	{
+		SCREEN_WIDTH / 2.0f + robotTransform.position.x * robotTransform.scale,
+		SCREEN_HEIGHT / 2.0f - robotTransform.position.y * robotTransform.scale
+	};
+
+	Vector2 pivotScreenPosition =
+	{
+		robotScreenPosition.x + robotTransform.pivot.x * robotTransform.scale,
+		robotScreenPosition.y - robotTransform.pivot.y * robotTransform.scale
+	};
+
+	Vector2 searchOrigin = robot.GetSearchRayOrigin();
+	Vector2 searchEnd = robot.GetSearchRayEnd();
+
+	DrawLineEx(searchOrigin, searchEnd, 2.0f, YELLOW);
+	DrawCircleV(searchOrigin, 6.0f, ORANGE);
+	DrawCircleV(searchEnd, 6.0f, RED);
+
+	DrawCircleV(robotScreenPosition, 7.0f, GREEN);
+	DrawCircleV(pivotScreenPosition, 5.0f, MAGENTA);
+	DrawLineEx(
+		robotScreenPosition,
+		{
+			robotScreenPosition.x + cosf(robotTransform.rotation * DEG2RAD) * 40.0f,
+			robotScreenPosition.y - sinf(robotTransform.rotation * DEG2RAD) * 40.0f
+		},
+		2.0f,
+		BLUE
+	);
+
+	DrawRectangle(8, 8, 285, 92, Fade(BLACK, 0.75f));
+	DrawText("F3 Debug Overlay", 18, 16, 18, WHITE);
+	DrawText("Green: robot position", 18, 39, 14, GREEN);
+	DrawText("Magenta: transform pivot", 18, 57, 14, MAGENTA);
+	DrawText("Yellow: search ray", 18, 75, 14, YELLOW);
 }
 
 // Release resources before exiting.
@@ -3286,9 +3361,6 @@ void Antenna::Initialise()
     dimensions.antennaHeight = texture.height / ROWS;
 
     const int TOTAL_FRAMES = COLUMNS * ROWS;
-
-    // Animation settings.
-    const float ROTATION = 0.0f;
     const float FRAME_DURATION = 0.06f;
 
     // Initialise the animation using the sprite sheet information.
@@ -3301,18 +3373,10 @@ void Antenna::Initialise()
         FRAME_DURATION
     );
 
-    //rotation = ROTATION;
-    //scale = SCALE;
-
-    /*anchorOffset =
-    {
-        dimensions.antennaWidth / 2.0f,
-        dimensions.antennaHeight / 2.0f
-        + dimensions.bodyHeight / 2.0f
-        + dimensions.headHeight / 2.0f
-        + dimensions.neckHeight
-        + topOfHeadOffset
-    };*/
+    positionOffset = {
+        0,
+        topOfHeadOffset
+    };
 }
 
 void Antenna::Update(float dt)
@@ -3330,6 +3394,11 @@ void Antenna::Update(float dt)
         antennaAnimationTimer = 0.0f;
         nextAntennaAnimation = GetRandomValue(1000, 5000) / 1000.0f;
     }
+}
+
+void Antenna::SetTransform(MyTransform parentTransform)
+{
+    transform = MakeChildTransform(parentTransform, positionOffset);
 }
 
 
@@ -3380,17 +3449,7 @@ void Ears::Initialise()
         FRAME_DURATION
     );
 
-    /*rotation = ROTATION;
-    scale = SCALE;
-
-    anchorOffset =
-    {
-        dimensions.earsWidth / 2.0f,
-        dimensions.earsHeight / 2.0f
-        + dimensions.bodyHeight / 2.0f
-        + dimensions.headHeight / 2.0f
-        + dimensions.neckHeight
-    };*/
+    positionOffset = {0, 0};
 }
 
 void Ears::Update(float dt)
@@ -3408,6 +3467,11 @@ void Ears::Update(float dt)
         idleAnimationTimer = 0.0f;
         nextIdleAnimation = GetRandomValue(1000, 5000) / 1000.0f;
     }
+}
+
+void Ears::SetTransform(MyTransform parentTransform)
+{
+    transform = MakeChildTransform(parentTransform, positionOffset);
 }
 
 
@@ -3444,9 +3508,6 @@ void Eyebrows::Initialise()
     dimensions.eyeBrowsHeight = texture.height / ROWS;
 
     const int TOTAL_FRAMES = COLUMNS * ROWS;
-
-    // Configure the eyebrow animation timing and orientation.
-    const float ROTATION = 0.0f;
     const float FRAME_DURATION = 0.3f;
 
     // Create the animation from the sprite sheet.
@@ -3459,23 +3520,13 @@ void Eyebrows::Initialise()
         FRAME_DURATION
     );
 
-    // Apply the default sprite transform.
-    /*rotation = ROTATION;
-    scale = SCALE;
-
-    anchorOffset =
-    {
-        dimensions.eyeBrowsWidth / 2.0f,
-
-        dimensions.eyeBrowsHeight / 2.0f
-        + dimensions.bodyHeight / 2.0f
-        + dimensions.headHeight / 2.0f
-        + dimensions.neckHeight
-        + foreheadOffset
-    };*/
+    positionOffset = {
+        0,
+        foreheadOffset
+    };
 }
 
-void Eyebrows::UpdateEyebrows(float dt, bool speaking, Emotion emotion)
+void Eyebrows::Update(float dt, bool speaking, Emotion emotion)
 {
     // Update the base sprite behaviour before handling eyebrow animation.
     Sprite::Update(dt);
@@ -3544,6 +3595,12 @@ void Eyebrows::UpdateEyebrows(float dt, bool speaking, Emotion emotion)
     }
 }
 
+void Eyebrows::SetTransform(MyTransform parentTransform) 
+{
+    transform = MakeChildTransform(parentTransform, positionOffset);
+    Sprite::SetTransform(transform);
+}
+
 
 =====================================
 .\src\head\Eyes.cpp
@@ -3560,8 +3617,11 @@ void Eyebrows::UpdateEyebrows(float dt, bool speaking, Emotion emotion)
 
 #include "Body/Head/Eyes.h"
 #include "Constants.h"
+#include <cmath>
 
-Eyes::Eyes(BodyDimensions& dimensions) : dimensions(dimensions)
+Eyes::Eyes(BodyDimensions& dimensions) : 
+    dimensions(dimensions),
+    pupils(dimensions)
 {
 }
 
@@ -3578,12 +3638,7 @@ void Eyes::Initialise()
     dimensions.eyesWidth = texture.width / COLUMNS;
     dimensions.eyesHeight = texture.height / ROWS;
 
-    dimensions.eyesYoffset = 30.0f;
-
     const int TOTAL_FRAMES = COLUMNS * ROWS;
-
-    // Animation settings.
-    const float ROTATION = 0.0f;
     const float FRAME_DURATION = 0.06f;
 
     // Initialise the animation using the sprite sheet information.
@@ -3596,18 +3651,13 @@ void Eyes::Initialise()
         FRAME_DURATION
     );
 
-    /*
-    rotation = ROTATION;
-    scale = SCALE;
+    dimensions.eyesYoffset = 30.0f;
 
-    anchorOffset = {
-        dimensions.eyesWidth / 2.0f,
-        dimensions.eyesHeight / 2.0f + 
-        dimensions.bodyHeight / 2.0f + 
-        dimensions.headHeight / 2.0f + 
-        dimensions.neckHeight +
-        dimensions.eyesYoffset
-    };*/
+    positionOffset = {
+        0, dimensions.eyesYoffset
+    };
+
+    pupils.Initialise();
 }
 
 void Eyes::Update(float dt)
@@ -3625,6 +3675,42 @@ void Eyes::Update(float dt)
         idleAnimationTimer = 0.0f;
         nextIdleAnimation = GetRandomValue(1000, 5000) / 1000.0f;
     }
+
+    pupils.Update(dt);
+}
+
+void Eyes::Draw() const
+{
+    Sprite::Draw();
+    pupils.Draw();
+}
+
+void Eyes::SetTransform(MyTransform parentTransform)
+{
+    transform = MakeChildTransform(parentTransform, positionOffset);
+
+    pupils.SetTransform(transform);
+}
+
+Pupils& Eyes::GetPupils()
+{
+    return pupils;
+}
+
+void Eyes::LookAt(Vector2 point)
+{
+    pupils.LookAt(point);
+}
+
+void Eyes::LookForward()
+{
+    pupils.LookForward();
+}
+
+void Eyes::Shutdown()
+{
+    pupils.Shutdown();
+    Sprite::Shutdown();
 }
 
 
@@ -3648,10 +3734,8 @@ void Eyes::Update(float dt)
 //====================================================
 
 #include "Body/Head/Head.h"
-#include <cmath>
 #include "Emotion.h"
-
-//TODO adjust all features of head with repect to neck
+#include <cmath>
 
 // Initialise the head's transform and idle animation state.
 Head::Head(BodyDimensions& dimensions) :
@@ -3662,96 +3746,83 @@ Head::Head(BodyDimensions& dimensions) :
     ears(dimensions),
     eyebrows(dimensions),
     mouth(dimensions),
-    nose(dimensions),
-    pupils(dimensions)
+    nose(dimensions)
 {
 }
 
 // Initialise every component that makes up the robot's head.
 void Head::Initialise()
 {
+    headBase.Initialise();
     positionOffset = {
         0,
-        0//-dimensions.neckHeight / 2.0f - dimensions.headHeight / 2.0f  
+        dimensions.neckHeight / 2.0f + dimensions.headHeight / 2.0f  
     };
 
-    headBase.Initialise();
-    //antenna.Initialise();
-    //ears.Initialise();
-    //eyebrows.Initialise();
-    //eyes.Initialise();
-    //mouth.Initialise();
-    //nose.Initialise();
-    //pupils.Initialise();
+    antenna.Initialise();
+    ears.Initialise();
+    eyebrows.Initialise();
+    eyes.Initialise();
+    mouth.Initialise();
+    nose.Initialise();
 }
 
 // Release resources used by each head component.
 void Head::Shutdown()
 {
     headBase.Shutdown();
-    //antenna.Shutdown();
-    //ears.Shutdown();
-    //eyebrows.Shutdown();
-    //eyes.Shutdown();
-    //mouth.Shutdown();
-    //nose.Shutdown();
-    //pupils.Shutdown();
+    antenna.Shutdown();
+    ears.Shutdown();
+    eyebrows.Shutdown();
+    eyes.Shutdown();
+    mouth.Shutdown();
+    nose.Shutdown();
 }
 
 // Update every animated head component.
 void Head::Update(float dt, bool speaking, Emotion emotion)
 {
     headBase.Update(dt);
-    //antenna.Update(dt);
-    //ears.Update(dt);
-    //eyebrows.UpdateEyebrows(dt, speaking, emotion);
-    //eyes.Update(dt);
-    //mouth.UpdateMouth(dt, speaking, emotion);
-    //nose.Update(dt);
-    //pupils.Update(dt);
+    antenna.Update(dt);
+    ears.Update(dt);
+    eyebrows.Update(dt, speaking, emotion);
+    eyes.Update(dt);
+    mouth.UpdateMouth(dt, speaking, emotion);
+    nose.Update(dt);
 }
 
 void Head::Draw() const
 {
-    //ears.Draw();
+    ears.Draw();
     headBase.Draw();
-    //eyes.Draw();
-    //mouth.Draw();
-    //nose.Draw();
-    //eyebrows.Draw();
-    //antenna.Draw();
-    //pupils.Draw();
+    eyes.Draw();
+    mouth.Draw();
+    nose.Draw();
+    eyebrows.Draw();
+    antenna.Draw();
 }
 
 void Head::SetTransform(MyTransform parentTransform)
 {
-    transform.position =
-    {
-        parentTransform.position.x + positionOffset.x,
-        parentTransform.position.y + positionOffset.y
-    };
-
-    transform.pivot =
-    {
-        0,
-        -positionOffset.y
-    };
-    
-    transform.rotation = parentTransform.rotation;
-    transform.scale = parentTransform.scale;
+    transform = MakeChildTransform(parentTransform, positionOffset);
 
     headBase.SetTransform(transform);
+    eyes.SetTransform(transform);
+    antenna.SetTransform(transform);
+    ears.SetTransform(transform);
+    eyebrows.SetTransform(transform);
+    nose.SetTransform(transform);
+    mouth.SetTransform(transform);
 }
 
-// Rotate the pupils to look towards the given point.
 void Head::LookAt(Vector2 point)
 {
-    pupils.LookAt(point);
+    eyes.GetPupils().LookAt(point);
 }
 
 void Head::LookForward()
 {
-    pupils.LookForward();
+    eyes.GetPupils().LookForward();
 }
 
 
@@ -3791,7 +3862,6 @@ void Headbase::Initialise()
     dimensions.headHeight = texture.height / ROWS;
 
     const int TOTAL_FRAMES = COLUMNS * ROWS;
-
     const float FRAME_DURATION = 0.02f;
 
     // Initialise the animation using the sprite sheet information.
@@ -3840,9 +3910,6 @@ void Mouth::Initialise()
 
     const int TOTAL_FRAMES = COLUMNS * ROWS;
 
-    // Animation settings.
-    const float ROTATION = 0.0f;
-    
     // Initialise the animation using the sprite sheet information.
     animation.Initialise
     (
@@ -3853,27 +3920,17 @@ void Mouth::Initialise()
         FRAME_DURATION
     );
 
-    //rotation = ROTATION;
-    //scale = SCALE;
-
-    localPositionOffset =
-    {
-        dimensions.mouthWidth / 2.0f,
-        dimensions.mouthHeight / 2.0f
-        + dimensions.bodyHeight / 2.0f
-        + dimensions.headHeight / 2.0f
-        + dimensions.neckHeight
-        + mouthDisplayOffset
+    positionOffset = {
+        0,
+        0
     };
-
-    //anchorOffset = localPositionOffset;
 }
 
 // Advance the mouth animation.
 void Mouth::UpdateMouth(float dt, bool speaking, Emotion emotion)
 {
     Sprite::Update(dt);
-
+    
     if (emotion == Emotion::Happy && !speaking)
     {
         frame = 0;
@@ -3899,6 +3956,11 @@ void Mouth::UpdateMouth(float dt, bool speaking, Emotion emotion)
         frame = (frame == 1) ? 2 : 1;
         animation.SetFrame(frame);
     }
+}
+
+void Mouth::SetTransform(MyTransform parentTransform)
+{
+    transform = MakeChildTransform(parentTransform, positionOffset);
 }
 
 
@@ -3955,8 +4017,6 @@ Nose::Nose(BodyDimensions& dimensions) : dimensions(dimensions)
 
 void Nose::Initialise()
 {
-    std::cout << "NOSE INITIALISE\n";
-
     // Load the nose texture.
     texture = LoadTexture(
         "assets/images/TingoBingo/head/nose.png"
@@ -3992,53 +4052,12 @@ void Nose::Initialise()
         FRAME_DURATION
     );
 
-    //================================================
-    // Sprite Transform
-    //================================================
+    positionOffset = {
+        0.0f,
+        -slightPositionOffset
+    };
 
-    // The nose initially has no local rotation.
-    //rotation = 0.0f;
-
-    // Use the global robot sprite scale.
-    //scale = SCALE;
-
-    //================================================
-    // Nose Position
-    //================================================
-    //
-    // localPositionOffset is expressed in LOCAL coordinates
-    // relative to anchorPoint.
-    //
-    // X:
-    // Position the nose horizontally relative to the
-    // parent anchor using half of the nose frame width.
-    //
-    // Y:
-    // Position the nose vertically using the nose frame
-    // height and the stored body/head dimensions.
-    //
-    // The offset is rotated around anchorPoint in Draw()
-    // when the head rotates.
-    //
-    //================================================
-
-    /*anchorOffset =
-    {
-        dimensions.noseWidth / 2.0f,
-
-        dimensions.noseHeight / 2.0f
-        - dimensions.bodyHeight / 2.0f
-        - dimensions.headHeight / 2.0f
-        + slightPositionOffset
-        - dimensions.neckHeight
-    };*/
-
-    // Store the original LOCAL offset.
-    //
-    // This is deliberately not a world-space position.
-    // The wiggle animation uses this as the nose's
-    // permanent home position.
-    //homeAnchorPoint = anchorOffset;
+    homePosition = positionOffset;
 }
 
 //====================================================
@@ -4128,8 +4147,8 @@ void Nose::Update(float dt)
         // Randomise the delay before the following wiggle.
         nextNoseWiggle = (float)GetRandomValue(5, 7);
 
-        // The original local anchor position is already
-        // stored in homeAnchorPoint.
+        // The original local parent position is already
+        // stored in home position.
     }
 
     if (noseWiggling)
@@ -4150,8 +4169,8 @@ void Nose::Update(float dt)
         // Using homeAnchorPoint as the starting position
         // prevents the wiggle from accumulating movement
         // from one frame to the next.
-        /*anchorOffset.x =
-            homeAnchorPoint.x + wiggleOffSetX;*/
+        positionOffset.x =
+            homePosition.x + wiggleOffSetX;
 
         // The wiggle lasts for one second.
         if (noseWiggleTimer >= 1.0f)
@@ -4164,155 +4183,24 @@ void Nose::Update(float dt)
             wiggleOffSetX = 0.0f;
 
             // Restore the original LOCAL anchor position.
-            //anchorOffset.x = homeAnchorPoint.x;
+            positionOffset.x = homePosition.x;
         }
     }
 }
 
-//====================================================
-// Draw
-//====================================================
-//
-// The nose uses two separate transforms.
-//
-// Parent transform:
-//     Rotates the nose's POSITION around anchorPoint.
-//
-// Local transform:
-//     Rotates the nose SPRITE around its own centre.
-//
-// This creates the following transform hierarchy:
-//
-//     Body / Head Pivot
-//            |
-//            v
-//     Rotate nose position
-//            |
-//            v
-//       Nose Centre
-//            |
-//            v
-//     Rotate nose sprite
-//
-// The parent rotation controls where the nose is
-// positioned around the head.
-//
-// The local rotation controls the nose's own rotation.
-//
-//====================================================
-
 void Nose::Draw() const
 {
-    // Get the current animation frame.
-    Rectangle source = animation.GetSourceRectangle();
+    Sprite::Draw();
+}
 
-    // Calculate the scaled dimensions of the nose.
-    //float width = animation.GetFrameWidth() * scale;
+void Nose::SetTransform(MyTransform parentTransform)
+{
+    transform = MakeChildTransform(parentTransform, positionOffset);
 
-    //float height = animation.GetFrameHeight() * scale;
+    transform.rotation =
+        parentTransform.rotation + localRotation;
 
-    //================================================
-    // Parent Transform
-    //================================================
-    //
-    // localPositionOffset represents the nose's LOCAL position
-    // relative to the body/head anchor point.
-    //
-    // Rotate this local offset around the parent anchor
-    // so the nose follows the head when it rotates.
-    //
-    //Vector2 offset = anchorOffset;
-
-    // Raylib rotation values are measured in degrees,
-    // while sinf() and cosf() require radians.
-    //float radians = rotation * DEG2RAD;
-
-    // Rotate the nose's local position around the
-    // body/head pivot.
-    Vector2 rotatedOffset =
-    {
-      //  offset.x * cosf(radians) - offset.y * sinf(radians),
-       // offset.x * sinf(radians) + offset.y * cosf(radians)
-    };
-
-    //================================================
-    // Nose World Position
-    //================================================
-    //
-    // Add the rotated local offset to the parent's
-    // world-space anchor point.
-    //
-    // The result is the nose's world-space centre
-    // after the parent/head rotation has been applied.
-    //
-    Vector2 nosePosition =
-    {
-        //anchorPoint.x + rotatedOffset.x * scale,
-        //anchorPoint.y + rotatedOffset.y * scale
-    };
-
-    //================================================
-    // Nose Destination
-    //================================================
-    //
-    // Build the destination rectangle around the
-    // calculated nose centre.
-    //
-    // Subtracting half the width and height means
-    // nosePosition represents the centre of the sprite
-    // rather than its top-left corner.
-    //
-    Rectangle destination =
-    {
-        //nosePosition.x - width / 2.0f,
-       // nosePosition.y - height / 2.0f,
-       // width,
-       // height
-    };
-
-    //================================================
-    // Local Rotation Pivot
-    //================================================
-    //
-    // The destination rectangle is centred around
-    // nosePosition.
-    //
-    // Therefore, the centre of the rectangle is simply
-    // half its width and half its height.
-    //
-    // This is the nose's LOCAL rotation origin.
-    //
-    // It is separate from anchorPoint, which remains
-    // the parent/body/head rotation reference point.
-    //
-    Vector2 origin =
-    {
-        //width / 2.0f,
-       // height / 2.0f
-    };
-
-    //================================================
-    // Draw
-    //================================================
-    //
-    // rotation:
-    //     Parent/head rotation.
-    //
-    // localRotation:
-    //     Independent nose rotation.
-    //
-    // Adding the two rotations causes the nose to
-    // inherit the head's rotation while also applying
-    // its own independent local rotation.
-    /*
-    DrawTexturePro(
-        texture,
-        source,
-        destination,
-        origin,
-        rotation + localRotation,
-        WHITE
-    );*/
+    transform.pivot = { 0.0f, 0.0f };
 }
 
 
@@ -4331,6 +4219,7 @@ void Nose::Draw() const
 
 #include "Body/Head/Pupil.h"
 #include "Constants.h"
+#include <cmath>
 #include <string>
 
 Pupil::Pupil(BodyDimensions& dimensions) :
@@ -4352,8 +4241,6 @@ void Pupil::Initialise()
 
     const int TOTAL_FRAMES = COLUMNS * ROWS;
 
-    // Animation settings.
-    const float ROTATION = 0.0f;
     const float FRAME_DURATION = 0.08f;
 
     // Initialise the animation using the sprite sheet information.
@@ -4366,31 +4253,15 @@ void Pupil::Initialise()
         FRAME_DURATION
     );
 
-    /*rotation = ROTATION;
-    scale = SCALE;
-
-    if(side == "left")
-    {
-        anchorOffset = {
-            dimensions.pupilWidth / 2.0f - sideOffset, 
-            dimensions.pupilHeight / 2.0f + 
-            dimensions.bodyHeight / 2.0f + 
-            dimensions.headHeight / 2.0f +
-            dimensions.neckHeight +
-            dimensions.eyesYoffset
-        };
+    if(side == "left") {
+        positionOffset = {sideOffset, 0};
     }
-    else if(side == "right")
+
+    if(side == "right")
     {
-        anchorOffset = {
-            dimensions.pupilWidth / 2.0f + sideOffset, 
-            dimensions.pupilHeight / 2.0f + 
-            dimensions.bodyHeight / 2.0f + 
-            dimensions.headHeight / 2.0f +
-            dimensions.neckHeight +
-            dimensions.eyesYoffset
-        };
-    }*/
+        positionOffset = {-sideOffset, 0};
+    }
+    
 }
 
 // Advance the pupil animation.
@@ -4407,6 +4278,29 @@ void Pupil::SetSide(std::string side)
 float Pupil::GetSideOffset()
 {
     return sideOffset;
+}
+
+void Pupil::SetPosition(Vector2 position)
+{
+    float radians = transform.rotation * DEG2RAD;
+    float X = positionOffset.x;
+    float Y = positionOffset.y;
+
+    transform.position = {
+            position.x + X * cosf(radians) - Y * sinf(radians),
+            position.y + X * sinf(radians) + Y * cosf(radians)
+    };
+}
+
+void Pupil::SetRotation(float rotation)
+{
+    transform.rotation = rotation;
+}
+
+void Pupil::SetTransform(MyTransform parentTransform) 
+{
+    transform = parentTransform;
+    SetPosition(parentTransform.position);
 }
 
 
@@ -4433,6 +4327,7 @@ Vector2 L;
 
 Pupils::Pupils(BodyDimensions& dimensions) : 
     dimensions(dimensions),
+    transform(),
     leftPupil(dimensions),
     rightPupil(dimensions)
 {}
@@ -4466,28 +4361,20 @@ void Pupils::Draw() const
 {
     leftPupil.Draw();
     rightPupil.Draw();
-    //DrawCircle(L.x, L.y, 10, RED);
+    DrawCircle(L.x, L.y, 50, RED);
 }
 
 // Set both pupil anchor points relative to the head.
-void Pupils::SetAnchorPoint(Vector2 anchorPoint)
+void Pupils::SetTransform(MyTransform parentTransform)
 {
-    headAnchorPoint = anchorPoint;
+    transform = parentTransform;
 
-    /*leftPupil.SetAnchorPoint(
-    {
-        anchorPoint.x,
-        anchorPoint.y
-    });
+    leftPupil.SetTransform(parentTransform);
+    rightPupil.SetTransform(parentTransform);
 
-    rightPupil.SetAnchorPoint(
-    {
-        anchorPoint.x,
-        anchorPoint.y
-    });*/
+    SetRotation(transform.rotation);
 }
 
-// Rotate an anchor offset around the anchor point.
 Vector2 Pupils::RotateVector(Vector2 v, float rotation)
 {
     float r = rotation * DEG2RAD;
@@ -4508,45 +4395,48 @@ void Pupils::SetRotation(float rotation)
     Vector2 rotatedRight =
         RotateVector(rightLookOffset, rotation);
 
-    /*leftPupil.SetAnchorPoint(
+    leftPupil.SetRotation(rotation);
+    rightPupil.SetRotation(rotation);
+
+    leftPupil.SetPosition(
     {
-        headAnchorPoint.x + rotatedLeft.x,
-        headAnchorPoint.y + rotatedLeft.y
+        transform.position.x + rotatedLeft.x,
+        transform.position.y + rotatedLeft.y
     });
 
-    rightPupil.SetAnchorPoint(
+    rightPupil.SetPosition(
     {
-        headAnchorPoint.x + rotatedRight.x,
-        headAnchorPoint.y + rotatedRight.y
-    });*/
+        transform.position.x + rotatedRight.x,
+        transform.position.y + rotatedRight.y
+    });
 
-    //leftPupil.SetRotation(rotation);
-    //rightPupil.SetRotation(rotation);
 }
 
 // Move the pupils towards a target point while limiting
 // how far they can travel within the eye.
 void Pupils::LookAt(Vector2 point)
 {
+    float scale = transform.scale;
+
     Vector2 leftEyeCentre =
     {
-        headAnchorPoint.x + leftPupil.GetSideOffset() * SCALE,
-        headAnchorPoint.y -
+        transform.position.x + leftPupil.GetSideOffset() * scale,
+        transform.position.y -
         (dimensions.bodyHeight / 2 
         + dimensions.headHeight / 2 
         + dimensions.neckHeight 
-        + dimensions.eyesYoffset) * SCALE
+        + dimensions.eyesYoffset) * scale
 
     };
 
     Vector2 rightEyeCentre =
     {
-        headAnchorPoint.x - rightPupil.GetSideOffset() * SCALE,
-        headAnchorPoint.y -  
+        transform.position.x - rightPupil.GetSideOffset() * scale,
+        transform.position.y -  
         (dimensions.bodyHeight / 2 
         + dimensions.headHeight / 2 
         + dimensions.neckHeight 
-        + dimensions.eyesYoffset) * SCALE
+        + dimensions.eyesYoffset) * scale
     };
 
     L = rightEyeCentre;
@@ -4579,6 +4469,8 @@ void Pupils::LookAt(Vector2 point)
         rightDirection.x * LOOK_DISTANCE,
         rightDirection.y * LOOK_DISTANCE
     };
+
+    SetRotation(transform.rotation);
 }
 
 void Pupils::LookForward()
@@ -4586,17 +4478,17 @@ void Pupils::LookForward()
     leftLookOffset = {0.0f, 0.0f};
     rightLookOffset = {0.0f, 0.0f};
 
-   /* leftPupil.SetAnchorPoint(
+    leftPupil.SetPosition(
     {
-        headAnchorPoint.x,
-        headAnchorPoint.y
+        transform.position.x,
+        transform.position.y
     });
 
-    rightPupil.SetAnchorPoint(
+    rightPupil.SetPosition(
     {
-        headAnchorPoint.x,
-        headAnchorPoint.y
-    });*/
+        transform.position.x,
+        transform.position.y
+    });
 }
 
 
@@ -5524,7 +5416,7 @@ void Robot::SetTransform(MyTransform transform)
 }
 
 // Return the robot's current anchor point.
-MyTransform Robot::GetTransform()
+MyTransform Robot::GetTransform() const
 {
     return transform;
 }
@@ -5579,14 +5471,14 @@ void Robot::LookForward()
 
 
 // Return the origin point of RobotBrain's search ray.
-Vector2 Robot::GetSearchRayOrigin()
+Vector2 Robot::GetSearchRayOrigin() const
 {
     return robotBrain.GetSearchRayOrigin();
 }
 
 
 // Return the end point of RobotBrain's search ray.
-Vector2 Robot::GetSearchRayEnd()
+Vector2 Robot::GetSearchRayEnd() const
 {
     return robotBrain.GetSearchRayEnd();
 }
@@ -5605,7 +5497,7 @@ void Robot::PlaySfx(std::string sound)
 
 void Robot::SwingArm(std::string side, bool swinging)
 {
-    //body.SwingArm(side, swinging);
+    body.SwingArm(side, swinging);
 }
 
 /*Vector2 Robot::GetHeadWorldPosition()
@@ -6520,7 +6412,7 @@ void RobotBrain::Search(float dt)
 // RobotBrain member.
 // ============================================================
 
-Vector2 RobotBrain::GetSearchRayOrigin()
+Vector2 RobotBrain::GetSearchRayOrigin() const
 {
     return searchRayOrigin;
 }
@@ -6536,7 +6428,7 @@ Vector2 RobotBrain::GetSearchRayOrigin()
 // another system to draw or inspect the current search ray.
 // ============================================================
 
-Vector2 RobotBrain::GetSearchRayEnd()
+Vector2 RobotBrain::GetSearchRayEnd() const
 {
     return searchRayEnd;
 }
@@ -6817,10 +6709,6 @@ void SfxController::Shutdown()
 #include "Shape.h"
 #include <cmath>
 
-Shape::Shape(BodyDimensions& dimensions) :
-    dimensions(dimensions)
-{}
-
 void Shape::Draw() const
 {
     Vector2 screenPosition =
@@ -6835,28 +6723,34 @@ void Shape::Draw() const
         screenPosition.y - transform.pivot.y * transform.scale
     };
 
-    float width = dimensions.neckWidth * transform.scale;
-    float height = dimensions.neckHeight * transform.scale;
+    float scaledWidth = width * transform.scale;
+    float scaledHeight = height * transform.scale;
 
     Rectangle rectangle = {
         pivotScreen.x,
         pivotScreen.y,
-        width,
-        height
+        scaledWidth,
+        scaledHeight
     };
 
     Vector2 origin =
     {
-        width / 2.0f + transform.pivot.x * transform.scale,
-        height / 2.0f - transform.pivot.y * transform.scale
+        scaledWidth / 2.0f + transform.pivot.x * transform.scale,
+        scaledHeight / 2.0f - transform.pivot.y * transform.scale
     };
 
     DrawRectanglePro(
         rectangle,
         origin,
-        transform.rotation,
-        CARDBOARD_DARK
+        -transform.rotation,
+        color
     );
+}
+
+void Shape::SetDimensions(float width, float height)
+{
+    this->width = width;
+    this->height = height;
 }
 
 void Shape::Shutdown()
@@ -6868,13 +6762,6 @@ void Shape::SetTransform(MyTransform transform)
 {
     this->transform = transform;
 }
-
-
-=====================================
-.\src\Shape.h
-=====================================
-
-#pragma once
 
 
 =====================================
@@ -7100,7 +6987,7 @@ void SpeechController::Speak(const std::string& text)
         //================================================
 
         bool success =
-            Speech::GenerateSpeech(text, stopRequested);
+            SpeechGenerator::GenerateSpeech(text, stopRequested);
 
         //================================================
         // GENERATION RESULT
@@ -7275,7 +7162,7 @@ static void CloseProcessHandles(PROCESS_INFORMATION& process)
 //             requested.
 //====================================================
 
-bool Speech::GenerateSpeech
+bool SpeechGenerator::GenerateSpeech
 (
     const std::string& text,
     const std::atomic<bool>& stopRequested
@@ -7960,7 +7847,7 @@ void DrawTextureCartesian(
         source,
         destination,
         origin,
-        transform.rotation,
+        -transform.rotation,
         WHITE
     );
 }

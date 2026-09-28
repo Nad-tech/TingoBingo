@@ -41,4 +41,11 @@ void Headbase::Initialise()
         COLUMNS,
         FRAME_DURATION
     );
+
+    positionOffset = {0.0f, 0.0f};
+}
+
+void Headbase::SetTransform(MyTransform parentTransform)
+{
+    Sprite::transform = MakeChildTransform(parentTransform, positionOffset);
 }

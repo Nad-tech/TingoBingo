@@ -3,26 +3,28 @@
 #include "BodyDimensions.h"
 #include <string>
 
-#include "Sprite.h"
+#include "Shape.h"
 #include "Hand.h"
 
-class ForeArm : public Sprite
+class ForeArm : public Shape
 {
     public:
         ForeArm(BodyDimensions& dimensions, std::string side);
-        void Initialise() override;
-        void Update(float dt) override;
-        void Draw() const override;
         
-        int GetFrame() const;
+        void Initialise();
         
-        void SetRotation(float rotation);
+        void Update(float dt);
+        void Draw() const;
+        
+        void SetTransform(MyTransform parentTransform);
 
     private:
         BodyDimensions& dimensions;
-        Vector2 localPositionOffset = {0, 0};
+        Vector2 positionOffset;
+        
         float localRotation = 0.0f;
         float homeRotation = 0.0f;
+        
         std::string side = "";
 
         Hand hand;

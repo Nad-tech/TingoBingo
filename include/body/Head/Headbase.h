@@ -9,6 +9,9 @@ class Headbase : public Sprite
         Headbase(BodyDimensions& dimensions);
         void Initialise() override;
         
+        void SetTransform(MyTransform parentTransform);
+
     private:
         BodyDimensions& dimensions;
+        Vector2 positionOffset;
 };

@@ -16,9 +16,10 @@ Shoulder::Shoulder(BodyDimensions& dimensions, std::string side) :
 
 void Shoulder::Initialise()
 {
-    dimensions.shoulderWidth = 70.0f;
-    dimensions.shoulderHeight = 70.0f;
-    SetDimensions(dimensions.shoulderWidth, dimensions.shoulderHeight);
+    dimensions.shoulderWidth = 65.0f;
+    dimensions.shoulderHeight = 65.0f;
+    
+    Shape::SetDimensions(dimensions.shoulderWidth, dimensions.shoulderHeight);
 
     upperArm.Initialise();
 

@@ -3,15 +3,17 @@
 #include "Constants.h"
 #include <iostream>
 
-BodyBase::BodyBase(BodyDimensions& dimensions) : 
-            dimensions(dimensions)
+BodyBase::BodyBase(BodyDimensions& dimensions) :
+    dimensions(dimensions)
 {
 }
 
-// Load the head sprite and initialise its animation.
+// Load the body sprite and initialise its animation.
 void BodyBase::Initialise()
 {
-    texture = LoadTexture("assets/images/TingoBingo/body/BodyBase.png");
+    texture = LoadTexture(
+        "assets/images/TingoBingo/body/BodyBase.png"
+    );
 
     // Sprite sheet layout.
     const int COLUMNS = 1;
@@ -33,5 +35,12 @@ void BodyBase::Initialise()
         COLUMNS,
         FRAME_DURATION
     );
+
+    // BodyBase is positioned directly at Body's position.
+    positionOffset = { 0.0f, 0.0f };
 }
 
+void BodyBase::SetTransform(MyTransform parentTransform)
+{
+    Sprite::transform = MakeChildTransform(parentTransform, positionOffset);
+}

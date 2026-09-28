@@ -6,20 +6,19 @@
 #include "Emotion.h"
 #include "SfxController.h"
 
-// Initialise the robot's brain 
-Robot::Robot() : 
+// Initialise the robot's brain.
+Robot::Robot() :
     dimensions(),
     transform(),
     body(dimensions),
     robotBrain(*this, dimensions)
 {}
 
-// Initialise the robot's head and place it at the
-// robot's starting anchor point.
+// Initialise the robot and apply its world transform to the body.
 void Robot::Initialise()
 {
     body.Initialise();
-    body.SetTransform(transform);   
+    body.SetTransform(transform);
     sfxController.Initialise();
 }
 
@@ -46,16 +45,14 @@ void Robot::SetSpeaking(bool state)
     speaking = state;
 }
 
-
-// Set the robot's anchor point and move the head to the
-// same anchor point.
+// Set the robot's world transform and pass it to the body.
 void Robot::SetTransform(MyTransform transform)
 {
     this->transform = transform;
     body.SetTransform(this->transform);
 }
 
-// Return the robot's current anchor point.
+// Return the robot's current world transform.
 MyTransform Robot::GetTransform() const
 {
     return transform;
@@ -68,7 +65,6 @@ Vector2 Robot::GetHeadTransform() const
     return body.GetHeadTransform();
 }*/
 
-
 // Draw the robot.
 void Robot::Draw() const
 {
@@ -76,13 +72,12 @@ void Robot::Draw() const
     robotBrain.Draw();
 }
 
-// Release the resources owned by the robot's head.
+// Release the resources owned by the robot's body.
 void Robot::Shutdown()
 {
     body.Shutdown();
     sfxController.Shutdown();
 }
-
 
 // Make the robot look towards a specific point.
 void Robot::LookAt(Vector2 point)
@@ -96,7 +91,6 @@ void Robot::SetEmotion(Emotion emotion)
     robotBrain.SetEmotion(emotion);
 }
 
-
 // Tell RobotBrain that the robot has picked up an object.
 void Robot::OnObjectPickedUp(Object& object)
 {
@@ -109,20 +103,17 @@ void Robot::LookForward()
     body.GetHead().LookForward();
 }
 
-
 // Return the origin point of RobotBrain's search ray.
 Vector2 Robot::GetSearchRayOrigin() const
 {
     return robotBrain.GetSearchRayOrigin();
 }
 
-
 // Return the end point of RobotBrain's search ray.
 Vector2 Robot::GetSearchRayEnd() const
 {
     return robotBrain.GetSearchRayEnd();
 }
-
 
 // Give RobotBrain access to the toys available in the game.
 void Robot::SetObjectPointers(std::vector<Object*> toys)
@@ -140,7 +131,9 @@ void Robot::SwingArm(std::string side, bool swinging)
     body.SwingArm(side, swinging);
 }
 
-/*Vector2 Robot::GetHeadWorldPosition()
+/*
+Vector2 Robot::GetHeadWorldPosition()
 {
     return body.GetHeadWorldPosition();
-}*/
+}
+*/

@@ -1,15 +1,47 @@
 #include "Body/Arms/ForeArm.h"
 
 ForeArm::ForeArm(BodyDimensions& dimensions, std::string side) :
-	dimensions(dimensions),
+	Shape(CARDBOARD_LIGHT),
+    dimensions(dimensions),
 	side(side),
 	hand(dimensions, side)
 {}
 
-void ForeArm::Initialise(){}
-void ForeArm::Update(float dt){}
-void ForeArm::Draw() const {}
+void ForeArm::Initialise()
+{
+    dimensions.forearmWidth = 50.0f;
+    dimensions.forearmHeight = 120.0f;
 
-int ForeArm::GetFrame() const{}
+    Shape::SetDimensions(
+        dimensions.forearmWidth,
+        dimensions.forearmHeight
+    );
 
-void ForeArm::SetRotation(float rotation){}
+    hand.Initialise();
+
+    positionOffset = 
+    {
+        0,
+        -dimensions.forearmHeight / 2.0f
+    };
+}
+
+//float rt = 0.0f;
+void ForeArm::Update(float dt)
+{
+    hand.Update(dt);
+    //rt += dt*50.0f;
+}
+
+void ForeArm::Draw() const 
+{
+    Shape::Draw();
+    hand.Draw();
+}
+
+void ForeArm::SetTransform(MyTransform parentTransform)
+{
+    Shape::transform = MakeChildTransform(parentTransform, positionOffset);
+    //transform.rotation += rt;
+    hand.SetTransform(Shape::transform);
+}

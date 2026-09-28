@@ -116,6 +116,5 @@ void Eyebrows::Update(float dt, bool speaking, Emotion emotion)
 
 void Eyebrows::SetTransform(MyTransform parentTransform) 
 {
-    transform = MakeChildTransform(parentTransform, positionOffset);
-    Sprite::SetTransform(transform);
+    Sprite::transform = MakeChildTransform(parentTransform, positionOffset);
 }

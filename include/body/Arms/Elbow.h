@@ -22,9 +22,6 @@ class Elbow : public Shape
         BodyDimensions& dimensions;
         Vector2 positionOffset;
 
-        float localRotation = 0.0f;
-        float homeRotation = 0.0f;
-
         std::string side = "";
 
         ForeArm foreArm;

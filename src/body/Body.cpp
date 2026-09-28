@@ -5,7 +5,7 @@
 Body::Body(BodyDimensions& dimensions) :
     dimensions(dimensions),
     transform(),
-    homeTransform(), 
+    homeTransform(),
     bodyBase(dimensions),
     neck(dimensions),
     pelvis(dimensions),
@@ -27,7 +27,9 @@ Body::Body(BodyDimensions& dimensions) :
 
 void Body::Initialise()
 {
+    // Store the body's initial world transform.
     homeTransform = transform;
+
     bodyBase.Initialise();
     neck.Initialise();
     arms.Initialise();
@@ -55,16 +57,22 @@ void Body::Update(float dt, bool speaking, Emotion emotion)
 
 void Body::Draw() const
 {
-    
     bodyBase.Draw();
     arms.Draw();
     neck.Draw();
     pelvis.Draw();
 }
 
+// Set the body's world transform.
+//
+// Body is directly below Robot in the hierarchy, so there
+// is no positionOffset here. The transform received from
+// Robot already describes the body's world position,
+// pivot, rotation and scale.
 void Body::SetTransform(MyTransform transform)
 {
     this->transform = transform;
+
     bodyBase.SetTransform(this->transform);
     neck.SetTransform(this->transform);
     arms.SetTransform(this->transform);
@@ -94,7 +102,9 @@ void Body::PlayBodyWiggle(float dt)
     {
         bodyWiggleTimer += dt;
 
-        transform.rotation = sin(bodyWiggleTimer * bodyWiggleFrequency) * bodyWiggleAmplitude;
+        transform.rotation =
+            sin(bodyWiggleTimer * bodyWiggleFrequency)
+            * bodyWiggleAmplitude;
 
         // Gradually reduce the wiggle until the body settles.
         bodyWiggleAmplitude -= 8.0f * dt;
@@ -127,8 +137,11 @@ void Body::PlayBodyBob(float dt)
     bodyBobOffset.x = cos(bodyBobAngle) * bodyBobRadiusX;
     bodyBobOffset.y = sin(bodyBobAngle) * bodyBobRadiusY;
 
-    transform.position.x = homeTransform.position.x + bodyBobOffset.x;
-    transform.position.y = homeTransform.position.y + bodyBobOffset.y;
+    transform.position.x =
+        homeTransform.position.x + bodyBobOffset.x;
+
+    transform.position.y =
+        homeTransform.position.y + bodyBobOffset.y;
 }
 
 Head& Body::GetHead()
@@ -136,9 +149,7 @@ Head& Body::GetHead()
     return neck.GetHead();
 }
 
-void Body::SwingArm(std::string side,  bool swing)
+void Body::SwingArm(std::string side, bool swing)
 {
     arms.SwingArm(side, swing);
 }
-
-
