@@ -1,9 +1,9 @@
 #pragma once
 
-#include "Sprite.h"
+#include "Shape.h"
 #include "BodyDimensions.h"
 
-class Headbase : public Sprite 
+class Headbase : public Shape 
 {
     public:
         Headbase(BodyDimensions& dimensions);

@@ -34,11 +34,12 @@ Head::Head(BodyDimensions& dimensions) :
 void Head::Initialise()
 {
     headBase.Initialise();
+    
     positionOffset = {
         0,
         dimensions.neckHeight / 2.0f + dimensions.headHeight / 2.0f  
     };
-
+    
     antenna.Initialise();
     ears.Initialise();
     eyebrows.Initialise();
@@ -50,19 +51,12 @@ void Head::Initialise()
 // Release resources used by each head component.
 void Head::Shutdown()
 {
-    headBase.Shutdown();
-    antenna.Shutdown();
-    ears.Shutdown();
-    eyebrows.Shutdown();
-    eyes.Shutdown();
-    mouth.Shutdown();
-    nose.Shutdown();
+
 }
 
 // Update every animated head component.
 void Head::Update(float dt, bool speaking, Emotion emotion)
 {
-    headBase.Update(dt);
     antenna.Update(dt);
     ears.Update(dt);
     eyebrows.Update(dt, speaking, emotion);

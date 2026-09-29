@@ -1,65 +1,111 @@
-
-
 #include "Shape.h"
 #include <cmath>
+#include <iostream>
 
 void Shape::Draw() const
-{
-    // Convert Cartesian world position to Raylib screen coordinates.
-    Vector2 screenPosition =
-    {
-        SCREEN_WIDTH / 2.0f + transform.position.x * transform.scale,
-        SCREEN_HEIGHT / 2.0f - transform.position.y * transform.scale
+{    
+    float scale = transform.scale;
+
+    Rectangle rec = {
+        screenX + transform.pivot.x * scale,
+        screenY - transform.pivot.y * scale,
+        width * transform.scale,
+        height * transform.scale
     };
-
-    // Scale the shape dimensions.
-    float scaledWidth = width * transform.scale;
-    float scaledHeight = height * transform.scale;
-
-    // Position the rectangle so that transform.position
-    // represents the CENTRE of the shape.
-    Rectangle rectangle =
-    {
-        screenPosition.x - scaledWidth / 2.0f,
-        screenPosition.y - scaledHeight / 2.0f,
-        scaledWidth,
-        scaledHeight
-    };
-
-    // Convert the Cartesian pivot offset into screen coordinates.
-    //
-    // pivot is the vector from:
-    //
-    //     child centre -> rotation joint
-    //
-    // Cartesian +Y points upward, while screen +Y points downward,
-    // so the Y component must be inverted.
-    Vector2 origin =
-    {
-        scaledWidth / 2.0f + transform.pivot.x * transform.scale,
-        scaledHeight / 2.0f - transform.pivot.y * transform.scale
+    
+    Vector2 screenPivot = {
+        (width * scale / 2.0f) + transform.pivot.x * scale,
+        (height * scale / 2.0f) - transform.pivot.y * scale
     };
 
     DrawRectanglePro(
-        rectangle,
-        origin,
+        rec,
+        screenPivot,
         -transform.rotation,
-        color
+        color  
     );
+
+    DebugDraw();
 }
 
-void Shape::SetDimensions(float width, float height)
+void Shape::SetScreenCoords()
 {
-    this->width = width;
-    this->height = height;
+    float scale = transform.scale;
+
+    screenX = SCREEN_WIDTH / 2.0f + transform.position.x * scale;
+    screenY = SCREEN_HEIGHT / 2.0f - transform.position.y * scale;
 }
 
-void Shape::Shutdown()
+void Shape::SetDimensions(float w, float h)
 {
-    
+    width = w;
+    height = h;
 }
 
-void Shape::SetTransform(MyTransform transform)
+void Shape::SetShapeName(std::string name) 
 {
-    this->transform = transform;
+    this->name = name;
+}
+
+void Shape::DebugDraw() const
+{
+    if(name == "bodyBase")
+    {
+        DrawText(
+            TextFormat
+            (   
+                "bodyBase: "
+                "pos(%.1f,%.1f)," 
+                "spos(%.1f,%.1f)," 
+                "piv(%.1f,%.1f)," 
+                "rot(%.1f),"
+                "sca:(%.1f),"
+                "W(%.1f) H(%.1f)",
+                transform.position.x,
+                transform.position.y,
+                screenX,
+                screenY,
+                transform.pivot.x,
+                transform.pivot.y,
+                transform.rotation,
+                transform.scale,
+                width,
+                height
+            ),
+            0,
+            0,
+            20,
+            WHITE
+        );
+    }
+
+    if(name == "neck")
+    {
+        DrawText(
+            TextFormat
+            (   
+                "neck: "
+                "pos(%.1f,%.1f)," 
+                "spos(%.1f,%.1f)," 
+                "piv(%.1f,%.1f)," 
+                "rot(%.1f),"
+                "sca:(%.1f),"
+                "W(%.1f) H(%.1f)",
+                transform.position.x,
+                transform.position.y,
+                screenX,
+                screenY,
+                transform.pivot.x,
+                transform.pivot.y,
+                transform.rotation,
+                transform.scale,
+                width,
+                height
+            ),
+            0,
+            20,
+            20,
+            WHITE
+        );
+    }
 }

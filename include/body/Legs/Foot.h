@@ -1,15 +1,15 @@
 #pragma once
 
 #include "BodyDimensions.h"
-#include "Sprite.h"
+#include "Shape.h"
 
-class Foot : public Sprite
+class Foot : public Shape
 {
     public:
         public:
         explicit Foot(BodyDimensions& dimensions);
         void Initialise() override;
-        void Update(float dt) override;
+        void Update(float dt);
         void Draw() const;
         void SetRotation(float rotation);
         void SetAnchorPoint(Vector2 anchorPoint);

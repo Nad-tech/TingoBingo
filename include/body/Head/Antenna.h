@@ -1,14 +1,17 @@
 #pragma once
 
-#include "Sprite.h"
+#include "Shape.h"
 #include "BodyDimensions.h"
 
-class Antenna : public Sprite 
+class Antenna : public Shape 
 {
     public:
         Antenna(BodyDimensions& dimensions);
+        
         void Initialise() override;
-        void Update(float dt) override;
+        
+        void Update(float dt);
+        
         void SetTransform(MyTransform parentTransform);
 
     private:

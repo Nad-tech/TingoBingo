@@ -40,7 +40,7 @@ public:
     void SetObjectPointers(std::vector<Object*> objects);
     void PlaySfx(std::string sound);
     
-    void SwingArm(std::string side, bool swinging);
+    //void SwingArm(std::string side, bool swinging);
     
     //Vector2 GetHeadWorldPosition();
 

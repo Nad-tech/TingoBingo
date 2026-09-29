@@ -2,7 +2,6 @@
 
 #include "BodyDimensions.h"
 #include <string>
-
 #include "Shape.h"
 #include "Hand.h"
 

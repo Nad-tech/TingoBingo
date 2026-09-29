@@ -1,14 +1,14 @@
 #pragma once
 
-#include "Sprite.h"
+#include "Shape.h"
 #include "BodyDimensions.h"
 
-class Ears : public Sprite
+class Ears : public Shape
 {
      public:
         Ears(BodyDimensions& dimensions);
         void Initialise() override;
-        void Update(float dt) override;
+        void Update(float dt);
         void SetTransform(MyTransform parentTransform);
 
     private:

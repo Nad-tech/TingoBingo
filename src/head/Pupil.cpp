@@ -19,29 +19,8 @@ Pupil::Pupil(BodyDimensions& dimensions) :
 // Load the pupil sprite and initialise its animation.
 void Pupil::Initialise()
 {
-    texture = LoadTexture("assets/images/TingoBingo/head/pupil.png");
-
-    // Sprite sheet layout.
-    const int COLUMNS = 1;
-    const int ROWS = 1;
-
-    // Calculate the size of a single animation frame.
-    dimensions.pupilWidth = texture.width / COLUMNS;
-    dimensions.pupilHeight = texture.height / ROWS;
-
-    const int TOTAL_FRAMES = COLUMNS * ROWS;
-
-    const float FRAME_DURATION = 0.08f;
-
-    // Initialise the animation using the sprite sheet information.
-    animation.Initialise
-    (
-        dimensions.pupilWidth,
-        dimensions.pupilHeight,
-        TOTAL_FRAMES,
-        COLUMNS,
-        FRAME_DURATION
-    );
+    dimensions.pupilWidth = 100;
+    dimensions.pupilHeight = 100;
 
     if(side == "left") {
         positionOffset = {sideOffset, 0};
@@ -57,7 +36,7 @@ void Pupil::Initialise()
 // Advance the pupil animation.
 void Pupil::Update(float dt)
 {
-    Sprite::Update(dt);
+
 }
 
 void Pupil::SetSide(std::string side)
@@ -89,5 +68,5 @@ void Pupil::SetRotation(float rotation)
 
 void Pupil::SetTransform(MyTransform parentTransform) 
 {
-    Sprite::transform = MakeChildTransform(parentTransform, positionOffset);
+    Shape::transform = MakeChildTransform(parentTransform, positionOffset);
 }

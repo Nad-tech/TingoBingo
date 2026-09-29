@@ -1,10 +1,10 @@
 #pragma once
 
-#include "Sprite.h"
+#include "Shape.h"
 #include "Emotion.h"
 #include "BodyDimensions.h"
 
-class Mouth : public Sprite
+class Mouth : public Shape
 {
     public:
         Mouth(BodyDimensions& dimensions);

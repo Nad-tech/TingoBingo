@@ -19,33 +19,14 @@ Headbase::Headbase(BodyDimensions& dimensions) :
 // Load the head sprite and initialise its animation.
 void Headbase::Initialise()
 {
-    texture = LoadTexture("assets/images/TingoBingo/head/HeadBase.png");
+    dimensions.headWidth = 100;
+    dimensions.headHeight = 100;
 
-    // Sprite sheet layout.
-    const int COLUMNS = 1;
-    const int ROWS = 1;
-
-    // Calculate the size of a single animation frame.
-    dimensions.headWidth = texture.width / COLUMNS;
-    dimensions.headHeight = texture.height / ROWS;
-
-    const int TOTAL_FRAMES = COLUMNS * ROWS;
-    const float FRAME_DURATION = 0.02f;
-
-    // Initialise the animation using the sprite sheet information.
-    animation.Initialise
-    (
-        dimensions.headWidth,
-        dimensions.headHeight,
-        TOTAL_FRAMES,
-        COLUMNS,
-        FRAME_DURATION
-    );
 
     positionOffset = {0.0f, 0.0f};
 }
 
 void Headbase::SetTransform(MyTransform parentTransform)
 {
-    Sprite::transform = MakeChildTransform(parentTransform, positionOffset);
+    Shape::transform = MakeChildTransform(parentTransform, positionOffset);
 }

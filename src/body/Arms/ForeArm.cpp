@@ -12,10 +12,10 @@ void ForeArm::Initialise()
     dimensions.forearmWidth = 50.0f;
     dimensions.forearmHeight = 120.0f;
 
-    Shape::SetDimensions(
+    /*Shape::SetDimensions(
         dimensions.forearmWidth,
         dimensions.forearmHeight
-    );
+    );*/
 
     hand.Initialise();
 

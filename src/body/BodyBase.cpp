@@ -4,6 +4,7 @@
 #include <iostream>
 
 BodyBase::BodyBase(BodyDimensions& dimensions) :
+    Shape(CARDBOARD),
     dimensions(dimensions)
 {
 }
@@ -11,36 +12,21 @@ BodyBase::BodyBase(BodyDimensions& dimensions) :
 // Load the body sprite and initialise its animation.
 void BodyBase::Initialise()
 {
-    texture = LoadTexture(
-        "assets/images/TingoBingo/body/BodyBase.png"
-    );
+    dimensions.bodyWidth = 240.0f;
+    dimensions.bodyHeight = 250.0f;
+    Shape::SetDimensions(dimensions.bodyWidth, dimensions.bodyHeight);
 
-    // Sprite sheet layout.
-    const int COLUMNS = 1;
-    const int ROWS = 1;
-
-    // Calculate the size of a single animation frame.
-    dimensions.bodyWidth = texture.width / COLUMNS;
-    dimensions.bodyHeight = texture.height / ROWS;
-
-    const int TOTAL_FRAMES = COLUMNS * ROWS;
-    const float FRAME_DURATION = 0.02f;
-
-    // Initialise the animation using the sprite sheet information.
-    animation.Initialise
-    (
-        dimensions.bodyWidth,
-        dimensions.bodyHeight,
-        TOTAL_FRAMES,
-        COLUMNS,
-        FRAME_DURATION
-    );
-
-    // BodyBase is positioned directly at Body's position.
     positionOffset = { 0.0f, 0.0f };
+
+    pivot = {0, 0};
+
+    Shape::SetShapeName("bodyBase");
 }
 
 void BodyBase::SetTransform(MyTransform parentTransform)
 {
-    Sprite::transform = MakeChildTransform(parentTransform, positionOffset);
+    Shape::transform = MakeChildTransform(parentTransform, positionOffset);
+    Shape::transform.pivot = pivot;
+
+    Shape::SetScreenCoords();
 }

@@ -1154,7 +1154,7 @@ Object* RobotBrain::DetectCollision(
 
 void RobotBrain::SwingArm(std::string side, bool swinging)
 {
-    robot.SwingArm(side, swinging);
+    //robot.SwingArm(side, swinging);
 }
 
 void RobotBrain::Draw() const {

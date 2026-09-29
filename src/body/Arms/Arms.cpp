@@ -15,8 +15,6 @@ void Arms::Initialise()
 
 void Arms::Shutdown()
 {
-    leftShoulder.Shutdown();
-    rightShoulder.Shutdown();
 }
 
 void Arms::Update(float dt)

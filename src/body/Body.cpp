@@ -39,28 +39,28 @@ void Body::Initialise()
 void Body::Shutdown()
 {
     neck.Shutdown();
-    bodyBase.Shutdown();
     arms.Shutdown();
     pelvis.Shutdown();
 }
 
+float rr = 100.0f;
 void Body::Update(float dt, bool speaking, Emotion emotion)
 {
     neck.Update(dt, speaking, emotion);
-    bodyBase.Update(dt);
     arms.Update(dt);
     pelvis.Update(dt);
 
     PlayIdleBodyTransform(dt);
     SetTransform(transform);
+    transform.rotation += dt*rr;
 }
 
 void Body::Draw() const
 {
     bodyBase.Draw();
-    arms.Draw();
+    //arms.Draw();
     neck.Draw();
-    pelvis.Draw();
+    //pelvis.Draw();
 }
 
 // Set the body's world transform.
@@ -81,8 +81,8 @@ void Body::SetTransform(MyTransform transform)
 
 void Body::PlayIdleBodyTransform(float dt)
 {
-    PlayBodyBob(dt);
-    PlayBodyWiggle(dt);
+    //PlayBodyBob(dt);
+    //PlayBodyWiggle(dt);
 }
 
 void Body::PlayBodyWiggle(float dt)

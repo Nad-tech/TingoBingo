@@ -1,8 +1,11 @@
 #pragma once
 
-#include "Sprite.h"
+#include "Shape.h"
 #include "BodyDimensions.h"
-class BodyBase : public Sprite 
+
+#include <string>
+
+class BodyBase : public Shape 
 {
     public:
         BodyBase(BodyDimensions& dimensions);
@@ -13,4 +16,7 @@ class BodyBase : public Sprite
     private:
         BodyDimensions& dimensions;
         Vector2 positionOffset;
+        Vector2 pivot = {0, 0};
+
+        std::string shapeName = "BodyBase"; 
 };

@@ -1,16 +1,16 @@
 #pragma once
 
-#include "Sprite.h"
+#include "Shape.h"
 #include <string>
 #include "BodyDimensions.h"
 #include "MyTransform.h"
 
-class Pupil : public Sprite
+class Pupil : public Shape
 {
     public:
         Pupil(BodyDimensions& dimensions);
         void Initialise() override;
-        void Update(float dt) override;
+        void Update(float dt);
         void SetSide(std::string side);
         float GetSideOffset();
         void SetPosition(Vector2 position);

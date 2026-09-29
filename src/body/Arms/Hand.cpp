@@ -11,10 +11,10 @@ void Hand::Initialise()
     dimensions.handWidth = 55.0f;
     dimensions.handHeight = 50.0f;
 
-    Shape::SetDimensions(
+    /*Shape::SetDimensions(
         dimensions.handWidth,
         dimensions.handHeight
-    );
+    );*/
 
     positionOffset = {
         0,

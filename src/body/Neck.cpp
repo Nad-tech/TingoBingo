@@ -2,6 +2,7 @@
 #include "raylib.h"
 
 Neck::Neck(BodyDimensions& dimensions) :
+    Shape(CARDBOARD_DARK),
     dimensions(dimensions),
     positionOffset(),
     head(dimensions)
@@ -12,7 +13,7 @@ void Neck::Initialise()
 {
     dimensions.neckWidth = 50.0f;
     dimensions.neckHeight = 30.0f;
-    SetDimensions(dimensions.neckWidth, dimensions.neckHeight);
+    Shape::SetDimensions(dimensions.neckWidth, dimensions.neckHeight);
 
     head.Initialise();
 
@@ -20,6 +21,10 @@ void Neck::Initialise()
         0, 
         dimensions.bodyHeight / 2.0f + dimensions.neckHeight / 2.0f
     };
+
+    pivot = {0, 0};
+
+    Shape::SetShapeName("neck");
 }
 
 void Neck::Update(float dt, bool speaking, Emotion emotion) {
@@ -35,7 +40,9 @@ void Neck::Draw() const
 void Neck::SetTransform(MyTransform parentTransform)
 {
     Shape::transform = MakeChildTransform(parentTransform, positionOffset);
-    
+    Shape::transform.pivot = pivot;
+    Shape::SetScreenCoords();
+
     head.SetTransform(transform);
 }
 

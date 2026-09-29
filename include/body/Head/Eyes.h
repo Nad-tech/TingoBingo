@@ -1,10 +1,10 @@
 #pragma once
 
-#include "Sprite.h"
+#include "Shape.h"
 #include "BodyDimensions.h"
 #include "Pupils.h"
 
-class Eyes : public Sprite
+class Eyes : public Shape
 {
     public:
         Eyes(BodyDimensions& dimensions);
@@ -12,7 +12,7 @@ class Eyes : public Sprite
         void Initialise() override;
         void Shutdown();
 
-        void Update(float dt) override;
+        void Update(float dt);
         void Draw() const;
 
         void SetTransform(MyTransform parentTransform);

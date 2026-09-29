@@ -13,8 +13,6 @@
 #include "cmath"
 #include "raymath.h"
 
-Vector2 L;
-
 Pupils::Pupils(BodyDimensions& dimensions) : 
     dimensions(dimensions),
     transform(),
@@ -35,8 +33,7 @@ void Pupils::Initialise()
 // Release resources used by both pupils.
 void Pupils::Shutdown()
 {
-    leftPupil.Shutdown();
-    rightPupil.Shutdown();
+    
 }
 
 // Update both pupil animations.
@@ -51,7 +48,6 @@ void Pupils::Draw() const
 {
     leftPupil.Draw();
     rightPupil.Draw();
-    DrawCircle(L.x, L.y, 50, RED);
 }
 
 // Set both pupil anchor points relative to the head.
@@ -128,8 +124,6 @@ void Pupils::LookAt(Vector2 point)
         + dimensions.neckHeight 
         + dimensions.eyesYoffset) * scale
     };
-
-    L = rightEyeCentre;
 
     // Calculate the direction from each eye to the target.
     Vector2 leftDirection =

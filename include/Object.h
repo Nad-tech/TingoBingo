@@ -1,10 +1,10 @@
 #pragma once
 
 #include "raylib.h"
-#include "Sprite.h"
+#include "Shape.h"
 #include <string>
 
-class Object : public Sprite
+class Object : public Shape
 {
     public:
         void Initialise() override;

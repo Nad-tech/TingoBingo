@@ -16,10 +16,10 @@ void Thigh::Initialise()
     dimensions.thighWidth = 80.0f; 
     dimensions.thighHeight = 250.0f;
 
-    Shape::SetDimensions(
+    /*Shape::SetDimensions(
         dimensions.thighWidth, 
         dimensions.thighHeight
-    );
+    );*/
 
     if(side == "left")
     {
@@ -55,5 +55,4 @@ void Thigh::Draw() const
 void Thigh::SetTransform(MyTransform parentTransform)
 {
     transform = MakeChildTransform(parentTransform, positionOffset);
-    knee.SetAnchorPoint({0,0});
 }

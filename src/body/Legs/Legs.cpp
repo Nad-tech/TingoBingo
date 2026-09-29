@@ -14,8 +14,7 @@ void Legs::Initialise()
 
 void Legs::Shutdown()
 {
-    leftThigh.Shutdown();
-    rightThigh.Shutdown();
+   
 }
 
 void Legs::Update(float dt)

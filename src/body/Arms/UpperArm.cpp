@@ -19,10 +19,10 @@ void UpperArm::Initialise()
     dimensions.upperArmWidth = 50.0f;
     dimensions.upperArmHeight = 120.0f;
 
-    Shape::SetDimensions(
+    /*Shape::SetDimensions(
         dimensions.upperArmWidth,
         dimensions.upperArmHeight
-    );
+    );*/
 
     elbow.Initialise();
 
@@ -44,7 +44,11 @@ void UpperArm::Initialise()
     positionOffset =
     {
         0,
-        -dimensions.upperArmHeight / 2.0f
+        0
+    };
+
+    pivot = {
+        0, dimensions.upperArmHeight / 2.0f
     };
 }
 
@@ -119,6 +123,7 @@ void UpperArm::SetTransform(MyTransform parentTransform)
 {
     Shape::transform = MakeChildTransform(parentTransform, positionOffset);
     Shape::transform.rotation += localRotation;
+    Shape::transform.pivot = pivot;
 
     elbow.SetTransform(Shape::transform);
 }

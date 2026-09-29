@@ -47,40 +47,9 @@ Nose::Nose(BodyDimensions& dimensions) : dimensions(dimensions)
 
 void Nose::Initialise()
 {
-    // Load the nose texture.
-    texture = LoadTexture(
-        "assets/images/TingoBingo/head/nose.png"
-    );
+    dimensions.noseWidth = 100;
 
-    //================================================
-    // Sprite Sheet Layout
-    //================================================
-
-    // The nose currently consists of a single frame.
-    const int COLUMNS = 1;
-    const int ROWS = 1;
-
-    // Calculate the dimensions of one animation frame.
-    dimensions.noseWidth =
-        texture.width / COLUMNS;
-
-    dimensions.noseHeight =
-        texture.height / ROWS;
-
-    const int TOTAL_FRAMES =
-        COLUMNS * ROWS;
-
-    // Time between animation frames.
-    const float FRAME_DURATION = 0.08f;
-
-    // Initialise the animation system.
-    animation.Initialise(
-        dimensions.noseWidth,
-        dimensions.noseHeight,
-        TOTAL_FRAMES,
-        COLUMNS,
-        FRAME_DURATION
-    );
+    dimensions.noseHeight = 100;
 
     positionOffset = {
         0.0f,
@@ -118,8 +87,6 @@ void Nose::Initialise()
 
 void Nose::Update(float dt)
 {
-    // Update the base Sprite animation.
-    Sprite::Update(dt);
 
     //================================================
     // Nose Rotation Idle Animation
@@ -220,7 +187,7 @@ void Nose::Update(float dt)
 
 void Nose::Draw() const
 {
-    Sprite::Draw();
+    Shape::Draw();
 }
 
 void Nose::SetTransform(MyTransform parentTransform)

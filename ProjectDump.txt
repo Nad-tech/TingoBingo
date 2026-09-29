@@ -228,6 +228,7 @@ class Elbow : public Shape
     private:
         BodyDimensions& dimensions;
         Vector2 positionOffset;
+        Vector2 pivot;
 
         std::string side = "";
 
@@ -362,6 +363,7 @@ class UpperArm : public Shape
     private:
         BodyDimensions& dimensions;
         Vector2 positionOffset;
+        Vector2 pivot;
         float localRotation = 0.0f;
         std::string side = "";
 
@@ -457,9 +459,12 @@ class BodyBase : public Sprite
     public:
         BodyBase(BodyDimensions& dimensions);
         void Initialise() override;
+
+        void SetTransform(MyTransform parentTransform);
         
     private:
         BodyDimensions& dimensions;
+        Vector2 positionOffset;
 };
 
 
@@ -668,8 +673,11 @@ class Headbase : public Sprite
         Headbase(BodyDimensions& dimensions);
         void Initialise() override;
         
+        void SetTransform(MyTransform parentTransform);
+
     private:
         BodyDimensions& dimensions;
+        Vector2 positionOffset;
 };
 
 
@@ -1247,258 +1255,32 @@ struct MyTransform
     float scale = 1.0f;
 };
 
-
-// ------------------------------------------------------------
-// Create a child transform from a parent's transform.
-// ------------------------------------------------------------
-//
-// A child transform needs to know where it sits relative to
-// its parent, while still following the parent's movement,
-// rotation and scale.
-//
-// positionOffset describes the child's local position relative
-// to the parent joint.
-//
-// For example:
-//
-//     PARENT JOINT
-//          ●
-//          │
-//          │ positionOffset
-//          │
-//          ●
-//     CHILD CENTRE
-//
-// The child's position must be calculated in world space so
-// that it continues to follow the parent when the parent rotates.
-//
 inline MyTransform MakeChildTransform(
     const MyTransform& parentTransform,
     Vector2 positionOffset)
 {
     MyTransform child;
 
+    float radians = parentTransform.rotation * DEG2RAD;
 
-    // ------------------------------------------------------------
-    // 1. Convert the parent's rotation from degrees to radians.
-    // ------------------------------------------------------------
-    //
-    // Our transforms store angles in degrees because that is
-    // convenient for the rest of the robot.
-    //
-    // sinf() and cosf() expect radians.
-    //
-    float globalRadians = parentTransform.rotation * DEG2RAD;
-
-
-    // ------------------------------------------------------------
-    // 2. Find the vector from the parent's rotation centre
-    //    to the parent joint.
-    // ------------------------------------------------------------
-    //
-    // parentTransform.pivot points from the parent joint back
-    // toward the parent's rotation centre.
-    //
-    // We need the opposite direction when calculating the
-    // joint's offset from the parent's rotation centre.
-    //
-    // So we negate the pivot.
-    //
-    // Conceptually:
-    //
-    //     PARENT ROTATION CENTRE
-    //             ●
-    //             │
-    //             │
-    //             ▼
-    //         PARENT JOINT
-    //
-    // parentTransform.pivot points toward the rotation centre.
-    // Negating it gives the offset back to the parent joint.
-    //
-    Vector2 parentOffset =
+    Vector2 rotatedOffset =
     {
-        -parentTransform.pivot.x,
-        -parentTransform.pivot.y
+        positionOffset.x * cosf(radians) -
+        positionOffset.y * sinf(radians),
+
+        positionOffset.x * sinf(radians) +
+        positionOffset.y * cosf(radians)
     };
 
-
-    // ------------------------------------------------------------
-    // 3. Recover the parent's rotation centre.
-    // ------------------------------------------------------------
-    //
-    // parentTransform.position is the centre of the parent.
-    //
-    // parentTransform.pivot points from the parent centre back
-    // toward the parent's rotation centre.
-    //
-    // Therefore:
-    //
-    //     parent position + parent pivot
-    //
-    // gives us the parent's rotation centre.
-    //
-    // This is important because the parent joint must rotate
-    // around the parent's rotation centre when the parent turns.
-    //
-    Vector2 parentPosition =
-    {
-        parentTransform.position.x + parentTransform.pivot.x,
-        parentTransform.position.y + parentTransform.pivot.y
-    };
-
-
-    // ------------------------------------------------------------
-    // 4. Rotate the parent's offset around the parent.
-    // ------------------------------------------------------------
-    //
-    // At this point we know:
-    //
-    //     parentPosition
-    //         = parent's rotation centre
-    //
-    //     parentOffset
-    //         = vector from the parent's rotation centre
-    //           to the parent joint
-    //
-    // When the parent rotates, that vector must rotate as well.
-    //
-    // This is the standard 2D rotation formula:
-    //
-    //     x' = x * cos(angle) - y * sin(angle)
-    //     y' = x * sin(angle) + y * cos(angle)
-    //
-    // The result is the parent joint's new offset after the
-    // parent has rotated.
-    //
-    Vector2 rotatedParentOffset =
-    {
-        parentOffset.x * cosf(globalRadians) -
-        parentOffset.y * sinf(globalRadians),
-
-        parentOffset.x * sinf(globalRadians) +
-        parentOffset.y * cosf(globalRadians)
-    };
-
-
-    // ------------------------------------------------------------
-    // 5. Convert the rotated offset back into a world position.
-    // ------------------------------------------------------------
-    //
-    // rotatedParentOffset tells us where the parent joint is
-    // relative to the parent's rotation centre.
-    //
-    // Add that offset to the parent's rotation centre to get
-    // the joint's new world position.
-    //
-    Vector2 parentJointPosition =
-    {
-        parentPosition.x + rotatedParentOffset.x,
-        parentPosition.y + rotatedParentOffset.y
-    };
-
-
-    // ------------------------------------------------------------
-    // 6. Position the centre of the child.
-    // ------------------------------------------------------------
-    //
-    // We now know where the parent joint is.
-    //
-    // positionOffset tells us where the centre of the child is
-    // relative to that joint.
-    //
-    // So:
-    //
-    //     parent joint position
-    //             +
-    //     child position offset
-    //             =
-    //     child centre
-    //
-    // This keeps the child attached to the parent joint.
-    //
     child.position =
     {
-        parentJointPosition.x + positionOffset.x,
-        parentJointPosition.y + positionOffset.y
+        parentTransform.position.x + rotatedOffset.x,
+        parentTransform.position.y + rotatedOffset.y
     };
 
-
-    // ------------------------------------------------------------
-    // 7. Set the child's pivot to the parent joint.
-    // ------------------------------------------------------------
-    //
-    // child.position is the centre of the child.
-    //
-    // We don't want the child to rotate around its centre.
-    //
-    // We want it to rotate around the parent joint.
-    //
-    // positionOffset points:
-    //
-    //     parent joint → child centre
-    //
-    // Therefore the negative of positionOffset points:
-    //
-    //     child centre → parent joint
-    //
-    // That is exactly the pivot we need.
-    //
-    // Example:
-    //
-    //     positionOffset = (0, -100)
-    //
-    // means:
-    //
-    //     child centre is 100 units below the parent joint.
-    //
-    // Therefore:
-    //
-    //     pivot = (0, +100)
-    //
-    // places the rotation point at the parent joint.
-    //
-    child.pivot =
-    {
-        -positionOffset.x,
-        -positionOffset.y
-    };
-
-
-    // ------------------------------------------------------------
-    // 8. Inherit the parent's rotation.
-    // ------------------------------------------------------------
-    //
-    // The child is attached to the parent, so it follows the
-    // parent's rotation.
-    //
-    // Any additional local rotation can be added by the child
-    // after this transform has been created.
-    //
     child.rotation = parentTransform.rotation;
-
-
-    // ------------------------------------------------------------
-    // 9. Inherit the parent's scale.
-    // ------------------------------------------------------------
-    //
-    // All parts of the robot use the same scale so that the
-    // hierarchy remains visually consistent.
-    //
     child.scale = parentTransform.scale;
 
-
-    // ------------------------------------------------------------
-    // 10. Return the completed child transform.
-    // ------------------------------------------------------------
-    //
-    // At this point we have calculated everything the child needs:
-    //
-    //     position -> where the child centre is
-    //     pivot    -> where the parent joint is
-    //     rotation -> inherited from the parent
-    //     scale    -> inherited from the parent
-    //
     return child;
 }
 
@@ -2250,23 +2032,11 @@ void Elbow::Initialise()
 
     foreArm.Initialise();
 
-    if(side == "left")
-    {
-        positionOffset = 
-        {
-            0,
-            -dimensions.upperArmHeight / 2.0f
-        };
-    }
+    positionOffset = {
+        0, 0
+    };
 
-    if(side == "right")
-    {
-        positionOffset = 
-        {
-            0,
-            -dimensions.upperArmHeight / 2.0f
-        };
-    }
+    pivot = {0, 0};
 }
 
 void Elbow::Update(float dt)
@@ -2283,7 +2053,20 @@ void Elbow::Draw() const
 void Elbow::SetTransform(MyTransform parentTransform)
 {
     Shape::transform = MakeChildTransform(parentTransform, positionOffset);
+    Shape::transform.pivot = pivot;
+    
     foreArm.SetTransform(transform);
+
+    std::cout
+    << "ELBOW: position "
+    << Shape::transform.position.x << ", "
+    << Shape::transform.position.y
+    << " | pivot "
+    << Shape::transform.pivot.x << ", "
+    << Shape::transform.pivot.y
+    << " | rotation "
+    << Shape::transform.rotation
+    << std::endl;
 }
 
 
@@ -2319,11 +2102,11 @@ void ForeArm::Initialise()
     };
 }
 
-float rt = 0.0f;
+//float rt = 0.0f;
 void ForeArm::Update(float dt)
 {
     hand.Update(dt);
-    rt += dt*50.0f;
+    //rt += dt*50.0f;
 }
 
 void ForeArm::Draw() const 
@@ -2335,7 +2118,7 @@ void ForeArm::Draw() const
 void ForeArm::SetTransform(MyTransform parentTransform)
 {
     Shape::transform = MakeChildTransform(parentTransform, positionOffset);
-    transform.rotation += rt;
+    //transform.rotation += rt;
     hand.SetTransform(Shape::transform);
 }
 
@@ -2382,8 +2165,7 @@ void Hand::Draw() const
 void Hand::SetTransform(MyTransform parentTransform)
 {
     Shape::transform = MakeChildTransform(parentTransform, positionOffset);
-
-    
+    Shape::transform.pivot = {0, 0};
 }
 
 
@@ -2449,8 +2231,19 @@ void Shoulder::SetTransform(MyTransform parentTransform)
 {
     transform = MakeChildTransform(parentTransform, positionOffset);
 
-    Shape::SetTransform(transform);
     upperArm.SetTransform(transform);
+
+     std::cout
+        << "SHOULDER: position "
+        << transform.position.x << ", "
+        << transform.position.y
+        << " | rotation "
+        << transform.rotation
+        << " | pivot "
+        << transform.pivot.x << ", "
+        << transform.pivot.y
+        << std::endl;
+
 }
 
 void Shoulder::SwingArm(
@@ -2513,7 +2306,11 @@ void UpperArm::Initialise()
     positionOffset =
     {
         0,
-        -dimensions.upperArmHeight / 2.0f
+        0
+    };
+
+    pivot = {
+        0, dimensions.upperArmHeight / 2.0f
     };
 }
 
@@ -2588,8 +2385,21 @@ void UpperArm::SetTransform(MyTransform parentTransform)
 {
     Shape::transform = MakeChildTransform(parentTransform, positionOffset);
     Shape::transform.rotation += localRotation;
+    Shape::transform.pivot = pivot;
 
     elbow.SetTransform(Shape::transform);
+
+     std::cout
+        << "UPPERARM: position "
+        << transform.position.x << ", "
+        << transform.position.y
+        << " | rotation "
+        << transform.rotation
+        << " | pivot "
+        << transform.pivot.x << ", "
+        << transform.pivot.y
+        << std::endl;
+
 }
 
 
@@ -2604,7 +2414,7 @@ void UpperArm::SetTransform(MyTransform parentTransform)
 Body::Body(BodyDimensions& dimensions) :
     dimensions(dimensions),
     transform(),
-    homeTransform(), 
+    homeTransform(),
     bodyBase(dimensions),
     neck(dimensions),
     pelvis(dimensions),
@@ -2626,7 +2436,9 @@ Body::Body(BodyDimensions& dimensions) :
 
 void Body::Initialise()
 {
+    // Store the body's initial world transform.
     homeTransform = transform;
+
     bodyBase.Initialise();
     neck.Initialise();
     arms.Initialise();
@@ -2654,16 +2466,22 @@ void Body::Update(float dt, bool speaking, Emotion emotion)
 
 void Body::Draw() const
 {
-    
     bodyBase.Draw();
     arms.Draw();
     neck.Draw();
     pelvis.Draw();
 }
 
+// Set the body's world transform.
+//
+// Body is directly below Robot in the hierarchy, so there
+// is no positionOffset here. The transform received from
+// Robot already describes the body's world position,
+// pivot, rotation and scale.
 void Body::SetTransform(MyTransform transform)
 {
     this->transform = transform;
+
     bodyBase.SetTransform(this->transform);
     neck.SetTransform(this->transform);
     arms.SetTransform(this->transform);
@@ -2693,7 +2511,9 @@ void Body::PlayBodyWiggle(float dt)
     {
         bodyWiggleTimer += dt;
 
-        transform.rotation = sin(bodyWiggleTimer * bodyWiggleFrequency) * bodyWiggleAmplitude;
+        transform.rotation =
+            sin(bodyWiggleTimer * bodyWiggleFrequency)
+            * bodyWiggleAmplitude;
 
         // Gradually reduce the wiggle until the body settles.
         bodyWiggleAmplitude -= 8.0f * dt;
@@ -2726,8 +2546,11 @@ void Body::PlayBodyBob(float dt)
     bodyBobOffset.x = cos(bodyBobAngle) * bodyBobRadiusX;
     bodyBobOffset.y = sin(bodyBobAngle) * bodyBobRadiusY;
 
-    transform.position.x = homeTransform.position.x + bodyBobOffset.x;
-    transform.position.y = homeTransform.position.y + bodyBobOffset.y;
+    transform.position.x =
+        homeTransform.position.x + bodyBobOffset.x;
+
+    transform.position.y =
+        homeTransform.position.y + bodyBobOffset.y;
 }
 
 Head& Body::GetHead()
@@ -2735,12 +2558,10 @@ Head& Body::GetHead()
     return neck.GetHead();
 }
 
-void Body::SwingArm(std::string side,  bool swing)
+void Body::SwingArm(std::string side, bool swing)
 {
     arms.SwingArm(side, swing);
 }
-
-
 
 
 =====================================
@@ -2752,15 +2573,17 @@ void Body::SwingArm(std::string side,  bool swing)
 #include "Constants.h"
 #include <iostream>
 
-BodyBase::BodyBase(BodyDimensions& dimensions) : 
-            dimensions(dimensions)
+BodyBase::BodyBase(BodyDimensions& dimensions) :
+    dimensions(dimensions)
 {
 }
 
-// Load the head sprite and initialise its animation.
+// Load the body sprite and initialise its animation.
 void BodyBase::Initialise()
 {
-    texture = LoadTexture("assets/images/TingoBingo/body/BodyBase.png");
+    texture = LoadTexture(
+        "assets/images/TingoBingo/body/BodyBase.png"
+    );
 
     // Sprite sheet layout.
     const int COLUMNS = 1;
@@ -2782,8 +2605,15 @@ void BodyBase::Initialise()
         COLUMNS,
         FRAME_DURATION
     );
+
+    // BodyBase is positioned directly at Body's position.
+    positionOffset = { 0.0f, 0.0f };
 }
 
+void BodyBase::SetTransform(MyTransform parentTransform)
+{
+    Sprite::transform = MakeChildTransform(parentTransform, positionOffset);
+}
 
 
 =====================================
@@ -2831,8 +2661,8 @@ void Knee::Shutdown(){}
 
 Legs::Legs(BodyDimensions& dimensions) :
     dimensions(dimensions),
-    leftThigh(dimensions, "left"),
-    rightThigh(dimensions, "right")
+    rightThigh(dimensions, "right"),
+    leftThigh(dimensions, "left")
 {}
 
 void Legs::Initialise()
@@ -2947,7 +2777,6 @@ void Thigh::Draw() const
 void Thigh::SetTransform(MyTransform parentTransform)
 {
     transform = MakeChildTransform(parentTransform, positionOffset);
-    knee.SetAnchorPoint({0,0});
 }
 
 
@@ -2991,9 +2820,8 @@ void Neck::Draw() const
 
 void Neck::SetTransform(MyTransform parentTransform)
 {
-    transform = MakeChildTransform(parentTransform, positionOffset);
-
-    Shape::SetTransform(transform);
+    Shape::transform = MakeChildTransform(parentTransform, positionOffset);
+    
     head.SetTransform(transform);
 }
 
@@ -3046,9 +2874,8 @@ void Pelvis::Draw() const
 
 void Pelvis::SetTransform(MyTransform parentTransform)
 {
-    transform = MakeChildTransform(parentTransform, positionOffset);
+    Shape::transform = MakeChildTransform(parentTransform, positionOffset);
 
-    Shape::SetTransform(transform);
     legs.SetTransform(transform);
 }
 
@@ -3597,8 +3424,7 @@ void Eyebrows::Update(float dt, bool speaking, Emotion emotion)
 
 void Eyebrows::SetTransform(MyTransform parentTransform) 
 {
-    transform = MakeChildTransform(parentTransform, positionOffset);
-    Sprite::SetTransform(transform);
+    Sprite::transform = MakeChildTransform(parentTransform, positionOffset);
 }
 
 
@@ -3754,11 +3580,12 @@ Head::Head(BodyDimensions& dimensions) :
 void Head::Initialise()
 {
     headBase.Initialise();
+    
     positionOffset = {
         0,
         dimensions.neckHeight / 2.0f + dimensions.headHeight / 2.0f  
     };
-
+    
     antenna.Initialise();
     ears.Initialise();
     eyebrows.Initialise();
@@ -3873,6 +3700,13 @@ void Headbase::Initialise()
         COLUMNS,
         FRAME_DURATION
     );
+
+    positionOffset = {0.0f, 0.0f};
+}
+
+void Headbase::SetTransform(MyTransform parentTransform)
+{
+    Sprite::transform = MakeChildTransform(parentTransform, positionOffset);
 }
 
 
@@ -3960,7 +3794,7 @@ void Mouth::UpdateMouth(float dt, bool speaking, Emotion emotion)
 
 void Mouth::SetTransform(MyTransform parentTransform)
 {
-    transform = MakeChildTransform(parentTransform, positionOffset);
+    Sprite::transform = MakeChildTransform(parentTransform, positionOffset);
 }
 
 
@@ -4299,8 +4133,7 @@ void Pupil::SetRotation(float rotation)
 
 void Pupil::SetTransform(MyTransform parentTransform) 
 {
-    transform = parentTransform;
-    SetPosition(parentTransform.position);
+    Sprite::transform = MakeChildTransform(parentTransform, positionOffset);
 }
 
 
@@ -5366,20 +5199,19 @@ std::string Object::GetName()
 #include "Emotion.h"
 #include "SfxController.h"
 
-// Initialise the robot's brain 
-Robot::Robot() : 
+// Initialise the robot's brain.
+Robot::Robot() :
     dimensions(),
     transform(),
     body(dimensions),
     robotBrain(*this, dimensions)
 {}
 
-// Initialise the robot's head and place it at the
-// robot's starting anchor point.
+// Initialise the robot and apply its world transform to the body.
 void Robot::Initialise()
 {
     body.Initialise();
-    body.SetTransform(transform);   
+    body.SetTransform(transform);
     sfxController.Initialise();
 }
 
@@ -5406,16 +5238,14 @@ void Robot::SetSpeaking(bool state)
     speaking = state;
 }
 
-
-// Set the robot's anchor point and move the head to the
-// same anchor point.
+// Set the robot's world transform and pass it to the body.
 void Robot::SetTransform(MyTransform transform)
 {
     this->transform = transform;
     body.SetTransform(this->transform);
 }
 
-// Return the robot's current anchor point.
+// Return the robot's current world transform.
 MyTransform Robot::GetTransform() const
 {
     return transform;
@@ -5428,7 +5258,6 @@ Vector2 Robot::GetHeadTransform() const
     return body.GetHeadTransform();
 }*/
 
-
 // Draw the robot.
 void Robot::Draw() const
 {
@@ -5436,13 +5265,12 @@ void Robot::Draw() const
     robotBrain.Draw();
 }
 
-// Release the resources owned by the robot's head.
+// Release the resources owned by the robot's body.
 void Robot::Shutdown()
 {
     body.Shutdown();
     sfxController.Shutdown();
 }
-
 
 // Make the robot look towards a specific point.
 void Robot::LookAt(Vector2 point)
@@ -5456,7 +5284,6 @@ void Robot::SetEmotion(Emotion emotion)
     robotBrain.SetEmotion(emotion);
 }
 
-
 // Tell RobotBrain that the robot has picked up an object.
 void Robot::OnObjectPickedUp(Object& object)
 {
@@ -5469,20 +5296,17 @@ void Robot::LookForward()
     body.GetHead().LookForward();
 }
 
-
 // Return the origin point of RobotBrain's search ray.
 Vector2 Robot::GetSearchRayOrigin() const
 {
     return robotBrain.GetSearchRayOrigin();
 }
 
-
 // Return the end point of RobotBrain's search ray.
 Vector2 Robot::GetSearchRayEnd() const
 {
     return robotBrain.GetSearchRayEnd();
 }
-
 
 // Give RobotBrain access to the toys available in the game.
 void Robot::SetObjectPointers(std::vector<Object*> toys)
@@ -5500,10 +5324,12 @@ void Robot::SwingArm(std::string side, bool swinging)
     body.SwingArm(side, swinging);
 }
 
-/*Vector2 Robot::GetHeadWorldPosition()
+/*
+Vector2 Robot::GetHeadWorldPosition()
 {
     return body.GetHeadWorldPosition();
-}*/
+}
+*/
 
 
 =====================================
@@ -6704,45 +6530,74 @@ void SfxController::Shutdown()
 .\src\Shape.cpp
 =====================================
 
-
-
 #include "Shape.h"
 #include <cmath>
 
 void Shape::Draw() const
 {
+    // ------------------------------------------------------------
+    // TingoBingo Cartesian coordinate system
+    //
+    // +X = right
+    // +Y = up
+    //
+    // transform.position = centre of the object
+    // transform.pivot    = local rotation point
+    // transform.rotation = Cartesian rotation
+    // transform.scale    = object scale
+    // ------------------------------------------------------------
+
+    float scaledWidth =
+        width * transform.scale;
+
+    float scaledHeight =
+        height * transform.scale;
+
+    // Convert the object's WORLD POSITION to screen coordinates.
     Vector2 screenPosition =
     {
-        SCREEN_WIDTH / 2.0f + transform.position.x * transform.scale,
-        SCREEN_HEIGHT / 2.0f - transform.position.y * transform.scale
+        SCREEN_WIDTH / 2.0f + transform.position.x,
+        SCREEN_HEIGHT / 2.0f - transform.position.y
     };
 
-    Vector2 pivotScreen =
+    // Keep the rectangle centred on transform.position.
+    Rectangle rectangle =
     {
-        screenPosition.x + transform.pivot.x * transform.scale,
-        screenPosition.y - transform.pivot.y * transform.scale
-    };
-
-    float scaledWidth = width * transform.scale;
-    float scaledHeight = height * transform.scale;
-
-    Rectangle rectangle = {
-        pivotScreen.x,
-        pivotScreen.y,
+        screenPosition.x - scaledWidth / 2.0f,
+        screenPosition.y - scaledHeight / 2.0f,
         scaledWidth,
         scaledHeight
     };
 
+    // Convert our Cartesian pivot into the rectangle's local
+    // coordinate space.
+    //
+    // Rectangle coordinates have:
+    //     +X = right
+    //     +Y = down
+    //
+    // Our Cartesian coordinates have:
+    //     +X = right
+    //     +Y = up
+    //
+    // Therefore pivot Y is inverted here.
     Vector2 origin =
     {
-        scaledWidth / 2.0f + transform.pivot.x * transform.scale,
-        scaledHeight / 2.0f - transform.pivot.y * transform.scale
+        scaledWidth / 2.0f +
+            transform.pivot.x * transform.scale,
+
+        scaledHeight / 2.0f -
+            transform.pivot.y * transform.scale
     };
+
+    // Convert Cartesian rotation to the screen rotation direction.
+    float screenRotation =
+        -transform.rotation;
 
     DrawRectanglePro(
         rectangle,
         origin,
-        -transform.rotation,
+        screenRotation,
         color
     );
 }
@@ -6755,7 +6610,6 @@ void Shape::SetDimensions(float width, float height)
 
 void Shape::Shutdown()
 {
-    
 }
 
 void Shape::SetTransform(MyTransform transform)

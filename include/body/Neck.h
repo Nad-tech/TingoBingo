@@ -5,6 +5,7 @@
 #include "Emotion.h"
 #include "BodyDimensions.h"
 #include "MyTransform.h"
+#include <string>
 
 class Neck : public Shape
 {
@@ -23,5 +24,9 @@ class Neck : public Shape
     private:
         BodyDimensions& dimensions;
         Vector2 positionOffset;
+        Vector2 pivot;
+
         Head head;
+
+        std::string name = "neck";
 };

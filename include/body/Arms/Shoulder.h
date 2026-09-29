@@ -21,6 +21,7 @@ class Shoulder : public Shape
     private:
         BodyDimensions& dimensions;
         Vector2 positionOffset = {0, 0};
+        Vector2 pivot;
 
         std::string side = "";
         UpperArm upperArm;

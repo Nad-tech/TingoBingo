@@ -14,30 +14,18 @@ void Elbow::Initialise()
     dimensions.elbowWidth = 65.0f;
     dimensions.elbowHeight = 65.0f;
 
-    Shape::SetDimensions(
+    /*Shape::SetDimensions(
         dimensions.elbowWidth, 
         dimensions.elbowHeight
-    );
+    );*/
 
     foreArm.Initialise();
 
-    if(side == "left")
-    {
-        positionOffset = 
-        {
-            0,
-            -dimensions.upperArmHeight / 2.0f
-        };
-    }
+    positionOffset = {
+        0, 0
+    };
 
-    if(side == "right")
-    {
-        positionOffset = 
-        {
-            0,
-            -dimensions.upperArmHeight / 2.0f
-        };
-    }
+    pivot = {0, 0};
 }
 
 void Elbow::Update(float dt)
@@ -54,5 +42,7 @@ void Elbow::Draw() const
 void Elbow::SetTransform(MyTransform parentTransform)
 {
     Shape::transform = MakeChildTransform(parentTransform, positionOffset);
+    Shape::transform.pivot = pivot;
+    
     foreArm.SetTransform(transform);
 }

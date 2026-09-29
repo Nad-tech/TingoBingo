@@ -8,36 +8,14 @@
 
 #include "Body/Head/Antenna.h"
 #include "Constants.h"
-#include "Animation.h"
 
 Antenna::Antenna(BodyDimensions& dimensions) : dimensions(dimensions)
 {}
 
 void Antenna::Initialise()
 {
-    // Load the antenna sprite sheet.
-    texture = LoadTexture("assets/images/TingoBingo/head/antenna.png");
-
-    // Sprite sheet layout.
-    const int COLUMNS = 4;
-    const int ROWS = 2;
-
-    // Calculate the size of a single animation frame.
-    dimensions.antennaWidth = texture.width / COLUMNS;
-    dimensions.antennaHeight = texture.height / ROWS;
-
-    const int TOTAL_FRAMES = COLUMNS * ROWS;
-    const float FRAME_DURATION = 0.06f;
-
-    // Initialise the animation using the sprite sheet information.
-    animation.Initialise
-    (
-        dimensions.antennaWidth,
-        dimensions.antennaHeight,
-        TOTAL_FRAMES,
-        COLUMNS,
-        FRAME_DURATION
-    );
+    dimensions.antennaWidth = 100;
+    dimensions.antennaHeight = 100;
 
     positionOffset = {
         0,
@@ -47,16 +25,12 @@ void Antenna::Initialise()
 
 void Antenna::Update(float dt)
 {
-     // Update the base sprite behaviour before handling antenna animation.
-    Sprite::Update(dt);
-    
     //Idle behavior
     //Wiggle the antenna at random intervals
     antennaAnimationTimer += dt;
 
     if (antennaAnimationTimer > nextAntennaAnimation)
     {
-        animation.Play(0, 7, AnimationPriority::Idle);
         antennaAnimationTimer = 0.0f;
         nextAntennaAnimation = GetRandomValue(1000, 5000) / 1000.0f;
     }

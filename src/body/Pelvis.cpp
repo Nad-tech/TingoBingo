@@ -9,7 +9,7 @@ void Pelvis::Initialise()
 {
     dimensions.pelvisWidth = 240.0f;
     dimensions.pelvisHeight = 70.0f;
-    SetDimensions(dimensions.pelvisWidth, dimensions.pelvisHeight);
+    //SetDimensions(dimensions.pelvisWidth, dimensions.pelvisHeight);
 
     legs.Initialise();
 
