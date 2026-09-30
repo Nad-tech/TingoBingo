@@ -24,8 +24,6 @@ void Headbase::Initialise()
     dimensions.headWidth = texture.width;
     dimensions.headHeight = texture.height;
 
-    Sprite::SetDimensions(dimensions.headWidth, dimensions.headHeight);
-
     const int COLUMNS = 1;
     const int ROWS = 1;
     const int TOTAL_FRAMES = COLUMNS * ROWS;
@@ -41,8 +39,6 @@ void Headbase::Initialise()
     );
 
     positionOffset = {0.0f, 0.0f};
-    
-    globalPivot = {0, 0};
 
     Sprite::SetShapeName("headBase");
 }
@@ -50,7 +46,6 @@ void Headbase::Initialise()
 void Headbase::SetTransform(MyTransform parentTransform)
 {
     Sprite::transform = MakeChildTransform(parentTransform, positionOffset);
-    transform.globalPivot = globalPivot;
     
     Sprite::SetScreenCoords();
 }

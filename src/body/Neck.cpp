@@ -13,8 +13,6 @@ void Neck::Initialise()
 {
     dimensions.neckWidth = 50.0f;
     dimensions.neckHeight = 30.0f;
-    
-    Shape::SetDimensions(dimensions.neckWidth, dimensions.neckHeight);
 
     head.Initialise();
 
@@ -22,8 +20,6 @@ void Neck::Initialise()
         0, 
         dimensions.bodyHeight / 2.0f + dimensions.neckHeight / 2.0f
     };
-
-    globalPivot = {0, 0};
 
     Shape::SetShapeName("neck");
 }
@@ -41,7 +37,6 @@ void Neck::Draw() const
 void Neck::SetTransform(MyTransform parentTransform)
 {
     Shape::transform = MakeChildTransform(parentTransform, positionOffset);
-    Shape::transform.globalPivot = globalPivot;
     Shape::SetScreenCoords();
 
     head.SetTransform(transform);

@@ -18,8 +18,6 @@ void Shoulder::Initialise()
 {
     dimensions.shoulderWidth = 65.0f;
     dimensions.shoulderHeight = 65.0f;
-    
-    Shape::SetDimensions(dimensions.shoulderWidth, dimensions.shoulderHeight);
 
     if(side == "left") 
     {
@@ -41,8 +39,6 @@ void Shoulder::Initialise()
         Shape::SetShapeName("rightShoulder");
     }
 
-    globalPivot = {0, 0};
-
     upperArm.Initialise();
 }
 
@@ -54,8 +50,9 @@ void Shoulder::Update(float dt)
 
 void Shoulder::Draw() const 
 {
-    upperArm.Draw();
     Shape::Draw();
+    upperArm.Draw();
+    
 }
 
 void Shoulder::SetTransform(MyTransform parentTransform)

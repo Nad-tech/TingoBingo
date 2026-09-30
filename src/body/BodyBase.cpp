@@ -15,8 +15,6 @@ void BodyBase::Initialise()
 
     dimensions.bodyWidth = texture.width;
     dimensions.bodyHeight = texture.height;
-    
-    Sprite::SetDimensions(dimensions.bodyWidth, dimensions.bodyHeight);
 
     const int COLUMNS = 1;
     const int ROWS = 1;
@@ -34,15 +32,12 @@ void BodyBase::Initialise()
 
     positionOffset = { 0.0f, 0.0f };
 
-    globalPivot = {0, 0};
-
     Sprite::SetShapeName("bodyBase");
 }
 
 void BodyBase::SetTransform(MyTransform parentTransform)
 {
     Sprite::transform = MakeChildTransform(parentTransform, positionOffset);
-    Sprite::transform.globalPivot = globalPivot;
-
+    
     Sprite::SetScreenCoords();
 }

@@ -21,8 +21,6 @@ class UpperArm : public Shape
     private:
         BodyDimensions& dimensions;
         Vector2 positionOffset;
-        Vector2 globalPivot;
-        Vector2 joint;
 
         float localRotation = 0.0f;
         std::string side = "";

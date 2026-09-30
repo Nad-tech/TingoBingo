@@ -5,24 +5,21 @@
 #include "MyTransform.h"
 #include "BodyDimensions.h"
 #include <string>
+#include "DrawGeometry.h"
 
 class Shape
 {
 protected:
     MyTransform transform;
+    DrawGeometry drawGeometry;
     
-    float width = 0.0f;
-    float height = 0.0f;
-
     float screenX;
     float screenY;
     
     Color color;
 
     std::string name;
-
-    bool hasJoint = false;
-
+    
 public:
     explicit Shape(Color color = CARDBOARD_DARK) : color(color) {}
     virtual void Initialise() = 0;

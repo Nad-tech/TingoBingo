@@ -6,18 +6,17 @@
 #include "BodyDimensions.h"
 #include <string>
 #include "Animation.h"
+#include "DrawGeometry.h"
 
 class Sprite
 {
 protected:
     MyTransform transform;
+    DrawGeometry drawGeometry;
 
     Texture2D texture;
     Animation animation;
     
-    float width;
-    float height;
-
     float screenX;
     float screenY;
 
@@ -31,9 +30,6 @@ public:
     
     void SetScreenCoords();
     void SetShapeName(std::string name);
-    void SetDimensions(float w, float h);
-
-    void DebugDraw() const;
     
     void Shutdown();
     virtual ~Sprite() = default;

@@ -20,6 +20,10 @@ class ForeArm : public Shape
     private:
         BodyDimensions& dimensions;
         Vector2 positionOffset;
+        Vector2 globalPivot;
+        Vector2 joint;
+        
+        bool hasJoint = true;
         
         float localRotation = 0.0f;
         float homeRotation = 0.0f;

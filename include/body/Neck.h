@@ -24,7 +24,6 @@ class Neck : public Shape
     private:
         BodyDimensions& dimensions;
         Vector2 positionOffset;
-        Vector2 globalPivot;
 
         Head head;
 

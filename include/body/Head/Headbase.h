@@ -14,7 +14,6 @@ class Headbase : public Sprite
     private:
         BodyDimensions& dimensions;
         Vector2 positionOffset;
-        Vector2 globalPivot;
 
         std::string name = "headBase";
 };

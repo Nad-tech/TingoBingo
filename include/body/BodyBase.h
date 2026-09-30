@@ -16,7 +16,6 @@ class BodyBase : public Sprite
     private:
         BodyDimensions& dimensions;
         Vector2 positionOffset;
-        Vector2 globalPivot = {0, 0};
 
         std::string shapeName = "BodyBase"; 
 };

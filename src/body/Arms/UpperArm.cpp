@@ -19,20 +19,15 @@ void UpperArm::Initialise()
     dimensions.upperArmWidth = 50.0f;
     dimensions.upperArmHeight = 120.0f;
 
-    Shape::SetDimensions(dimensions.upperArmWidth, dimensions.upperArmHeight);
-
     positionOffset = {
         0, 
-        0
+        -dimensions.upperArmHeight / 2.0f
     };
 
-    globalPivot = {0, 0};
-
-    joint = {0 , dimensions.upperArmHeight / 2.0f};
-
-    Shape::hasJoint = true;
-
     elbow.Initialise();
+
+    if(side == "left") {Shape::SetShapeName("leftUpperArm");}
+    if(side == "right") {Shape::SetShapeName("rightUpperArm");}
 }
 
 // Update the upper arm and its child elbow.
@@ -106,8 +101,6 @@ void UpperArm::SetTransform(MyTransform parentTransform)
 {
     Shape::transform = MakeChildTransform(parentTransform, positionOffset);
     Shape::transform.rotation += localRotation;
-    Shape::transform.globalPivot = globalPivot;
-    Shape::transform.joint = joint;
 
     Shape::SetScreenCoords();
 

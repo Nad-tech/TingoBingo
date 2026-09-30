@@ -3,11 +3,13 @@
 #include "raylib.h"
 #include <cmath>
 
-struct MyTransform
+
+//Cartesion position of this objects local origin/joint/pivot
+//World rotation in degrees
+//inherited scale
+ struct MyTransform
 {
     Vector2 position = { 0.0f, 0.0f };
-    Vector2 globalPivot = { 0.0f, 0.0f };
-    Vector2 joint = { 0.0f, 0.0f };
     float rotation = 0.0f;
     float scale = 1.0f;
 };

@@ -12,11 +12,6 @@ void ForeArm::Initialise()
     dimensions.forearmWidth = 50.0f;
     dimensions.forearmHeight = 120.0f;
 
-    /*Shape::SetDimensions(
-        dimensions.forearmWidth,
-        dimensions.forearmHeight
-    );*/
-
     hand.Initialise();
 
     positionOffset = 
@@ -24,6 +19,8 @@ void ForeArm::Initialise()
         0,
         -dimensions.forearmHeight / 2.0f
     };
+
+    
 }
 
 //float rt = 0.0f;

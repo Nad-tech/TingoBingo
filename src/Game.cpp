@@ -74,7 +74,6 @@ void Game::Initialise()
 	MyTransform initialTransform
 	{
 		.position = robotWorldPos,
-		.globalPivot = {0, 0},
 		.rotation = 0.0f,
 		.scale = SCALE
 	};
@@ -197,8 +196,8 @@ void Game::DrawDebugOverlay() const
 
 	Vector2 pivotScreenPosition =
 	{
-		robotScreenPosition.x + robotTransform.globalPivot.x * robotTransform.scale,
-		robotScreenPosition.y - robotTransform.globalPivot.y * robotTransform.scale
+		robotScreenPosition.x,
+		robotScreenPosition.y
 	};
 
 	Vector2 searchOrigin = robot.GetSearchRayOrigin();

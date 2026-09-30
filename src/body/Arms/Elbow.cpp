@@ -14,18 +14,12 @@ void Elbow::Initialise()
     dimensions.elbowWidth = 65.0f;
     dimensions.elbowHeight = 65.0f;
 
-    /*Shape::SetDimensions(
-        dimensions.elbowWidth, 
-        dimensions.elbowHeight
-    );*/
-
-    foreArm.Initialise();
-
     positionOffset = {
-        0, 0
+        0, 
+        -dimensions.upperArmHeight / 2.0f
     };
 
-    globalPivot = {0, 0};
+    foreArm.Initialise();
 }
 
 void Elbow::Update(float dt)
@@ -42,7 +36,8 @@ void Elbow::Draw() const
 void Elbow::SetTransform(MyTransform parentTransform)
 {
     Shape::transform = MakeChildTransform(parentTransform, positionOffset);
-    Shape::transform.globalPivot = globalPivot;
+    
+    Shape::SetScreenCoords();
     
     foreArm.SetTransform(transform);
 }

@@ -21,7 +21,6 @@ class Elbow : public Shape
     private:
         BodyDimensions& dimensions;
         Vector2 positionOffset;
-        Vector2 globalPivot;
 
         std::string side = "";
 

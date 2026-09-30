@@ -50,9 +50,9 @@ void Body::Update(float dt, bool speaking, Emotion emotion)
     arms.Update(dt);
     pelvis.Update(dt);
 
-    PlayIdleBodyTransform(dt);
+    //PlayIdleBodyTransform(dt);
     SetTransform(transform);
-    transform.rotation += dt*rr;
+    //transform.rotation += dt*rr;
 }
 
 void Body::Draw() const
