@@ -75,7 +75,7 @@ void Game::Initialise()
 	{
 		.position = robotWorldPos,
 		.pivot = {0, 0},
-		.rotation = 30.0f,
+		.rotation = 0.0f,
 		.scale = SCALE
 	};
 	robot.SetTransform(initialTransform);

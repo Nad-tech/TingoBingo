@@ -13,6 +13,7 @@ void Neck::Initialise()
 {
     dimensions.neckWidth = 50.0f;
     dimensions.neckHeight = 30.0f;
+    
     Shape::SetDimensions(dimensions.neckWidth, dimensions.neckHeight);
 
     head.Initialise();

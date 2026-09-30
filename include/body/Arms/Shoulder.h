@@ -25,4 +25,6 @@ class Shoulder : public Shape
 
         std::string side = "";
         UpperArm upperArm;
+
+        std::string name;
 };

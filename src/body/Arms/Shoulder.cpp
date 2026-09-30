@@ -19,9 +19,7 @@ void Shoulder::Initialise()
     dimensions.shoulderWidth = 65.0f;
     dimensions.shoulderHeight = 65.0f;
     
-    //Shape::SetDimensions(dimensions.shoulderWidth, dimensions.shoulderHeight);
-
-    upperArm.Initialise();
+    Shape::SetDimensions(dimensions.shoulderWidth, dimensions.shoulderHeight);
 
     if(side == "left") 
     {
@@ -29,6 +27,8 @@ void Shoulder::Initialise()
             dimensions.bodyWidth / 2.0f + dimensions.shoulderWidth / 2.0f,
             dimensions.bodyHeight / 2.0f - dimensions.shoulderHeight / 2.0f
         };
+
+        Shape::SetShapeName("leftShoulder");
     }
 
     if(side == "right") 
@@ -37,9 +37,13 @@ void Shoulder::Initialise()
             -dimensions.bodyWidth / 2.0f - dimensions.shoulderWidth / 2.0f,
             dimensions.bodyHeight / 2.0f - dimensions.shoulderHeight / 2.0f
         };
+
+        Shape::SetShapeName("rightShoulder");
     }
 
     pivot = {0, 0};
+
+    upperArm.Initialise();
 }
 
 // Update the shoulder and its child upper arm.
@@ -57,6 +61,8 @@ void Shoulder::Draw() const
 void Shoulder::SetTransform(MyTransform parentTransform)
 {
     transform = MakeChildTransform(parentTransform, positionOffset);
+
+    Shape::SetScreenCoords();
 
     upperArm.SetTransform(transform);
 }

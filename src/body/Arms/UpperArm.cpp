@@ -19,37 +19,16 @@ void UpperArm::Initialise()
     dimensions.upperArmWidth = 50.0f;
     dimensions.upperArmHeight = 120.0f;
 
-    /*Shape::SetDimensions(
-        dimensions.upperArmWidth,
-        dimensions.upperArmHeight
-    );*/
+    Shape::SetDimensions(dimensions.upperArmWidth, dimensions.upperArmHeight);
+
+    positionOffset = {
+        0, 
+        -dimensions.upperArmHeight / 2.0f
+    };
+
+    pivot = {0, dimensions.upperArmHeight / 2.0f};
 
     elbow.Initialise();
-
-    // positionOffset describes where the centre of the upper arm
-    // is relative to the shoulder.
-    //
-    // The shoulder is at the top of the upper arm, so the centre
-    // of the arm is half its height below the shoulder.
-    //
-    // This gives us:
-    //
-    //             SHOULDER
-    //                 ●
-    //                 │
-    //                 │  positionOffset
-    //                 │
-    //                 ●
-    //             ARM CENTRE
-    positionOffset =
-    {
-        0,
-        0
-    };
-
-    pivot = {
-        0, dimensions.upperArmHeight / 2.0f
-    };
 }
 
 // Update the upper arm and its child elbow.
@@ -124,6 +103,8 @@ void UpperArm::SetTransform(MyTransform parentTransform)
     Shape::transform = MakeChildTransform(parentTransform, positionOffset);
     Shape::transform.rotation += localRotation;
     Shape::transform.pivot = pivot;
+
+    Shape::SetScreenCoords();
 
     elbow.SetTransform(Shape::transform);
 }

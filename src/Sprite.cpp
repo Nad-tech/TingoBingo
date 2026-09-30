@@ -1,12 +1,14 @@
-#include "Shape.h"
+#include "Sprite.h"
 #include <cmath>
 #include <iostream>
 
-void Shape::Draw() const
+void Sprite::Draw() const
 {    
+    Rectangle source = animation.GetSourceRectangle();
+
     float scale = transform.scale;
 
-    Rectangle rec = {
+    Rectangle destination = {
         screenX + transform.pivot.x * scale,
         screenY - transform.pivot.y * scale,
         width * transform.scale,
@@ -18,17 +20,19 @@ void Shape::Draw() const
         (height * scale / 2.0f) - transform.pivot.y * scale
     };
 
-    DrawRectanglePro(
-        rec,
+    DrawTexturePro(
+        texture,
+        source,
+        destination,
         screenPivot,
         -transform.rotation,
-        color  
-    );
+        WHITE
+    );    
 
     //DebugDraw();
 }
 
-void Shape::SetScreenCoords()
+void Sprite::SetScreenCoords()
 {
     float scale = transform.scale;
 
@@ -36,25 +40,25 @@ void Shape::SetScreenCoords()
     screenY = SCREEN_HEIGHT / 2.0f - transform.position.y * scale;
 }
 
-void Shape::SetDimensions(float w, float h)
+void Sprite::SetDimensions(float w, float h)
 {
     width = w;
     height = h;
 }
 
-void Shape::SetShapeName(std::string name) 
+void Sprite::SetShapeName(std::string name) 
 {
     this->name = name;
 }
 
-void Shape::DebugDraw() const
+void Sprite::DebugDraw() const
 {
-    if(name == "neck")
+    if(name == "bodyBase")
     {
         DrawText(
             TextFormat
             (   
-                "neck: "
+                "bodyBase: "
                 "pos(%.1f,%.1f)," 
                 "spos(%.1f,%.1f)," 
                 "piv(%.1f,%.1f)," 
@@ -73,7 +77,7 @@ void Shape::DebugDraw() const
                 height
             ),
             0,
-            20,
+            0,
             20,
             WHITE
         );
@@ -108,4 +112,14 @@ void Shape::DebugDraw() const
             WHITE
         );
     }
+}
+
+void Sprite::Update(float dt)
+{
+    animation.Update(dt);
+}
+
+void Sprite::Shutdown()
+{
+    UnloadTexture(texture);
 }

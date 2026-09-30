@@ -1,11 +1,11 @@
 #pragma once
 
-#include "Shape.h"
+#include "Sprite.h"
 #include "BodyDimensions.h"
 
 #include <string>
 
-class BodyBase : public Shape 
+class BodyBase : public Sprite 
 {
     public:
         BodyBase(BodyDimensions& dimensions);

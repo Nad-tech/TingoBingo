@@ -1,9 +1,9 @@
 #pragma once
 
-#include "Shape.h"
+#include "Sprite.h"
 #include "BodyDimensions.h"
 
-class Headbase : public Shape 
+class Headbase : public Sprite 
 {
     public:
         Headbase(BodyDimensions& dimensions);
@@ -14,4 +14,7 @@ class Headbase : public Shape
     private:
         BodyDimensions& dimensions;
         Vector2 positionOffset;
+        Vector2 pivot;
+
+        std::string name = "headBase";
 };

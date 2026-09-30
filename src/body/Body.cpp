@@ -58,7 +58,7 @@ void Body::Update(float dt, bool speaking, Emotion emotion)
 void Body::Draw() const
 {
     bodyBase.Draw();
-    //arms.Draw();
+    arms.Draw();
     neck.Draw();
     //pelvis.Draw();
 }
@@ -81,8 +81,8 @@ void Body::SetTransform(MyTransform transform)
 
 void Body::PlayIdleBodyTransform(float dt)
 {
-    //PlayBodyBob(dt);
-    //PlayBodyWiggle(dt);
+    PlayBodyBob(dt);
+    PlayBodyWiggle(dt);
 }
 
 void Body::PlayBodyWiggle(float dt)
