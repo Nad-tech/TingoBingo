@@ -21,6 +21,8 @@ protected:
 
     std::string name;
 
+    bool hasJoint = false;
+
 public:
     explicit Shape(Color color = CARDBOARD_DARK) : color(color) {}
     virtual void Initialise() = 0;

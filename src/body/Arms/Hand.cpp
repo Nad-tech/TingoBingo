@@ -36,5 +36,5 @@ void Hand::Draw() const
 void Hand::SetTransform(MyTransform parentTransform)
 {
     Shape::transform = MakeChildTransform(parentTransform, positionOffset);
-    Shape::transform.pivot = {0, 0};
+    Shape::transform.globalPivot = {0, 0};
 }

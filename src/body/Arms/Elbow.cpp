@@ -25,7 +25,7 @@ void Elbow::Initialise()
         0, 0
     };
 
-    pivot = {0, 0};
+    globalPivot = {0, 0};
 }
 
 void Elbow::Update(float dt)
@@ -42,7 +42,7 @@ void Elbow::Draw() const
 void Elbow::SetTransform(MyTransform parentTransform)
 {
     Shape::transform = MakeChildTransform(parentTransform, positionOffset);
-    Shape::transform.pivot = pivot;
+    Shape::transform.globalPivot = globalPivot;
     
     foreArm.SetTransform(transform);
 }

@@ -197,5 +197,5 @@ void Nose::SetTransform(MyTransform parentTransform)
     transform.rotation =
         parentTransform.rotation + localRotation;
 
-    transform.pivot = { 0.0f, 0.0f };
+    transform.globalPivot = { 0.0f, 0.0f };
 }

@@ -41,7 +41,7 @@ void Shoulder::Initialise()
         Shape::SetShapeName("rightShoulder");
     }
 
-    pivot = {0, 0};
+    globalPivot = {0, 0};
 
     upperArm.Initialise();
 }

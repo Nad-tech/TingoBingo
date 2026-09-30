@@ -6,7 +6,8 @@
 struct MyTransform
 {
     Vector2 position = { 0.0f, 0.0f };
-    Vector2 pivot = { 0.0f, 0.0f };
+    Vector2 globalPivot = { 0.0f, 0.0f };
+    Vector2 joint = { 0.0f, 0.0f };
     float rotation = 0.0f;
     float scale = 1.0f;
 };
@@ -38,4 +39,22 @@ inline MyTransform MakeChildTransform(
     child.scale = parentTransform.scale;
 
     return child;
+}
+
+inline Vector2 RotateVector(MyTransform& transform, Vector2 joint) 
+{
+    float radians = transform.rotation * DEG2RAD;
+
+    return {
+        joint.x * cosf(radians) - joint.y * sinf(radians),
+        joint.x * sinf(radians) + joint.y * cosf(radians)
+    };
+}
+
+inline Vector2 AddVector(Vector2 a, Vector2 b)
+{
+    return {
+        a.x + b.x,
+        a.y + b.y
+    };
 }

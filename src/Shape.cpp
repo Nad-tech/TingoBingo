@@ -6,24 +6,51 @@ void Shape::Draw() const
 {    
     float scale = transform.scale;
 
-    Rectangle rec = {
-        screenX + transform.pivot.x * scale,
-        screenY - transform.pivot.y * scale,
-        width * transform.scale,
-        height * transform.scale
-    };
-    
-    Vector2 screenPivot = {
-        (width * scale / 2.0f) + transform.pivot.x * scale,
-        (height * scale / 2.0f) - transform.pivot.y * scale
-    };
+    if(hasJoint)
+    {
+        Rectangle rec = {
+            screenX,
+            screenY,
+            width * scale,
+            height * scale
+        };
 
-    DrawRectanglePro(
-        rec,
-        screenPivot,
-        -transform.rotation,
-        color  
-    );
+        Vector2 screenPivot = {
+            (width * scale / 2.0f) +
+                transform.joint.x * scale,
+
+            (height * scale / 2.0f) -
+                transform.joint.y * scale
+        };
+
+        DrawRectanglePro(
+            rec,
+            screenPivot,
+            -transform.rotation,
+            color
+        );
+    }
+    else
+    {
+        Rectangle rec = {
+            screenX + transform.globalPivot.x * scale,
+            screenY - transform.globalPivot.y * scale,
+            width * transform.scale,
+            height * transform.scale
+        };
+        
+        Vector2 screenPivot = {
+            (width * scale / 2.0f) + transform.globalPivot.x * scale,
+            (height * scale / 2.0f) - transform.globalPivot.y * scale
+        };
+
+        DrawRectanglePro(
+            rec,
+            screenPivot,
+            -transform.rotation,
+            color  
+        );
+    }
 
     //DebugDraw();
 }
@@ -65,8 +92,8 @@ void Shape::DebugDraw() const
                 transform.position.y,
                 screenX,
                 screenY,
-                transform.pivot.x,
-                transform.pivot.y,
+                transform.globalPivot.x,
+                transform.globalPivot.y,
                 transform.rotation,
                 transform.scale,
                 width,
@@ -95,8 +122,8 @@ void Shape::DebugDraw() const
                 transform.position.y,
                 screenX,
                 screenY,
-                transform.pivot.x,
-                transform.pivot.y,
+                transform.globalPivot.x,
+                transform.globalPivot.y,
                 transform.rotation,
                 transform.scale,
                 width,

@@ -23,10 +23,14 @@ void UpperArm::Initialise()
 
     positionOffset = {
         0, 
-        -dimensions.upperArmHeight / 2.0f
+        0
     };
 
-    pivot = {0, dimensions.upperArmHeight / 2.0f};
+    globalPivot = {0, 0};
+
+    joint = {0 , dimensions.upperArmHeight / 2.0f};
+
+    Shape::hasJoint = true;
 
     elbow.Initialise();
 }
@@ -102,7 +106,8 @@ void UpperArm::SetTransform(MyTransform parentTransform)
 {
     Shape::transform = MakeChildTransform(parentTransform, positionOffset);
     Shape::transform.rotation += localRotation;
-    Shape::transform.pivot = pivot;
+    Shape::transform.globalPivot = globalPivot;
+    Shape::transform.joint = joint;
 
     Shape::SetScreenCoords();
 

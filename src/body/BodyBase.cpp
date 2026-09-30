@@ -34,7 +34,7 @@ void BodyBase::Initialise()
 
     positionOffset = { 0.0f, 0.0f };
 
-    pivot = {0, 0};
+    globalPivot = {0, 0};
 
     Sprite::SetShapeName("bodyBase");
 }
@@ -42,7 +42,7 @@ void BodyBase::Initialise()
 void BodyBase::SetTransform(MyTransform parentTransform)
 {
     Sprite::transform = MakeChildTransform(parentTransform, positionOffset);
-    Sprite::transform.pivot = pivot;
+    Sprite::transform.globalPivot = globalPivot;
 
     Sprite::SetScreenCoords();
 }

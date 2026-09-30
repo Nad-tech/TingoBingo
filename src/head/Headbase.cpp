@@ -42,7 +42,7 @@ void Headbase::Initialise()
 
     positionOffset = {0.0f, 0.0f};
     
-    pivot = {0, 0};
+    globalPivot = {0, 0};
 
     Sprite::SetShapeName("headBase");
 }
@@ -50,7 +50,7 @@ void Headbase::Initialise()
 void Headbase::SetTransform(MyTransform parentTransform)
 {
     Sprite::transform = MakeChildTransform(parentTransform, positionOffset);
-    transform.pivot = pivot;
+    transform.globalPivot = globalPivot;
     
     Sprite::SetScreenCoords();
 }
