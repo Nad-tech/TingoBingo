@@ -52,7 +52,7 @@ void Body::Update(float dt, bool speaking, Emotion emotion)
 
     //PlayIdleBodyTransform(dt);
     SetTransform(transform);
-    //transform.rotation += dt*rr;
+    transform.rotation += dt*rr;
 }
 
 void Body::Draw() const

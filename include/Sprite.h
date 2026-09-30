@@ -22,6 +22,8 @@ protected:
 
     std::string name;
 
+    void DebugDraw() const;
+
 public:
     virtual void Initialise() = 0;
     

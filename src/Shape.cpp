@@ -7,8 +7,8 @@ void Shape::Draw() const
     float scale = transform.scale;
 
     Rectangle rectangle = {
-        screenX - drawGeometry.origin.x * scale,
-        screenY - drawGeometry.origin.y * scale,
+        screenX,
+        screenY,
         drawGeometry.width * scale,
         drawGeometry.height * scale
     };

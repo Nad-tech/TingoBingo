@@ -16,6 +16,9 @@ void BodyBase::Initialise()
     dimensions.bodyWidth = texture.width;
     dimensions.bodyHeight = texture.height;
 
+    drawGeometry.width = texture.width;
+    drawGeometry.height = texture.height;
+
     const int COLUMNS = 1;
     const int ROWS = 1;
     const int TOTAL_FRAMES = COLUMNS * ROWS;
@@ -31,6 +34,11 @@ void BodyBase::Initialise()
     );
 
     positionOffset = { 0.0f, 0.0f };
+
+    drawGeometry.origin = {
+        drawGeometry.width / 2.0f,
+        drawGeometry.height / 2.0f
+    };
 
     Sprite::SetShapeName("bodyBase");
 }
