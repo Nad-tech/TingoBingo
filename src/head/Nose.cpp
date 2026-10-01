@@ -107,7 +107,7 @@ void Nose::Initialise()
 //
 //====================================================
 
-void Nose::Update(float dt)
+void Nose::Update(float dt, Emotion emotion)
 {
     Sprite::Update(dt);
 

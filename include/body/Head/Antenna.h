@@ -2,6 +2,7 @@
 
 #include "Sprite.h"
 #include "BodyDimensions.h"
+#include "Emotion.h"
 
 class Antenna : public Sprite 
 {
@@ -10,7 +11,8 @@ class Antenna : public Sprite
         
         void Initialise() override;
         
-        void Update(float dt);
+        using Sprite::Update;
+        void Update(float dt, Emotion emotion);
         
         void SetTransform(MyTransform parentTransform);
 

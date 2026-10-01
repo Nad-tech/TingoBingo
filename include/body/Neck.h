@@ -14,7 +14,7 @@ class Neck : public Shape
         void Initialise() override;
         void Shutdown();
         
-        void Update(float dt, bool speaking, Emotion emotion);
+        void Update(float dt, Emotion emotion);
         void Draw() const override;
         
         void SetTransform(MyTransform parentTransform);

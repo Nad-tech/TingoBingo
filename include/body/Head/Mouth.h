@@ -10,7 +10,7 @@ class Mouth : public Sprite
         Mouth(BodyDimensions& dimensions);
         
         void Initialise() override;
-        void UpdateMouth(float dt, bool speaking, Emotion emotion);
+        void UpdateMouth(float dt, Emotion emotion);
         
         void SetTransform(MyTransform parentTransform);
 

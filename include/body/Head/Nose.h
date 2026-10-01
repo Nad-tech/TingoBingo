@@ -3,6 +3,7 @@
 #include "Sprite.h"
 #include "raylib.h"
 #include "BodyDimensions.h"
+#include "Emotion.h"
 
 class Nose : public Sprite
 {
@@ -11,7 +12,8 @@ class Nose : public Sprite
         
         void Initialise() override;
         
-        void Update(float dt);
+        using Sprite::Update;
+        void Update(float dt, Emotion emotion);
         void Draw() const override;
         
         void SetTransform(MyTransform parentTransform);

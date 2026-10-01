@@ -2,6 +2,8 @@
 #include "Body/Legs/Legs.h"
 #include "Shape.h"
 #include "BodyDimensions.h"
+#include "Emotion.h"
+
 class Pelvis : Shape
 {
     public:
@@ -9,7 +11,7 @@ class Pelvis : Shape
         void Initialise() override;
         void Shutdown();
         
-        void Update(float dt);
+        void Update(float dt, Emotion emotion);
         void Draw() const;
         
         void SetTransform(MyTransform parentTransform);

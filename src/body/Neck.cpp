@@ -32,8 +32,8 @@ void Neck::Initialise()
     Shape::SetShapeName("neck");
 }
 
-void Neck::Update(float dt, bool speaking, Emotion emotion) {
-    head.Update(dt, speaking, emotion);
+void Neck::Update(float dt, Emotion emotion) {
+    head.Update(dt, emotion);
 }
 
 void Neck::Draw() const

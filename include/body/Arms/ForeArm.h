@@ -4,6 +4,7 @@
 #include <string>
 #include "Shape.h"
 #include "Hand.h"
+#include "Emotion.h"
 
 class ForeArm : public Shape
 {
@@ -12,7 +13,7 @@ class ForeArm : public Shape
         
         void Initialise();
         
-        void Update(float dt);
+        void Update(float dt, Emotion emotion);
         void Draw() const;
         
         void SetTransform(MyTransform parentTransform);

@@ -45,7 +45,7 @@ void Ears::Initialise()
     };
 }
 
-void Ears::Update(float dt)
+void Ears::Update(float dt, Emotion emotion)
 {
     Sprite::Update(dt);
 

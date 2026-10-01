@@ -4,6 +4,8 @@
 #include "BodyDimensions.h"
 #include "Shape.h"
 #include "MyTransform.h"
+#include "Emotion.h"
+#include "Thigh.h"
 
 class Legs : Shape
 {
@@ -12,7 +14,7 @@ class Legs : Shape
         void Initialise();
         void Shutdown();
         
-        void Update(float dt);
+        void Update(float dt, Emotion emotion);
         void Draw() const;
 
         void SetTransform(MyTransform parentTransform);

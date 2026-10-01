@@ -43,7 +43,7 @@ void Foot::Initialise()
 }
 
 float kjhr = 0;
-void Foot::Update(float dt)
+void Foot::Update(float dt, Emotion emotion)
 {
 	kjhr *= dt;
 }

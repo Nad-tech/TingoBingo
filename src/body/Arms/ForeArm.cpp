@@ -30,9 +30,9 @@ void ForeArm::Initialise()
 }
 
 
-void ForeArm::Update(float dt)
+void ForeArm::Update(float dt, Emotion emotion)
 {
-    hand.Update(dt);
+    hand.Update(dt, emotion);
 }
 
 void ForeArm::Draw() const 

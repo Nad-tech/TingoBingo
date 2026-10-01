@@ -47,7 +47,7 @@ void Antenna::Initialise()
     };
 }
 
-void Antenna::Update(float dt)
+void Antenna::Update(float dt, Emotion emotion)
 {
     Sprite::Update(dt);
 

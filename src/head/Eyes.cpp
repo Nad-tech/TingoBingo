@@ -55,7 +55,7 @@ void Eyes::Initialise()
     pupils.Initialise();
 }
 
-void Eyes::Update(float dt)
+void Eyes::Update(float dt, Emotion emotion)
 {
     Sprite::Update(dt);
 
@@ -68,7 +68,7 @@ void Eyes::Update(float dt)
         nextIdleAnimation = GetRandomValue(1000, 5000) / 1000.0f;
     }
 
-    pupils.Update(dt);
+    pupils.Update(dt, emotion);
 }
 
 void Eyes::Draw() const

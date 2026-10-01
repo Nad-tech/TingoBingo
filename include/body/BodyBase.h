@@ -15,7 +15,7 @@ class BodyBase : public Sprite
         
     private:
         BodyDimensions& dimensions;
-        Vector2 positionOffset;
+        Vector2 positionOffset = { 0.0f, 0.0f };
 
         std::string shapeName = "BodyBase"; 
 };

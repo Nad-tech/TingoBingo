@@ -50,10 +50,11 @@ void Mouth::Initialise()
 }
 
 // Advance the mouth animation.
-void Mouth::UpdateMouth(float dt, bool speaking, Emotion emotion)
+void Mouth::UpdateMouth(float dt, Emotion emotion)
 {
     Update(dt);
 
+    /*
     if (emotion == Emotion::Happy && !speaking)
     {
         frame = 0;
@@ -78,7 +79,7 @@ void Mouth::UpdateMouth(float dt, bool speaking, Emotion emotion)
         frameTimer -= FRAME_DURATION;
         frame = (frame == 1) ? 2 : 1;
         animation.SetFrame(frame);
-    }
+    }*/
 }
 
 void Mouth::SetTransform(MyTransform parentTransform)

@@ -57,7 +57,7 @@ void Pupil::Initialise()
 }
 
 // Advance the pupil animation.
-void Pupil::Update(float dt)
+void Pupil::Update(float dt, Emotion emotion)
 {
     Sprite::Update(dt);
 }

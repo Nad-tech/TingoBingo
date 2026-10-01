@@ -30,9 +30,9 @@ void Elbow::Initialise()
     foreArm.Initialise();
 }
 
-void Elbow::Update(float dt)
+void Elbow::Update(float dt, Emotion emotion)
 {
-    foreArm.Update(dt);
+    foreArm.Update(dt, emotion);
 }
 
 void Elbow::Draw() const 

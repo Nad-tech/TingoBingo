@@ -39,9 +39,9 @@ void UpperArm::Initialise()
 }
 
 // Update the upper arm and its child elbow.
-void UpperArm::Update(float dt)
+void UpperArm::Update(float dt, Emotion emotion)
 {
-    elbow.Update(dt);
+    elbow.Update(dt, emotion);
 }
 
 

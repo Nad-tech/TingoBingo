@@ -4,31 +4,14 @@
 
 Body::Body(BodyDimensions& dimensions) :
     dimensions(dimensions),
-    transform(),
-    homeTransform(),
     bodyBase(dimensions),
     neck(dimensions),
     pelvis(dimensions),
-    arms(dimensions),
-    bodyWiggleTimer(0.0f),
-    bodyWiggleAmplitude(0.0f),
-    bodyWiggling(false),
-    nextBodyWiggle((float)GetRandomValue(5, 7)),
-    bodyWiggleFrequency(0.0f),
-    bodyBobOffset({0.0f, 0.0f}),
-    bodyBobScale(7.0f),
-    bodyBobAngle(0.0f),
-    bodyBobDirection(1.0f),
-    randomBodyBobSignTimer((float)GetRandomValue(5, 10)),
-    bodyBobRadiusX(GetRandomValue(3, 8)),
-    bodyBobRadiusY(GetRandomValue(2, 6)),
-    bodyBobSpeed(GetRandomValue(6, 14) / 10.0f)
+    arms(dimensions)
 {}
 
 void Body::Initialise()
 {
-    homeTransform = transform;
-
     bodyBase.Initialise();
     neck.Initialise();
     arms.Initialise();
@@ -42,16 +25,11 @@ void Body::Shutdown()
     pelvis.Shutdown();
 }
 
-float rr = 10.0f;
-void Body::Update(float dt, bool speaking, Emotion emotion)
+void Body::Update(float dt, Emotion emotion)
 {
-    neck.Update(dt, speaking, emotion);
-    arms.Update(dt);
-    pelvis.Update(dt);
-
-    PlayIdleBodyTransform(dt);
-    SetTransform(transform);
-    //transform.rotation += dt*rr;
+    neck.Update(dt, emotion);
+    arms.Update(dt, emotion);
+    pelvis.Update(dt, emotion);
 }
 
 void Body::Draw() const
@@ -70,79 +48,4 @@ void Body::SetTransform(MyTransform transform)
     neck.SetTransform(this->transform);
     arms.SetTransform(this->transform);
     pelvis.SetTransform(this->transform);
-}
-
-void Body::PlayIdleBodyTransform(float dt)
-{
-    PlayBodyBob(dt);
-    PlayBodyWiggle(dt);
-}
-
-void Body::PlayBodyWiggle(float dt)
-{
-    nextBodyWiggle -= dt;
-
-    if (nextBodyWiggle <= 0.0f && !bodyWiggling)
-    {
-        bodyWiggling = true;
-        bodyWiggleTimer = 0.0f;
-        bodyWiggleAmplitude = (float)GetRandomValue(5, 10);
-        nextBodyWiggle = (float)GetRandomValue(5, 7);
-        bodyWiggleFrequency = (float)GetRandomValue(5, 20);
-    }
-
-    if (bodyWiggling)
-    {
-        bodyWiggleTimer += dt;
-
-        transform.rotation =
-            sin(bodyWiggleTimer * bodyWiggleFrequency)
-            * bodyWiggleAmplitude;
-
-        // Gradually reduce the wiggle until the body settles.
-        bodyWiggleAmplitude -= 8.0f * dt;
-
-        if (bodyWiggleAmplitude <= 0.0f)
-        {
-            bodyWiggling = false;
-            transform.rotation = homeTransform.rotation;
-        }
-    }
-}
-
-// Move the body in a slow, organic elliptical motion.
-void Body::PlayBodyBob(float dt)
-{
-    bodyBobAngle += dt * bodyBobSpeed * bodyBobDirection;
-
-    randomBodyBobSignTimer -= dt;
-
-    // Periodically randomise the bobbing direction and movement.
-    if (randomBodyBobSignTimer <= 0)
-    {
-        bodyBobDirection *= -1;
-        randomBodyBobSignTimer = (float)GetRandomValue(5, 10);
-        bodyBobRadiusX = GetRandomValue(3, 8);
-        bodyBobRadiusY = GetRandomValue(2, 6);
-        bodyBobSpeed = GetRandomValue(6, 14) / 10.0f;
-    }
-
-    bodyBobOffset.x = cos(bodyBobAngle) * bodyBobRadiusX;
-    bodyBobOffset.y = sin(bodyBobAngle) * bodyBobRadiusY;
-
-    transform.position.x =
-        homeTransform.position.x + bodyBobOffset.x;
-
-    transform.position.y =
-        homeTransform.position.y + bodyBobOffset.y;
-}
-
-Head& Body::GetHead()
-{
-    return neck.GetHead();
-}
-
-void Body::SwingArm(std::string side, bool swing)
-{
-    arms.SwingArm(side, swing);
 }

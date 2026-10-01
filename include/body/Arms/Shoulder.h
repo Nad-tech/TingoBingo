@@ -3,6 +3,7 @@
 #include "Shape.h"
 #include "UpperArm.h"
 #include "BodyDimensions.h"
+#include "Emotion.h"
 
 class Shoulder : public Shape
 {
@@ -11,7 +12,7 @@ class Shoulder : public Shape
 
         void Initialise() override;
 
-        void Update(float dt);
+        void Update(float dt, Emotion emotion);
         void Draw() const;
         
         void SetTransform(MyTransform parentTransform);

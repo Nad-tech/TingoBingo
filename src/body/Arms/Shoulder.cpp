@@ -51,9 +51,9 @@ void Shoulder::Initialise()
 }
 
 // Update the shoulder and its child upper arm.
-void Shoulder::Update(float dt)
+void Shoulder::Update(float dt, Emotion emotion)
 {
-    upperArm.Update(dt);
+    upperArm.Update(dt, emotion);
 }
 
 void Shoulder::Draw() const 

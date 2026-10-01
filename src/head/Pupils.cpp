@@ -38,10 +38,10 @@ void Pupils::Shutdown()
 }
 
 // Update both pupil animations.
-void Pupils::Update(float dt)
+void Pupils::Update(float dt, Emotion emotion)
 {
-    leftPupil.Update(dt);
-    rightPupil.Update(dt);
+    leftPupil.Update(dt, emotion);
+    rightPupil.Update(dt, emotion);
 }
 
 // Draw both pupils.

@@ -1,11 +1,7 @@
 #pragma once
 
-#include "raylib.h"
 #include "RobotBrain.h"
-#include <string>
 #include "Emotion.h"
-#include "Object.h"
-#include "SfxController.h"
 #include "Body/Body.h"
 #include "BodyDimensions.h"
 #include "MyTransform.h"
@@ -21,34 +17,15 @@ public:
     void Draw() const;
     
     void SetTransform(MyTransform transform);
-    MyTransform GetTransform() const;
     
-    void LookAt(Vector2 point);
-    
-    //Vector2 GetHeadTransform() const;
-    void Speak(const std::string& text);
-    void SetSpeaking(bool state);
     void SetEmotion(Emotion emotion);
+    Emotion GetEmotion();
     
-    void OnObjectPickedUp(Object& object);
     
-    void LookForward();
-    
-    Vector2 GetSearchRayOrigin() const;
-    Vector2 GetSearchRayEnd() const;
-    
-    void SetObjectPointers(std::vector<Object*> objects);
-    void PlaySfx(std::string sound);
-    
-    void SwingArm(std::string side, bool swinging);
-    
-    //Vector2 GetHeadWorldPosition();
-
 private:
     BodyDimensions dimensions;
     MyTransform transform;
+   
     Body body;
     RobotBrain robotBrain;
-    bool speaking = false;
-    SfxController sfxController;
 };

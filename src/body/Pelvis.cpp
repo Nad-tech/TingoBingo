@@ -26,9 +26,9 @@ void Pelvis::Initialise()
     };
 }
 
-void Pelvis::Update(float dt)
+void Pelvis::Update(float dt, Emotion emotion)
 {
-    legs.Update(dt);
+    legs.Update(dt, emotion);
 }
 
 void Pelvis::Draw() const 

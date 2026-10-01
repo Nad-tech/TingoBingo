@@ -3,6 +3,7 @@
 #include "Shape.h"
 #include "Foot.h"
 #include <string>
+#include "Emotion.h"
 
 class Shin : public Shape
 {
@@ -12,7 +13,7 @@ class Shin : public Shape
         
         void Initialise() override;
         
-        void Update(float dt);
+        void Update(float dt, Emotion emotion);
         void Draw() const;
         
         void SetTransform(MyTransform parentTrnsform);

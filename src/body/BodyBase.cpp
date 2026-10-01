@@ -12,7 +12,7 @@ BodyBase::BodyBase(BodyDimensions& dimensions) :
 void BodyBase::Initialise()
 {
     Sprite::texture = LoadTexture("assets/images/TingoBingo/body/bodyBase.png");
-
+   
     dimensions.bodyWidth = texture.width;
     dimensions.bodyHeight = texture.height;
 

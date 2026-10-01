@@ -33,8 +33,8 @@ public:
     
     void Initialise();
     void Shutdown();
-
-    void Update(float dt, bool speaking, Emotion emotion);
+    
+    void Update(float dt, Emotion emotion);
     void Draw() const;
 
     void SetTransform(MyTransform parentTransform);

@@ -4,6 +4,7 @@
 #include "Knee.h"
 #include "BodyDimensions.h"
 #include "MyTransform.h"
+#include "Emotion.h"
 
 #include <string>
 
@@ -13,7 +14,7 @@ class Thigh : public Shape
         Thigh(BodyDimensions& dimensions, std::string side);
         void Initialise() override;
         
-        void Update(float dt);
+        void Update(float dt, Emotion emotion);
         void Draw() const;
 
         void SetTransform(MyTransform parentTransform);

@@ -12,7 +12,7 @@ class Eyebrows : public Sprite
         void Initialise() override;
 
         using Sprite::Update;
-        void Update(float dt, bool speaking, Emotion emotion);
+        void Update(float dt, Emotion emotion);
         
         void SetTransform(MyTransform transform);
 

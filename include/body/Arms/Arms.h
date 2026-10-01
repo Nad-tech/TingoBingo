@@ -3,6 +3,7 @@
 #include "Shoulder.h"
 #include "BodyDimensions.h"
 #include "MyTransform.h"
+#include "Emotion.h"
 
 class Arms
 {
@@ -12,7 +13,7 @@ class Arms
         void Initialise();
         void Shutdown();
 
-        void Update(float dt);
+        void Update(float dt, Emotion emotion);
         void Draw() const;
         
         void SetTransform(MyTransform parentTransform);

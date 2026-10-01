@@ -26,7 +26,7 @@ void Hand::Initialise()
 }
 
 float r = 0.0f;
-void Hand::Update(float dt)
+void Hand::Update(float dt, Emotion emotion)
 {
     r += dt*50.0;
 }

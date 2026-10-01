@@ -17,10 +17,10 @@ void Arms::Shutdown()
 {
 }
 
-void Arms::Update(float dt)
+void Arms::Update(float dt, Emotion emotion)
 {
-    leftShoulder.Update(dt);
-    rightShoulder.Update(dt);
+    leftShoulder.Update(dt, emotion);
+    rightShoulder.Update(dt, emotion);
 
     if(swingLeftArm)
     {

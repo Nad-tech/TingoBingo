@@ -39,9 +39,9 @@ void Shin::Initialise()
 	foot.Initialise();
 }
 
-void Shin::Update(float dt)
+void Shin::Update(float dt, Emotion emotion)
 {
-    foot.Update(dt);
+    foot.Update(dt, emotion);
 }
 
 void Shin::Draw() const

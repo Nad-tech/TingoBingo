@@ -17,10 +17,10 @@ void Legs::Shutdown()
    
 }
 
-void Legs::Update(float dt)
+void Legs::Update(float dt, Emotion emotion)
 {
-    leftThigh.Update(dt);
-    rightThigh.Update(dt);
+    leftThigh.Update(dt, emotion);
+    rightThigh.Update(dt, emotion);
 }
 
 void Legs::Draw() const

@@ -48,10 +48,11 @@ void Eyebrows::Initialise()
     };
 }
 
-void Eyebrows::Update(float dt, bool speaking, Emotion emotion)
+void Eyebrows::Update(float dt, Emotion emotion)
 {
     Sprite::Update(dt);
 
+    /*
     // Speaking and happiness both use the expressive eyebrow animation.
     bool happy = speaking || emotion == Emotion::Happy;
 
@@ -114,7 +115,7 @@ void Eyebrows::Update(float dt, bool speaking, Emotion emotion)
         idleAnimationTimer = 0.0f;
         nextIdleAnimation =
             GetRandomValue(1000, 5000) / 1000.0f;
-    }
+    }*/
 }
 
 void Eyebrows::SetTransform(MyTransform parentTransform) 

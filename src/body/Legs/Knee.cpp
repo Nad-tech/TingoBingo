@@ -41,9 +41,9 @@ void Knee::Initialise()
     shin.Initialise();
 }
 
-void Knee::Update(float dt)
+void Knee::Update(float dt, Emotion emotion)
 {
-    shin.Update(dt);
+    shin.Update(dt, emotion);
 }
 
 void Knee::Draw() const

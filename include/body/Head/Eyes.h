@@ -3,6 +3,7 @@
 #include "Sprite.h"
 #include "BodyDimensions.h"
 #include "Pupils.h"
+#include "Emotion.h"
 
 class Eyes : public Sprite
 {
@@ -12,7 +13,8 @@ class Eyes : public Sprite
         void Initialise() override;
         void Shutdown();
 
-        void Update(float dt);
+        using Sprite::Update;
+        void Update(float dt, Emotion emotion);
         void Draw() const;
 
         void SetTransform(MyTransform parentTransform);

@@ -5,6 +5,7 @@
 #include "Constants.h"
 #include "BodyDimensions.h"
 #include "MyTransform.h"
+#include "Emotion.h"
 
 
 //====================================================
@@ -25,7 +26,7 @@ public:
     void Initialise();
     void Shutdown();
 
-    void Update(float dt);
+    void Update(float dt, Emotion emotion);
     void Draw() const;
 
     void SetTransform(MyTransform parentTransform);
