@@ -9,7 +9,8 @@
 RobotBrain::RobotBrain(Robot& robot)
     : robot(robot),
       state(State::Idle),
-      emotion(Emotion::Neutral)
+      emotion(Emotion::Neutral),
+      gestureController(robot.GetBody())
 {}
 
 inline int rrrr = 0;

@@ -1,6 +1,7 @@
 #pragma once
 
 #include "Emotion.h"
+#include "GestureController.h"
 
 class Robot;
 
@@ -38,4 +39,5 @@ class RobotBrain
         Robot& robot;
         State state;
         Emotion emotion;
+        GestureController gestureController;
 };

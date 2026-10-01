@@ -23,6 +23,8 @@ public:
 
     void NextState();
     void NextEmotion();
+
+    Body& GetBody();
     
 private:
     BodyDimensions dimensions;

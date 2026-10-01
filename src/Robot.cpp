@@ -53,3 +53,8 @@ void Robot::NextEmotion()
 {
     robotBrain.NextEmotion();
 }
+
+Body& Robot::GetBody()
+{
+    return body;
+}
