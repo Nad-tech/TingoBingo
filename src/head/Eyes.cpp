@@ -19,13 +19,37 @@ Eyes::Eyes(BodyDimensions& dimensions) :
 
 void Eyes::Initialise()
 {
-    dimensions.eyesWidth = 100;
-    dimensions.eyesHeight = 100;
+    Sprite::texture = LoadTexture("assets/images/TingoBingo/head/eyes.png");
+
+    const int COLUMNS = 5;
+    const int ROWS = 1;
+    const int TOTAL_FRAMES = COLUMNS * ROWS;
+    const float FRAME_DURATION = 0.02f;
+
+    dimensions.eyesWidth = texture.width / COLUMNS;
+    dimensions.eyesHeight = texture.height / ROWS;
+
+    drawGeometry.width = dimensions.eyesWidth;
+    drawGeometry.height = dimensions.eyesHeight;
 
     dimensions.eyesYoffset = 30.0f;
 
+    Sprite::animation.Initialise
+    (
+        dimensions.eyesWidth,
+        dimensions.eyesHeight,
+        TOTAL_FRAMES,
+        COLUMNS,
+        FRAME_DURATION
+    );
+
     positionOffset = {
         0, dimensions.eyesYoffset
+    };
+
+    Sprite::drawGeometry.origin = {
+        drawGeometry.width / 2.0f,
+        drawGeometry.height / 2.0f
     };
 
     pupils.Initialise();
@@ -33,10 +57,13 @@ void Eyes::Initialise()
 
 void Eyes::Update(float dt)
 {
+    Sprite::Update(dt);
+
     idleAnimationTimer += dt;
     
     if(idleAnimationTimer > nextIdleAnimation)
     {
+        animation.Play(0, 4, AnimationPriority::Idle);
         idleAnimationTimer = 0.0f;
         nextIdleAnimation = GetRandomValue(1000, 5000) / 1000.0f;
     }
@@ -46,12 +73,14 @@ void Eyes::Update(float dt)
 
 void Eyes::Draw() const
 {
+    Sprite::Draw();
     pupils.Draw();
 }
 
 void Eyes::SetTransform(MyTransform parentTransform)
 {
-    transform = MakeChildTransform(parentTransform, positionOffset);
+    Sprite::transform = MakeChildTransform(parentTransform, positionOffset);
+    Sprite::SetScreenCoords();
 
     pupils.SetTransform(transform);
 }
@@ -73,5 +102,6 @@ void Eyes::LookForward()
 
 void Eyes::Shutdown()
 {
+    UnloadTexture(texture);
     pupils.Shutdown();
 }

@@ -33,7 +33,8 @@ void Pupils::Initialise()
 // Release resources used by both pupils.
 void Pupils::Shutdown()
 {
-    
+    leftPupil.Shutdown();
+    rightPupil.Shutdown();
 }
 
 // Update both pupil animations.

@@ -47,13 +47,35 @@ Nose::Nose(BodyDimensions& dimensions) : dimensions(dimensions)
 
 void Nose::Initialise()
 {
-    dimensions.noseWidth = 100;
+    Sprite::texture = LoadTexture("assets/images/TingoBingo/head/nose.png");
 
-    dimensions.noseHeight = 100;
+    const int COLUMNS = 1;
+    const int ROWS = 1;
+    const int TOTAL_FRAMES = COLUMNS * ROWS;
+    const float FRAME_DURATION = 0.08f;
+
+    dimensions.noseWidth = texture.width / COLUMNS;
+    dimensions.noseHeight = texture.height / ROWS;
+
+    Sprite::drawGeometry.width = dimensions.noseWidth;
+    Sprite::drawGeometry.height = dimensions.noseHeight;
+    
+    animation.Initialise(
+        dimensions.noseWidth,
+        dimensions.noseHeight,
+        TOTAL_FRAMES,
+        COLUMNS,
+        FRAME_DURATION
+    );
 
     positionOffset = {
         0.0f,
         -slightPositionOffset
+    };
+
+    drawGeometry.origin = {
+        drawGeometry.width / 2.0f,
+        drawGeometry.height / 2.0f
     };
 
     homePosition = positionOffset;
@@ -87,6 +109,7 @@ void Nose::Initialise()
 
 void Nose::Update(float dt)
 {
+    Sprite::Update(dt);
 
     //================================================
     // Nose Rotation Idle Animation
@@ -187,13 +210,13 @@ void Nose::Update(float dt)
 
 void Nose::Draw() const
 {
-    Shape::Draw();
+    Sprite::Draw();
 }
 
 void Nose::SetTransform(MyTransform parentTransform)
 {
-    transform = MakeChildTransform(parentTransform, positionOffset);
+    Sprite::transform = MakeChildTransform(parentTransform, positionOffset);
+    Sprite::transform.rotation = parentTransform.rotation + localRotation;
 
-    transform.rotation =
-        parentTransform.rotation + localRotation;
+    Sprite::SetScreenCoords();
 }

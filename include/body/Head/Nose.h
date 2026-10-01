@@ -1,16 +1,19 @@
 #pragma once
 
-#include "Shape.h"
+#include "Sprite.h"
 #include "raylib.h"
 #include "BodyDimensions.h"
 
-class Nose : public Shape
+class Nose : public Sprite
 {
     public:
         Nose(BodyDimensions& dimensions);
+        
         void Initialise() override;
+        
         void Update(float dt);
         void Draw() const override;
+        
         void SetTransform(MyTransform parentTransform);
 
     private:

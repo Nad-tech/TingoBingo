@@ -1,10 +1,10 @@
 #pragma once
 
-#include "Shape.h"
+#include "Sprite.h"
 #include "BodyDimensions.h"
 #include "Pupils.h"
 
-class Eyes : public Shape
+class Eyes : public Sprite
 {
     public:
         Eyes(BodyDimensions& dimensions);
@@ -25,9 +25,9 @@ class Eyes : public Shape
     private:
         BodyDimensions& dimensions;
         Vector2 positionOffset;
-        Pupils pupils;
-
-        // TODO: make pupils child of Eyes
+        
         float idleAnimationTimer = 0.0f;
         float nextIdleAnimation = 0.0f;
+
+        Pupils pupils;
 }; 

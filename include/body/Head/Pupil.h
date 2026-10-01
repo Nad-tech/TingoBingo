@@ -1,11 +1,11 @@
 #pragma once
 
-#include "Shape.h"
+#include "Sprite.h"
 #include <string>
 #include "BodyDimensions.h"
 #include "MyTransform.h"
 
-class Pupil : public Shape
+class Pupil : public Sprite
 {
     public:
         Pupil(BodyDimensions& dimensions);
