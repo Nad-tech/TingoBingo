@@ -19,6 +19,9 @@ void Shoulder::Initialise()
     dimensions.shoulderWidth = 65.0f;
     dimensions.shoulderHeight = 65.0f;
 
+    drawGeometry.width = dimensions.shoulderWidth;
+    drawGeometry.height = dimensions.shoulderHeight;
+
     if(side == "left") 
     {
         positionOffset = {
@@ -39,6 +42,11 @@ void Shoulder::Initialise()
         Shape::SetShapeName("rightShoulder");
     }
 
+    drawGeometry.origin = {
+        drawGeometry.width / 2.0f,
+        drawGeometry.height / 2.0f
+    };
+
     upperArm.Initialise();
 }
 
@@ -50,9 +58,8 @@ void Shoulder::Update(float dt)
 
 void Shoulder::Draw() const 
 {
-    Shape::Draw();
     upperArm.Draw();
-    
+    Shape::Draw();   
 }
 
 void Shoulder::SetTransform(MyTransform parentTransform)

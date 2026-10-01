@@ -12,22 +12,27 @@ void ForeArm::Initialise()
     dimensions.forearmWidth = 50.0f;
     dimensions.forearmHeight = 120.0f;
 
+    Shape::drawGeometry.width = dimensions.forearmWidth;
+    Shape::drawGeometry.height = dimensions.forearmHeight;
+
     hand.Initialise();
 
     positionOffset = 
     {
         0,
-        -dimensions.forearmHeight / 2.0f
+        0
     };
 
-    
+    Shape::drawGeometry.origin = {
+        Shape::drawGeometry.width / 2.0f,
+        0
+    };
 }
 
-//float rt = 0.0f;
+
 void ForeArm::Update(float dt)
 {
     hand.Update(dt);
-    //rt += dt*50.0f;
 }
 
 void ForeArm::Draw() const 
@@ -39,6 +44,12 @@ void ForeArm::Draw() const
 void ForeArm::SetTransform(MyTransform parentTransform)
 {
     Shape::transform = MakeChildTransform(parentTransform, positionOffset);
-    //transform.rotation += rt;
+
+    float angle = -20.0f;
+    if(side == "left") angle = 20.0f; 
+    Shape::transform.rotation += angle;
+
+    Shape::SetScreenCoords();
+
     hand.SetTransform(Shape::transform);
 }

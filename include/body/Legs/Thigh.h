@@ -21,6 +21,8 @@ class Thigh : public Shape
     private:
         BodyDimensions& dimensions;
         Vector2 positionOffset;
+        
         std::string side;
+        
         Knee knee;
 };

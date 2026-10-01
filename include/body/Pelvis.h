@@ -16,6 +16,7 @@ class Pelvis : Shape
 
     private:
         BodyDimensions& dimensions;
-        Vector2 positionOffset = {};
+        Vector2 positionOffset;
+        
         Legs legs;
 };

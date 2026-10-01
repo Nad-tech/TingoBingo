@@ -9,13 +9,20 @@ void Pelvis::Initialise()
 {
     dimensions.pelvisWidth = 240.0f;
     dimensions.pelvisHeight = 70.0f;
-    //SetDimensions(dimensions.pelvisWidth, dimensions.pelvisHeight);
+
+    Shape::drawGeometry.width = dimensions.pelvisWidth;
+    Shape::drawGeometry.height = dimensions.pelvisHeight;
 
     legs.Initialise();
 
     positionOffset = {
         0,
         -dimensions.bodyHeight / 2.0f - dimensions.pelvisHeight / 2.0f
+    };
+
+    Shape::drawGeometry.origin = {
+        Shape::drawGeometry.width / 2.0f,
+        Shape::drawGeometry.height / 2.0f
     };
 }
 
@@ -33,6 +40,7 @@ void Pelvis::Draw() const
 void Pelvis::SetTransform(MyTransform parentTransform)
 {
     Shape::transform = MakeChildTransform(parentTransform, positionOffset);
+    Shape::SetScreenCoords();
 
     legs.SetTransform(transform);
 }

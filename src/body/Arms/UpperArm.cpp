@@ -19,9 +19,17 @@ void UpperArm::Initialise()
     dimensions.upperArmWidth = 50.0f;
     dimensions.upperArmHeight = 120.0f;
 
+    drawGeometry.width = dimensions.upperArmWidth;
+    drawGeometry.height = dimensions.upperArmHeight;
+
     positionOffset = {
         0, 
-        -dimensions.upperArmHeight / 2.0f
+        0
+    };
+
+    drawGeometry.origin = {
+        drawGeometry.width / 2.0f,
+        0
     };
 
     elbow.Initialise();

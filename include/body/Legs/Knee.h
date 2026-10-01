@@ -3,21 +3,25 @@
 #include "BodyDimensions.h"
 #include "Shape.h"
 #include "Shin.h"
+#include <string>
+
 class Knee : public Shape
 {
     public:
-        public:
-        explicit Knee(BodyDimensions& dimensions);
+        Knee(BodyDimensions& dimensions, std::string side);
+        
         void Initialise() override;
+        
         void Update(float dt);
         void Draw() const;
-        void SetRotation(float rotation);
-        void SetAnchorPoint(Vector2 anchorPoint);
-        void Shutdown();
 
+        void SetTransform(MyTransform parentTransform);
+        
     private:
         BodyDimensions& dimensions;
-        Vector2 localPositionOffset = {};
+        Vector2 positionOffset;
+
+        std::string side;
 
         Shin shin;
 };

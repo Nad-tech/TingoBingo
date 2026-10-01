@@ -2,22 +2,26 @@
 #include "BodyDimensions.h"
 #include "Shape.h"
 #include "Foot.h"
+#include <string>
 
 class Shin : public Shape
 {
     public:
         public:
-        explicit Shin(BodyDimensions& dimensions);
+        Shin(BodyDimensions& dimensions, std::string side);
+        
         void Initialise() override;
+        
         void Update(float dt);
         void Draw() const;
-        void SetRotation(float rotation);
-        void SetAnchorPoint(Vector2 anchorPoint);
-        void Shutdown();
+        
+        void SetTransform(MyTransform parentTrnsform);
 
     private:
         BodyDimensions& dimensions;
-        Vector2 localPositionOffset = {};
+        Vector2 positionOffset;
+
+        std::string side;
 
         Foot foot;
 };

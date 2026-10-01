@@ -11,9 +11,17 @@ void Hand::Initialise()
     dimensions.handWidth = 55.0f;
     dimensions.handHeight = 50.0f;
 
+    Shape::drawGeometry.width = dimensions.handWidth;
+    Shape::drawGeometry.height = dimensions.handHeight;
+
     positionOffset = {
         0,
-        -dimensions.forearmHeight / 2.0f
+        -dimensions.forearmHeight
+    };
+
+    Shape::drawGeometry.origin = {
+        Shape::drawGeometry.width / 2.0f,
+        Shape::drawGeometry.height / 2.0f
     };
 }
 
@@ -31,4 +39,5 @@ void Hand::Draw() const
 void Hand::SetTransform(MyTransform parentTransform)
 {
     Shape::transform = MakeChildTransform(parentTransform, positionOffset);
+    Shape::SetScreenCoords();
 }

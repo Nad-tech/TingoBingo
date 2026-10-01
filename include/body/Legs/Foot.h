@@ -2,20 +2,23 @@
 
 #include "BodyDimensions.h"
 #include "Shape.h"
+#include <string>
 
 class Foot : public Shape
 {
     public:
-        public:
-        explicit Foot(BodyDimensions& dimensions);
+        Foot(BodyDimensions& dimensions, std::string side);
+        
         void Initialise() override;
         void Update(float dt);
+        
         void Draw() const;
-        void SetRotation(float rotation);
-        void SetAnchorPoint(Vector2 anchorPoint);
-        void Shutdown();
+        
+        void SetTransform(MyTransform parentTransform);
 
     private:
         BodyDimensions& dimensions;
-        Vector2 localPositionOffset = {};
+        Vector2 positionOffset;
+
+        std::string side;
 };

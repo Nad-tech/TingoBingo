@@ -7,26 +7,24 @@ Thigh::Thigh(BodyDimensions& dimensions, std::string side) :
     Shape(CARDBOARD),
     dimensions(dimensions),
     side(side),
-    knee(dimensions)
+    knee(dimensions, side)
 {}
 
 void Thigh::Initialise()
 {
     // Calculate the size of a single animation frame.
     dimensions.thighWidth = 80.0f; 
-    dimensions.thighHeight = 250.0f;
+    dimensions.thighHeight = 150.0f;
 
-    /*Shape::SetDimensions(
-        dimensions.thighWidth, 
-        dimensions.thighHeight
-    );*/
+    Shape::drawGeometry.width = dimensions.thighWidth;
+    Shape::drawGeometry.height = dimensions.thighHeight;
 
     if(side == "left")
     {
         positionOffset = {
             dimensions.pelvisWidth / 2.0f - 
             dimensions.thighWidth / 2.0f,
-            -dimensions.thighHeight / 2.0f
+            0
         };
     }
 
@@ -35,11 +33,16 @@ void Thigh::Initialise()
         positionOffset = {
             -dimensions.pelvisWidth / 2.0f + 
             dimensions.thighWidth / 2.0f,
-            -dimensions.thighHeight / 2.0f
+            0
         };
     }
-    
 
+    Shape::drawGeometry.origin = {
+        Shape::drawGeometry.width / 2.0f,
+        0
+    };
+
+    knee.Initialise();
 }
 
 void Thigh::Update(float dt)
@@ -50,9 +53,18 @@ void Thigh::Update(float dt)
 void Thigh::Draw() const
 {
     Shape::Draw();
+    knee.Draw();
 }
 
 void Thigh::SetTransform(MyTransform parentTransform)
 {
-    transform = MakeChildTransform(parentTransform, positionOffset);
+    Shape::transform = MakeChildTransform(parentTransform, positionOffset);
+    
+    float angle = -20.0f;
+    if(side == "left") angle = 20.0f; 
+    Shape::transform.rotation += angle;
+
+    Shape::SetScreenCoords();
+
+    knee.SetTransform(Shape::transform);
 }

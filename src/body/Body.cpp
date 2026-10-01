@@ -27,7 +27,6 @@ Body::Body(BodyDimensions& dimensions) :
 
 void Body::Initialise()
 {
-    // Store the body's initial world transform.
     homeTransform = transform;
 
     bodyBase.Initialise();
@@ -43,16 +42,16 @@ void Body::Shutdown()
     pelvis.Shutdown();
 }
 
-float rr = 100.0f;
+float rr = 10.0f;
 void Body::Update(float dt, bool speaking, Emotion emotion)
 {
     neck.Update(dt, speaking, emotion);
     arms.Update(dt);
     pelvis.Update(dt);
 
-    //PlayIdleBodyTransform(dt);
+    PlayIdleBodyTransform(dt);
     SetTransform(transform);
-    transform.rotation += dt*rr;
+    //transform.rotation += dt*rr;
 }
 
 void Body::Draw() const
@@ -60,15 +59,9 @@ void Body::Draw() const
     bodyBase.Draw();
     arms.Draw();
     neck.Draw();
-    //pelvis.Draw();
+    pelvis.Draw();
 }
 
-// Set the body's world transform.
-//
-// Body is directly below Robot in the hierarchy, so there
-// is no positionOffset here. The transform received from
-// Robot already describes the body's world position,
-// pivot, rotation and scale.
 void Body::SetTransform(MyTransform transform)
 {
     this->transform = transform;

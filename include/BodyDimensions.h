@@ -56,6 +56,9 @@ public:
     float thighWidth;
     float thighHeight;
 
+    float kneeWidth;
+    float kneeHeight;
+
     float shinWidth;
     float shinHeight;
 
