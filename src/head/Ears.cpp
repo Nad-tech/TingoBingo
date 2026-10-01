@@ -1,11 +1,3 @@
-//====================================================
-// Ears.cpp
-//
-// Handles the robot's ear sprites and animation.
-// The ears can play a short wiggle animation when
-// triggered.
-//====================================================
-
 #include "Body/Head/Ears.h"
 #include "Constants.h"
 
@@ -48,15 +40,6 @@ void Ears::Initialise()
 void Ears::Update(float dt, Emotion emotion)
 {
     Sprite::Update(dt);
-
-    idleAnimationTimer += dt;
-
-    if(idleAnimationTimer > nextIdleAnimation)
-    { 
-        animation.Play(0, 4, AnimationPriority::Idle);
-        idleAnimationTimer = 0.0f;
-        nextIdleAnimation = GetRandomValue(1000, 5000) / 1000.0f;
-    }
 }
 
 void Ears::SetTransform(MyTransform parentTransform)

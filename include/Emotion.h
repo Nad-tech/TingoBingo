@@ -14,5 +14,7 @@ enum class Emotion
     Happy,
     Sad,
     Angry,
-    Surprised
+    Surprised,
+
+    Count
 };

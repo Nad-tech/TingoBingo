@@ -50,17 +50,6 @@ void Antenna::Initialise()
 void Antenna::Update(float dt, Emotion emotion)
 {
     Sprite::Update(dt);
-
-    //Idle behavior
-    //Wiggle the antenna at random intervals
-    antennaAnimationTimer += dt;
-
-    if (antennaAnimationTimer > nextAntennaAnimation)
-    {
-        animation.Play(0, 7, AnimationPriority::Idle);
-        antennaAnimationTimer = 0.0f;
-        nextAntennaAnimation = GetRandomValue(1000, 5000) / 1000.0f;
-    }
 }
 
 void Antenna::SetTransform(MyTransform parentTransform)

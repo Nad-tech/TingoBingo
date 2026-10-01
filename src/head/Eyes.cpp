@@ -59,13 +59,13 @@ void Eyes::Update(float dt, Emotion emotion)
 {
     Sprite::Update(dt);
 
-    idleAnimationTimer += dt;
+    blinkAnimationTimer += dt;
     
-    if(idleAnimationTimer > nextIdleAnimation)
+    if(blinkAnimationTimer > nextBlinkAnimation)
     {
         animation.Play(0, 4, AnimationPriority::Idle);
-        idleAnimationTimer = 0.0f;
-        nextIdleAnimation = GetRandomValue(1000, 5000) / 1000.0f;
+        blinkAnimationTimer = 0.0f;
+        nextBlinkAnimation = GetRandomValue(1000, 5000) / 1000.0f;
     }
 
     pupils.Update(dt, emotion);

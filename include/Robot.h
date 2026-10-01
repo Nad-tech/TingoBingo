@@ -20,7 +20,9 @@ public:
     
     void SetEmotion(Emotion emotion);
     Emotion GetEmotion();
-    
+
+    void NextState();
+    void NextEmotion();
     
 private:
     BodyDimensions dimensions;

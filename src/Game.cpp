@@ -62,9 +62,22 @@ void Game::Initialise()
 
 void Game::HandleInput()
 {
-	if(input.H_Pressed())
+
+	/*Neutral,
+    Happy,
+    Sad,
+    Angry,
+    Surprised*/
+	//Emotion remote control
+	
+	if(input.S_Pressed())
 	{
-		robot.SetEmotion(Emotion::Happy);
+		robot.NextState();
+	}
+
+	if(input.E_Pressed()) 
+	{
+		robot.NextEmotion();
 	}
 }
 

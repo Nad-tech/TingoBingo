@@ -1,12 +1,3 @@
-//====================================================
-// Pupil.cpp
-//
-// Handles the robot's pupil sprite.
-//
-// The pupil is drawn separately from the eyes so it
-// can move independently when the robot looks around.
-//====================================================
-
 #include "Body/Head/Pupil.h"
 #include "Constants.h"
 #include <cmath>

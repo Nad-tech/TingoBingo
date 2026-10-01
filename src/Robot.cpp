@@ -15,7 +15,6 @@ void Robot::Initialise()
 void Robot::Update(float dt)
 {
     body.Update(dt, robotBrain.GetEmotion());
-
 }
 
 void Robot::SetTransform(MyTransform transform)
@@ -27,6 +26,7 @@ void Robot::SetTransform(MyTransform transform)
 void Robot::Draw() const
 {
     body.Draw();
+    robotBrain.Draw();
 }
 
 void Robot::Shutdown()
@@ -42,4 +42,14 @@ void Robot::SetEmotion(Emotion emotion)
 Emotion Robot::GetEmotion()
 {
     return robotBrain.GetEmotion();
+}
+
+void Robot::NextState()
+{
+    robotBrain.NextState();
+}
+
+void Robot::NextEmotion()
+{
+    robotBrain.NextEmotion();
 }

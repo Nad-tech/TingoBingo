@@ -172,6 +172,7 @@ private:
 #include "Shoulder.h"
 #include "BodyDimensions.h"
 #include "MyTransform.h"
+#include "Emotion.h"
 
 class Arms
 {
@@ -181,7 +182,7 @@ class Arms
         void Initialise();
         void Shutdown();
 
-        void Update(float dt);
+        void Update(float dt, Emotion emotion);
         void Draw() const;
         
         void SetTransform(MyTransform parentTransform);
@@ -210,6 +211,7 @@ class Arms
 #include "Shape.h"
 #include "ForeArm.h"
 #include "BodyDimensions.h"
+#include "Emotion.h"
 
 #include <string>
 
@@ -220,7 +222,7 @@ class Elbow : public Shape
         
         void Initialise() override;
         
-        void Update(float dt);
+        void Update(float dt, Emotion emotion);
         void Draw() const;
 
         void SetTransform(MyTransform parentTransform);
@@ -228,7 +230,6 @@ class Elbow : public Shape
     private:
         BodyDimensions& dimensions;
         Vector2 positionOffset;
-        Vector2 pivot;
 
         std::string side = "";
 
@@ -244,9 +245,9 @@ class Elbow : public Shape
 
 #include "BodyDimensions.h"
 #include <string>
-
 #include "Shape.h"
 #include "Hand.h"
+#include "Emotion.h"
 
 class ForeArm : public Shape
 {
@@ -255,7 +256,7 @@ class ForeArm : public Shape
         
         void Initialise();
         
-        void Update(float dt);
+        void Update(float dt, Emotion emotion);
         void Draw() const;
         
         void SetTransform(MyTransform parentTransform);
@@ -282,6 +283,7 @@ class ForeArm : public Shape
 #include "BodyDimensions.h"
 #include "Shape.h"
 #include <string>
+#include "Emotion.h"
 
 class Hand : public Shape
 {
@@ -290,7 +292,7 @@ class Hand : public Shape
         
         void Initialise() override;
         
-        void Update(float dt);
+        void Update(float dt, Emotion emotion);
         void Draw() const;
         
         void SetTransform(MyTransform parentTransform);
@@ -312,6 +314,7 @@ class Hand : public Shape
 #include "Shape.h"
 #include "UpperArm.h"
 #include "BodyDimensions.h"
+#include "Emotion.h"
 
 class Shoulder : public Shape
 {
@@ -320,7 +323,7 @@ class Shoulder : public Shape
 
         void Initialise() override;
 
-        void Update(float dt);
+        void Update(float dt, Emotion emotion);
         void Draw() const;
         
         void SetTransform(MyTransform parentTransform);
@@ -333,6 +336,8 @@ class Shoulder : public Shape
 
         std::string side = "";
         UpperArm upperArm;
+
+        std::string name;
 };
 
 
@@ -345,6 +350,7 @@ class Shoulder : public Shape
 #include "Shape.h"
 #include "Body/Arms/Elbow.h"
 #include "BodyDimensions.h"
+#include "Emotion.h"
 
 class UpperArm : public Shape
 {
@@ -353,7 +359,7 @@ class UpperArm : public Shape
 
         void Initialise() override;
      
-        void Update(float dt);
+        void Update(float dt, Emotion emotion);
         void Draw() const;
         
         void SetTransform(MyTransform parentTransform);
@@ -363,7 +369,7 @@ class UpperArm : public Shape
     private:
         BodyDimensions& dimensions;
         Vector2 positionOffset;
-        Vector2 pivot;
+
         float localRotation = 0.0f;
         std::string side = "";
 
@@ -400,49 +406,18 @@ public:
     void Initialise();
     void Shutdown();
     
-    void Update(float dt, bool speaking, Emotion emotion);
+    void Update(float dt, Emotion emotion);
     void Draw() const;
     
     void SetTransform(MyTransform transform);
-    
-    Head& GetHead();
-    
-    void PlayIdleBodyTransform(float dt);
-    void PlayBodyWiggle(float dt);
-    void PlayBodyBob(float dt);
-    void SwingArm(std::string side, bool swing);
 
 private:
     BodyDimensions &dimensions;
     MyTransform transform;
-    MyTransform homeTransform;
     BodyBase bodyBase;
     Neck neck;
     Pelvis pelvis;
     Arms arms;
-    
-    //================================================
-    // Body Wiggle State
-    //================================================
-
-    float bodyWiggleTimer;
-    float bodyWiggleAmplitude;
-    bool bodyWiggling;
-    float nextBodyWiggle;
-    float bodyWiggleFrequency;
-
-    //================================================
-    // Body Bob State
-    //================================================
-
-    Vector2 bodyBobOffset;
-    float bodyBobScale;
-    float bodyBobAngle;
-    float bodyBobDirection;
-    float randomBodyBobSignTimer;
-    float bodyBobRadiusX;
-    float bodyBobRadiusY;
-    float bodyBobSpeed;
 };
 
 
@@ -454,6 +429,9 @@ private:
 
 #include "Sprite.h"
 #include "BodyDimensions.h"
+
+#include <string>
+
 class BodyBase : public Sprite 
 {
     public:
@@ -464,7 +442,9 @@ class BodyBase : public Sprite
         
     private:
         BodyDimensions& dimensions;
-        Vector2 positionOffset;
+        Vector2 positionOffset = { 0.0f, 0.0f };
+
+        std::string shapeName = "BodyBase"; 
 };
 
 
@@ -476,18 +456,24 @@ class BodyBase : public Sprite
 
 #include "Sprite.h"
 #include "BodyDimensions.h"
+#include "Emotion.h"
 
 class Antenna : public Sprite 
 {
     public:
         Antenna(BodyDimensions& dimensions);
+        
         void Initialise() override;
-        void Update(float dt) override;
+        
+        using Sprite::Update;
+        void Update(float dt, Emotion emotion);
+        
         void SetTransform(MyTransform parentTransform);
 
     private:
         BodyDimensions& dimensions;
         Vector2 positionOffset;
+        
         float antennaAnimationTimer = 0.0f;
         float nextAntennaAnimation = 3.0f;
         float topOfHeadOffset = 46.0f;
@@ -502,13 +488,18 @@ class Antenna : public Sprite
 
 #include "Sprite.h"
 #include "BodyDimensions.h"
+#include "Emotion.h"
 
 class Ears : public Sprite
 {
      public:
         Ears(BodyDimensions& dimensions);
+        
         void Initialise() override;
-        void Update(float dt) override;
+        
+        using Sprite::Update;
+        void Update(float dt, Emotion emotion);
+        
         void SetTransform(MyTransform parentTransform);
 
     private:
@@ -537,7 +528,9 @@ class Eyebrows : public Sprite
         
         void Initialise() override;
 
-        void Update(float dt, bool speaking, Emotion emotion);
+        using Sprite::Update;
+        void Update(float dt, Emotion emotion);
+        
         void SetTransform(MyTransform transform);
 
     private:
@@ -565,6 +558,7 @@ class Eyebrows : public Sprite
 #include "Sprite.h"
 #include "BodyDimensions.h"
 #include "Pupils.h"
+#include "Emotion.h"
 
 class Eyes : public Sprite
 {
@@ -574,7 +568,8 @@ class Eyes : public Sprite
         void Initialise() override;
         void Shutdown();
 
-        void Update(float dt) override;
+        using Sprite::Update;
+        void Update(float dt, Emotion emotion);
         void Draw() const;
 
         void SetTransform(MyTransform parentTransform);
@@ -587,11 +582,11 @@ class Eyes : public Sprite
     private:
         BodyDimensions& dimensions;
         Vector2 positionOffset;
-        Pupils pupils;
-
-        // TODO: make pupils child of Eyes
+        
         float idleAnimationTimer = 0.0f;
         float nextIdleAnimation = 0.0f;
+
+        Pupils pupils;
 }; 
 
 
@@ -634,8 +629,8 @@ public:
     
     void Initialise();
     void Shutdown();
-
-    void Update(float dt, bool speaking, Emotion emotion);
+    
+    void Update(float dt, Emotion emotion);
     void Draw() const;
 
     void SetTransform(MyTransform parentTransform);
@@ -678,6 +673,8 @@ class Headbase : public Sprite
     private:
         BodyDimensions& dimensions;
         Vector2 positionOffset;
+
+        std::string name = "headBase";
 };
 
 
@@ -695,18 +692,20 @@ class Mouth : public Sprite
 {
     public:
         Mouth(BodyDimensions& dimensions);
+        
         void Initialise() override;
-        void UpdateMouth(float dt, bool speaking, Emotion emotion);
+        void UpdateMouth(float dt, Emotion emotion);
+        
         void SetTransform(MyTransform parentTransform);
 
     private:
         BodyDimensions& dimensions;
+        Vector2 positionOffset;
 
         int frame = 0;
         float frameTimer = 0.0f;
         const float FRAME_DURATION = 0.3f;
 
-        Vector2 positionOffset = {};
         float mouthDisplayOffset = 28.0f;
 };
 
@@ -720,14 +719,19 @@ class Mouth : public Sprite
 #include "Sprite.h"
 #include "raylib.h"
 #include "BodyDimensions.h"
+#include "Emotion.h"
 
 class Nose : public Sprite
 {
     public:
         Nose(BodyDimensions& dimensions);
+        
         void Initialise() override;
-        void Update(float dt) override;
+        
+        using Sprite::Update;
+        void Update(float dt, Emotion emotion);
         void Draw() const override;
+        
         void SetTransform(MyTransform parentTransform);
 
     private:
@@ -772,17 +776,25 @@ class Nose : public Sprite
 #include <string>
 #include "BodyDimensions.h"
 #include "MyTransform.h"
+#include "Emotion.h"
 
 class Pupil : public Sprite
 {
     public:
         Pupil(BodyDimensions& dimensions);
+        
         void Initialise() override;
-        void Update(float dt) override;
+        
+        using Sprite::Update;
+        void Update(float dt, Emotion emotion);
+        
         void SetSide(std::string side);
         float GetSideOffset();
+        
         void SetPosition(Vector2 position);
+        
         void SetRotation(float rotation);
+        
         void SetTransform(MyTransform parentTransform);
 
     private:
@@ -805,6 +817,7 @@ class Pupil : public Sprite
 #include "Constants.h"
 #include "BodyDimensions.h"
 #include "MyTransform.h"
+#include "Emotion.h"
 
 
 //====================================================
@@ -825,7 +838,7 @@ public:
     void Initialise();
     void Shutdown();
 
-    void Update(float dt);
+    void Update(float dt, Emotion emotion);
     void Draw() const;
 
     void SetTransform(MyTransform parentTransform);
@@ -858,23 +871,27 @@ private:
 #pragma once
 
 #include "BodyDimensions.h"
-#include "Sprite.h"
+#include "Shape.h"
+#include <string>
+#include "Emotion.h"
 
-class Foot : public Sprite
+class Foot : public Shape
 {
     public:
-        public:
-        explicit Foot(BodyDimensions& dimensions);
+        Foot(BodyDimensions& dimensions, std::string side);
+        
         void Initialise() override;
-        void Update(float dt) override;
+        void Update(float dt, Emotion emotion);
+        
         void Draw() const;
-        void SetRotation(float rotation);
-        void SetAnchorPoint(Vector2 anchorPoint);
-        void Shutdown();
+        
+        void SetTransform(MyTransform parentTransform);
 
     private:
         BodyDimensions& dimensions;
-        Vector2 localPositionOffset = {};
+        Vector2 positionOffset;
+
+        std::string side;
 };
 
 
@@ -885,23 +902,28 @@ class Foot : public Sprite
 #pragma once
 
 #include "BodyDimensions.h"
-#include "Sprite.h"
+#include "Shape.h"
 #include "Shin.h"
-class Knee : public Sprite
+#include <string>
+#include "Emotion.h"
+
+class Knee : public Shape
 {
     public:
-        public:
-        explicit Knee(BodyDimensions& dimensions);
+        Knee(BodyDimensions& dimensions, std::string side);
+        
         void Initialise() override;
-        void Update(float dt) override;
+        
+        void Update(float dt, Emotion emotion);
         void Draw() const;
-        void SetRotation(float rotation);
-        void SetAnchorPoint(Vector2 anchorPoint);
-        void Shutdown();
 
+        void SetTransform(MyTransform parentTransform);
+        
     private:
         BodyDimensions& dimensions;
-        Vector2 localPositionOffset = {};
+        Vector2 positionOffset;
+
+        std::string side;
 
         Shin shin;
 };
@@ -917,6 +939,8 @@ class Knee : public Sprite
 #include "BodyDimensions.h"
 #include "Shape.h"
 #include "MyTransform.h"
+#include "Emotion.h"
+#include "Thigh.h"
 
 class Legs : Shape
 {
@@ -925,7 +949,7 @@ class Legs : Shape
         void Initialise();
         void Shutdown();
         
-        void Update(float dt);
+        void Update(float dt, Emotion emotion);
         void Draw() const;
 
         void SetTransform(MyTransform parentTransform);
@@ -943,24 +967,29 @@ class Legs : Shape
 
 #pragma once
 #include "BodyDimensions.h"
-#include "Sprite.h"
-
+#include "Shape.h"
 #include "Foot.h"
-class Shin : public Sprite
+#include <string>
+#include "Emotion.h"
+
+class Shin : public Shape
 {
     public:
         public:
-        explicit Shin(BodyDimensions& dimensions);
+        Shin(BodyDimensions& dimensions, std::string side);
+        
         void Initialise() override;
-        void Update(float dt) override;
+        
+        void Update(float dt, Emotion emotion);
         void Draw() const;
-        void SetRotation(float rotation);
-        void SetAnchorPoint(Vector2 anchorPoint);
-        void Shutdown();
+        
+        void SetTransform(MyTransform parentTrnsform);
 
     private:
         BodyDimensions& dimensions;
-        Vector2 localPositionOffset = {};
+        Vector2 positionOffset;
+
+        std::string side;
 
         Foot foot;
 };
@@ -976,6 +1005,7 @@ class Shin : public Sprite
 #include "Knee.h"
 #include "BodyDimensions.h"
 #include "MyTransform.h"
+#include "Emotion.h"
 
 #include <string>
 
@@ -985,7 +1015,7 @@ class Thigh : public Shape
         Thigh(BodyDimensions& dimensions, std::string side);
         void Initialise() override;
         
-        void Update(float dt);
+        void Update(float dt, Emotion emotion);
         void Draw() const;
 
         void SetTransform(MyTransform parentTransform);
@@ -993,7 +1023,9 @@ class Thigh : public Shape
     private:
         BodyDimensions& dimensions;
         Vector2 positionOffset;
+        
         std::string side;
+        
         Knee knee;
 };
 
@@ -1009,6 +1041,7 @@ class Thigh : public Shape
 #include "Emotion.h"
 #include "BodyDimensions.h"
 #include "MyTransform.h"
+#include <string>
 
 class Neck : public Shape
 {
@@ -1017,7 +1050,7 @@ class Neck : public Shape
         void Initialise() override;
         void Shutdown();
         
-        void Update(float dt, bool speaking, Emotion emotion);
+        void Update(float dt, Emotion emotion);
         void Draw() const override;
         
         void SetTransform(MyTransform parentTransform);
@@ -1027,7 +1060,10 @@ class Neck : public Shape
     private:
         BodyDimensions& dimensions;
         Vector2 positionOffset;
+
         Head head;
+
+        std::string name = "neck";
 };
 
 
@@ -1039,6 +1075,8 @@ class Neck : public Shape
 #include "Body/Legs/Legs.h"
 #include "Shape.h"
 #include "BodyDimensions.h"
+#include "Emotion.h"
+
 class Pelvis : Shape
 {
     public:
@@ -1046,14 +1084,15 @@ class Pelvis : Shape
         void Initialise() override;
         void Shutdown();
         
-        void Update(float dt);
+        void Update(float dt, Emotion emotion);
         void Draw() const;
         
         void SetTransform(MyTransform parentTransform);
 
     private:
         BodyDimensions& dimensions;
-        Vector2 positionOffset = {};
+        Vector2 positionOffset;
+        
         Legs legs;
 };
 
@@ -1120,6 +1159,9 @@ public:
     float thighWidth;
     float thighHeight;
 
+    float kneeWidth;
+    float kneeHeight;
+
     float shinWidth;
     float shinHeight;
 
@@ -1152,11 +1194,33 @@ constexpr int SCREEN_HEIGHT = 700;
 constexpr char WINDOW_TITLE[] = "Tingo Bingo";
 constexpr int TARGET_FPS = 60;
 
-constexpr float SCALE = 0.8f;
+constexpr float SCALE = 0.7f;
 
 constexpr Color CARDBOARD_LIGHT = { 181, 150, 105, 255 };
 constexpr Color CARDBOARD = { 150, 120, 80, 255 };
 constexpr Color CARDBOARD_DARK = { 105, 80, 55, 255 };
+
+
+=====================================
+.\include\DrawGeometry.h
+=====================================
+
+#pragma once
+
+#include "raylib.h"
+
+struct DrawGeometry
+{
+    // Drawable width in local pixels before scaling.
+    float width = 0.0f;
+
+    // Drawable height in local pixels before scaling.
+    float height = 0.0f;
+
+    // Local pixel position of the transform pivot measured from the
+    // drawable's top-left corner, using Raylib's screen-space origin rules.
+    Vector2 origin = {0.0f, 0.0f};
+};
 
 
 =====================================
@@ -1179,7 +1243,9 @@ enum class Emotion
     Happy,
     Sad,
     Angry,
-    Surprised
+    Surprised,
+
+    Count
 };
 
 
@@ -1191,7 +1257,6 @@ enum class Emotion
 
 #include "Robot.h"
 #include "Input.h"
-#include "Object.h"
 #include "BodyDimensions.h"
 class Game
 {
@@ -1205,16 +1270,11 @@ private:
 	void HandleInput();
 	void Update(const float dt);
 	void Draw();
-	void DrawDebugOverlay() const;
 	
 	Robot robot;
 	Vector2 robotWorldPos;
 	Input input;
-	Object ball;
-	Object banana;
 	Texture2D background;
-	std::vector<Object*> objects; 
-	bool drawDebugOverlay = false;
 };
 
 
@@ -1232,9 +1292,12 @@ public:
     bool RightPressed() const;
     bool SpacePressed() const;
     Vector2 MousePosition() const;
-    bool H_Pressed() const;
+  
     bool LeftMouseButtonPressed() const;
     bool G_Pressed() const;
+
+    bool E_Pressed();
+    bool S_Pressed();
 };
 
 
@@ -1247,10 +1310,13 @@ public:
 #include "raylib.h"
 #include <cmath>
 
-struct MyTransform
+
+//Cartesion position of this objects local origin/joint/pivot
+//World rotation in degrees
+//inherited scale
+ struct MyTransform
 {
     Vector2 position = { 0.0f, 0.0f };
-    Vector2 pivot = { 0.0f, 0.0f };
     float rotation = 0.0f;
     float scale = 1.0f;
 };
@@ -1284,6 +1350,24 @@ inline MyTransform MakeChildTransform(
     return child;
 }
 
+inline Vector2 RotateVector(MyTransform& transform, Vector2 joint) 
+{
+    float radians = transform.rotation * DEG2RAD;
+
+    return {
+        joint.x * cosf(radians) - joint.y * sinf(radians),
+        joint.x * sinf(radians) + joint.y * cosf(radians)
+    };
+}
+
+inline Vector2 AddVector(Vector2 a, Vector2 b)
+{
+    return {
+        a.x + b.x,
+        a.y + b.y
+    };
+}
+
 
 =====================================
 .\include\Object.h
@@ -1292,10 +1376,10 @@ inline MyTransform MakeChildTransform(
 #pragma once
 
 #include "raylib.h"
-#include "Sprite.h"
+#include "Shape.h"
 #include <string>
 
-class Object : public Sprite
+class Object : public Shape
 {
     public:
         void Initialise() override;
@@ -1336,12 +1420,8 @@ class Object : public Sprite
 
 #pragma once
 
-#include "raylib.h"
 #include "RobotBrain.h"
-#include <string>
 #include "Emotion.h"
-#include "Object.h"
-#include "SfxController.h"
 #include "Body/Body.h"
 #include "BodyDimensions.h"
 #include "MyTransform.h"
@@ -1357,36 +1437,19 @@ public:
     void Draw() const;
     
     void SetTransform(MyTransform transform);
-    MyTransform GetTransform() const;
     
-    void LookAt(Vector2 point);
-    
-    //Vector2 GetHeadTransform() const;
-    void Speak(const std::string& text);
-    void SetSpeaking(bool state);
     void SetEmotion(Emotion emotion);
-    
-    void OnObjectPickedUp(Object& object);
-    
-    void LookForward();
-    
-    Vector2 GetSearchRayOrigin() const;
-    Vector2 GetSearchRayEnd() const;
-    
-    void SetObjectPointers(std::vector<Object*> objects);
-    void PlaySfx(std::string sound);
-    
-    void SwingArm(std::string side, bool swinging);
-    
-    //Vector2 GetHeadWorldPosition();
+    Emotion GetEmotion();
 
+    void NextState();
+    void NextEmotion();
+    
 private:
     BodyDimensions dimensions;
     MyTransform transform;
+   
     Body body;
     RobotBrain robotBrain;
-    bool speaking = false;
-    SfxController sfxController;
 };
 
 
@@ -1396,76 +1459,44 @@ private:
 
 #pragma once
 
-#include "SpeechController.h"
-#include <string>
 #include "Emotion.h"
-#include <vector>
-#include "Object.h"
-#include <string>
-#include "BodyDimensions.h"
 
 class Robot;
 
 class RobotBrain
 {
     public:
+
         enum class State
         {
             Idle,
-            Searching,
-            Reacting
-        };
+            Speaking,
+            Thinking,
+            Listening,
+            Reacting,
 
-        RobotBrain(Robot& robot, BodyDimensions& dimensions);
+            Count
+        };
+        static const char* RobotStateToString(State state);
+        static const char* EmotionToString(Emotion emotion);
+        void NextEmotion();
+        void NextState();
+
+        RobotBrain(Robot& robot);
 
         void Update(float dt);
 
         void SetState(State newState);
         
-        void Speak(const std::string& command);
-        
         void SetEmotion(Emotion newEmotion);
         Emotion GetEmotion();
-        
-        void OnObjectPickedUp(Object& object);
-        
-        void Search(float dt);
-        Vector2 GetSearchRayOrigin() const;
-        Vector2 GetSearchRayEnd() const;
-
-        void SetObjectPointers(std::vector<Object*> objects);
-
-        Object* DetectCollision
-                        (
-                            Vector2 rayOrigin, 
-                            Vector2 rayEnd
-                        );
-                        
-        void SwingArm(std::string side, bool swinging);
 
         void Draw() const;
-
+        
     private:
         Robot& robot;
         State state;
-        SpeechController speechController;
-        bool speaking = false;
         Emotion emotion;
-        float searchTimer = 0;
-        float idleTimer = 0;
-        float idleTimeLimit = 3.0f;
-        float searchAngle = 0.0f;
-        float searchSpeed = 1.0f;
-        Vector2 searchRayOrigin = {};
-        Vector2 searchRayEnd = {};
-        std::vector<Object*> objects;
-        bool reactionCoolDown = false;
-        float reactionCoolDownTimer = 0.0f;
-        Object* targetObject;
-        Object* detectedObject;
-        float detectedTimer = 0.0f;
-
-        BodyDimensions& dimensions;
 };
 
 
@@ -1498,25 +1529,34 @@ class SfxController
 #include "Constants.h"
 #include "MyTransform.h"
 #include "BodyDimensions.h"
+#include <string>
+#include "DrawGeometry.h"
 
 class Shape
 {
 protected:
     MyTransform transform;
-    float width = 0.0f;
-    float height = 0.0f;
+    DrawGeometry drawGeometry;
+    
+    float screenX;
+    float screenY;
+    
     Color color;
 
+    std::string name;
+    
 public:
     explicit Shape(Color color = CARDBOARD_DARK) : color(color) {}
     virtual void Initialise() = 0;
-    void Shutdown();
     
     virtual void Draw() const;
     
-    void SetDimensions(float width, float height);
-    void SetTransform(MyTransform transform);
+    void SetScreenCoords();
+    void SetShapeName(std::string name);
+    void SetDimensions(float w, float h);
 
+    void DebugDraw() const;
+    
     virtual ~Shape() = default;
 };
 
@@ -1716,25 +1756,39 @@ public:
 #pragma once
 
 #include "raylib.h"
-#include "Animation.h"
 #include "Constants.h"
 #include "MyTransform.h"
+#include "BodyDimensions.h"
+#include <string>
+#include "Animation.h"
+#include "DrawGeometry.h"
+
 class Sprite
 {
 protected:
+    MyTransform transform;
+    DrawGeometry drawGeometry;
+
     Texture2D texture;
     Animation animation;
-    MyTransform transform;
+    
+    float screenX;
+    float screenY;
+
+    std::string name;
+
+    void DebugDraw() const;
 
 public:
     virtual void Initialise() = 0;
-    void Shutdown();
-
+    
     virtual void Update(float dt);
     virtual void Draw() const;
     
-    void SetTransform(MyTransform transform);
-
+    void SetScreenCoords();
+    void SetShapeName(std::string name);
+    
+    void Shutdown();
     virtual ~Sprite() = default;
 };
 
@@ -1951,14 +2005,12 @@ void Arms::Initialise()
 
 void Arms::Shutdown()
 {
-    leftShoulder.Shutdown();
-    rightShoulder.Shutdown();
 }
 
-void Arms::Update(float dt)
+void Arms::Update(float dt, Emotion emotion)
 {
-    leftShoulder.Update(dt);
-    rightShoulder.Update(dt);
+    leftShoulder.Update(dt, emotion);
+    rightShoulder.Update(dt, emotion);
 
     if(swingLeftArm)
     {
@@ -2025,23 +2077,25 @@ void Elbow::Initialise()
     dimensions.elbowWidth = 65.0f;
     dimensions.elbowHeight = 65.0f;
 
-    Shape::SetDimensions(
-        dimensions.elbowWidth, 
-        dimensions.elbowHeight
-    );
-
-    foreArm.Initialise();
+    drawGeometry.width = dimensions.elbowWidth;
+    drawGeometry.height = dimensions.elbowHeight;
 
     positionOffset = {
-        0, 0
+        0, 
+        -dimensions.upperArmHeight
     };
 
-    pivot = {0, 0};
+    drawGeometry.origin = {
+        drawGeometry.width / 2.0f,
+        drawGeometry.height / 2.0f
+    };
+
+    foreArm.Initialise();
 }
 
-void Elbow::Update(float dt)
+void Elbow::Update(float dt, Emotion emotion)
 {
-    foreArm.Update(dt);
+    foreArm.Update(dt, emotion);
 }
 
 void Elbow::Draw() const 
@@ -2053,20 +2107,10 @@ void Elbow::Draw() const
 void Elbow::SetTransform(MyTransform parentTransform)
 {
     Shape::transform = MakeChildTransform(parentTransform, positionOffset);
-    Shape::transform.pivot = pivot;
+    
+    Shape::SetScreenCoords();
     
     foreArm.SetTransform(transform);
-
-    std::cout
-    << "ELBOW: position "
-    << Shape::transform.position.x << ", "
-    << Shape::transform.position.y
-    << " | pivot "
-    << Shape::transform.pivot.x << ", "
-    << Shape::transform.pivot.y
-    << " | rotation "
-    << Shape::transform.rotation
-    << std::endl;
 }
 
 
@@ -2088,25 +2132,27 @@ void ForeArm::Initialise()
     dimensions.forearmWidth = 50.0f;
     dimensions.forearmHeight = 120.0f;
 
-    Shape::SetDimensions(
-        dimensions.forearmWidth,
-        dimensions.forearmHeight
-    );
+    Shape::drawGeometry.width = dimensions.forearmWidth;
+    Shape::drawGeometry.height = dimensions.forearmHeight;
 
     hand.Initialise();
 
     positionOffset = 
     {
         0,
-        -dimensions.forearmHeight / 2.0f
+        0
+    };
+
+    Shape::drawGeometry.origin = {
+        Shape::drawGeometry.width / 2.0f,
+        0
     };
 }
 
-//float rt = 0.0f;
-void ForeArm::Update(float dt)
+
+void ForeArm::Update(float dt, Emotion emotion)
 {
-    hand.Update(dt);
-    //rt += dt*50.0f;
+    hand.Update(dt, emotion);
 }
 
 void ForeArm::Draw() const 
@@ -2118,7 +2164,13 @@ void ForeArm::Draw() const
 void ForeArm::SetTransform(MyTransform parentTransform)
 {
     Shape::transform = MakeChildTransform(parentTransform, positionOffset);
-    //transform.rotation += rt;
+
+    float angle = -20.0f;
+    if(side == "left") angle = 20.0f; 
+    Shape::transform.rotation += angle;
+
+    Shape::SetScreenCoords();
+
     hand.SetTransform(Shape::transform);
 }
 
@@ -2140,19 +2192,22 @@ void Hand::Initialise()
     dimensions.handWidth = 55.0f;
     dimensions.handHeight = 50.0f;
 
-    Shape::SetDimensions(
-        dimensions.handWidth,
-        dimensions.handHeight
-    );
+    Shape::drawGeometry.width = dimensions.handWidth;
+    Shape::drawGeometry.height = dimensions.handHeight;
 
     positionOffset = {
         0,
-        -dimensions.forearmHeight / 2.0f
+        -dimensions.forearmHeight
+    };
+
+    Shape::drawGeometry.origin = {
+        Shape::drawGeometry.width / 2.0f,
+        Shape::drawGeometry.height / 2.0f
     };
 }
 
 float r = 0.0f;
-void Hand::Update(float dt)
+void Hand::Update(float dt, Emotion emotion)
 {
     r += dt*50.0;
 }
@@ -2165,7 +2220,7 @@ void Hand::Draw() const
 void Hand::SetTransform(MyTransform parentTransform)
 {
     Shape::transform = MakeChildTransform(parentTransform, positionOffset);
-    Shape::transform.pivot = {0, 0};
+    Shape::SetScreenCoords();
 }
 
 
@@ -2193,10 +2248,9 @@ void Shoulder::Initialise()
 {
     dimensions.shoulderWidth = 65.0f;
     dimensions.shoulderHeight = 65.0f;
-    
-    Shape::SetDimensions(dimensions.shoulderWidth, dimensions.shoulderHeight);
 
-    upperArm.Initialise();
+    drawGeometry.width = dimensions.shoulderWidth;
+    drawGeometry.height = dimensions.shoulderHeight;
 
     if(side == "left") 
     {
@@ -2204,6 +2258,8 @@ void Shoulder::Initialise()
             dimensions.bodyWidth / 2.0f + dimensions.shoulderWidth / 2.0f,
             dimensions.bodyHeight / 2.0f - dimensions.shoulderHeight / 2.0f
         };
+
+        Shape::SetShapeName("leftShoulder");
     }
 
     if(side == "right") 
@@ -2212,38 +2268,37 @@ void Shoulder::Initialise()
             -dimensions.bodyWidth / 2.0f - dimensions.shoulderWidth / 2.0f,
             dimensions.bodyHeight / 2.0f - dimensions.shoulderHeight / 2.0f
         };
+
+        Shape::SetShapeName("rightShoulder");
     }
+
+    drawGeometry.origin = {
+        drawGeometry.width / 2.0f,
+        drawGeometry.height / 2.0f
+    };
+
+    upperArm.Initialise();
 }
 
 // Update the shoulder and its child upper arm.
-void Shoulder::Update(float dt)
+void Shoulder::Update(float dt, Emotion emotion)
 {
-    upperArm.Update(dt);
+    upperArm.Update(dt, emotion);
 }
 
 void Shoulder::Draw() const 
 {
     upperArm.Draw();
-    Shape::Draw();
+    Shape::Draw();   
 }
 
 void Shoulder::SetTransform(MyTransform parentTransform)
 {
     transform = MakeChildTransform(parentTransform, positionOffset);
 
+    Shape::SetScreenCoords();
+
     upperArm.SetTransform(transform);
-
-     std::cout
-        << "SHOULDER: position "
-        << transform.position.x << ", "
-        << transform.position.y
-        << " | rotation "
-        << transform.rotation
-        << " | pivot "
-        << transform.pivot.x << ", "
-        << transform.pivot.y
-        << std::endl;
-
 }
 
 void Shoulder::SwingArm(
@@ -2281,43 +2336,29 @@ void UpperArm::Initialise()
     dimensions.upperArmWidth = 50.0f;
     dimensions.upperArmHeight = 120.0f;
 
-    Shape::SetDimensions(
-        dimensions.upperArmWidth,
-        dimensions.upperArmHeight
-    );
+    drawGeometry.width = dimensions.upperArmWidth;
+    drawGeometry.height = dimensions.upperArmHeight;
 
-    elbow.Initialise();
-
-    // positionOffset describes where the centre of the upper arm
-    // is relative to the shoulder.
-    //
-    // The shoulder is at the top of the upper arm, so the centre
-    // of the arm is half its height below the shoulder.
-    //
-    // This gives us:
-    //
-    //             SHOULDER
-    //                 ●
-    //                 │
-    //                 │  positionOffset
-    //                 │
-    //                 ●
-    //             ARM CENTRE
-    positionOffset =
-    {
-        0,
+    positionOffset = {
+        0, 
         0
     };
 
-    pivot = {
-        0, dimensions.upperArmHeight / 2.0f
+    drawGeometry.origin = {
+        drawGeometry.width / 2.0f,
+        0
     };
+
+    elbow.Initialise();
+
+    if(side == "left") {Shape::SetShapeName("leftUpperArm");}
+    if(side == "right") {Shape::SetShapeName("rightUpperArm");}
 }
 
 // Update the upper arm and its child elbow.
-void UpperArm::Update(float dt)
+void UpperArm::Update(float dt, Emotion emotion)
 {
-    elbow.Update(dt);
+    elbow.Update(dt, emotion);
 }
 
 
@@ -2385,21 +2426,10 @@ void UpperArm::SetTransform(MyTransform parentTransform)
 {
     Shape::transform = MakeChildTransform(parentTransform, positionOffset);
     Shape::transform.rotation += localRotation;
-    Shape::transform.pivot = pivot;
+
+    Shape::SetScreenCoords();
 
     elbow.SetTransform(Shape::transform);
-
-     std::cout
-        << "UPPERARM: position "
-        << transform.position.x << ", "
-        << transform.position.y
-        << " | rotation "
-        << transform.rotation
-        << " | pivot "
-        << transform.pivot.x << ", "
-        << transform.pivot.y
-        << std::endl;
-
 }
 
 
@@ -2413,32 +2443,14 @@ void UpperArm::SetTransform(MyTransform parentTransform)
 
 Body::Body(BodyDimensions& dimensions) :
     dimensions(dimensions),
-    transform(),
-    homeTransform(),
     bodyBase(dimensions),
     neck(dimensions),
     pelvis(dimensions),
-    arms(dimensions),
-    bodyWiggleTimer(0.0f),
-    bodyWiggleAmplitude(0.0f),
-    bodyWiggling(false),
-    nextBodyWiggle((float)GetRandomValue(5, 7)),
-    bodyWiggleFrequency(0.0f),
-    bodyBobOffset({0.0f, 0.0f}),
-    bodyBobScale(7.0f),
-    bodyBobAngle(0.0f),
-    bodyBobDirection(1.0f),
-    randomBodyBobSignTimer((float)GetRandomValue(5, 10)),
-    bodyBobRadiusX(GetRandomValue(3, 8)),
-    bodyBobRadiusY(GetRandomValue(2, 6)),
-    bodyBobSpeed(GetRandomValue(6, 14) / 10.0f)
+    arms(dimensions)
 {}
 
 void Body::Initialise()
 {
-    // Store the body's initial world transform.
-    homeTransform = transform;
-
     bodyBase.Initialise();
     neck.Initialise();
     arms.Initialise();
@@ -2448,20 +2460,15 @@ void Body::Initialise()
 void Body::Shutdown()
 {
     neck.Shutdown();
-    bodyBase.Shutdown();
     arms.Shutdown();
     pelvis.Shutdown();
 }
 
-void Body::Update(float dt, bool speaking, Emotion emotion)
+void Body::Update(float dt, Emotion emotion)
 {
-    neck.Update(dt, speaking, emotion);
-    bodyBase.Update(dt);
-    arms.Update(dt);
-    pelvis.Update(dt);
-
-    PlayIdleBodyTransform(dt);
-    SetTransform(transform);
+    neck.Update(dt, emotion);
+    arms.Update(dt, emotion);
+    pelvis.Update(dt, emotion);
 }
 
 void Body::Draw() const
@@ -2472,12 +2479,6 @@ void Body::Draw() const
     pelvis.Draw();
 }
 
-// Set the body's world transform.
-//
-// Body is directly below Robot in the hierarchy, so there
-// is no positionOffset here. The transform received from
-// Robot already describes the body's world position,
-// pivot, rotation and scale.
 void Body::SetTransform(MyTransform transform)
 {
     this->transform = transform;
@@ -2486,81 +2487,6 @@ void Body::SetTransform(MyTransform transform)
     neck.SetTransform(this->transform);
     arms.SetTransform(this->transform);
     pelvis.SetTransform(this->transform);
-}
-
-void Body::PlayIdleBodyTransform(float dt)
-{
-    PlayBodyBob(dt);
-    PlayBodyWiggle(dt);
-}
-
-void Body::PlayBodyWiggle(float dt)
-{
-    nextBodyWiggle -= dt;
-
-    if (nextBodyWiggle <= 0.0f && !bodyWiggling)
-    {
-        bodyWiggling = true;
-        bodyWiggleTimer = 0.0f;
-        bodyWiggleAmplitude = (float)GetRandomValue(5, 10);
-        nextBodyWiggle = (float)GetRandomValue(5, 7);
-        bodyWiggleFrequency = (float)GetRandomValue(5, 20);
-    }
-
-    if (bodyWiggling)
-    {
-        bodyWiggleTimer += dt;
-
-        transform.rotation =
-            sin(bodyWiggleTimer * bodyWiggleFrequency)
-            * bodyWiggleAmplitude;
-
-        // Gradually reduce the wiggle until the body settles.
-        bodyWiggleAmplitude -= 8.0f * dt;
-
-        if (bodyWiggleAmplitude <= 0.0f)
-        {
-            bodyWiggling = false;
-            transform.rotation = homeTransform.rotation;
-        }
-    }
-}
-
-// Move the body in a slow, organic elliptical motion.
-void Body::PlayBodyBob(float dt)
-{
-    bodyBobAngle += dt * bodyBobSpeed * bodyBobDirection;
-
-    randomBodyBobSignTimer -= dt;
-
-    // Periodically randomise the bobbing direction and movement.
-    if (randomBodyBobSignTimer <= 0)
-    {
-        bodyBobDirection *= -1;
-        randomBodyBobSignTimer = (float)GetRandomValue(5, 10);
-        bodyBobRadiusX = GetRandomValue(3, 8);
-        bodyBobRadiusY = GetRandomValue(2, 6);
-        bodyBobSpeed = GetRandomValue(6, 14) / 10.0f;
-    }
-
-    bodyBobOffset.x = cos(bodyBobAngle) * bodyBobRadiusX;
-    bodyBobOffset.y = sin(bodyBobAngle) * bodyBobRadiusY;
-
-    transform.position.x =
-        homeTransform.position.x + bodyBobOffset.x;
-
-    transform.position.y =
-        homeTransform.position.y + bodyBobOffset.y;
-}
-
-Head& Body::GetHead()
-{
-    return neck.GetHead();
-}
-
-void Body::SwingArm(std::string side, bool swing)
-{
-    arms.SwingArm(side, swing);
 }
 
 
@@ -2581,23 +2507,20 @@ BodyBase::BodyBase(BodyDimensions& dimensions) :
 // Load the body sprite and initialise its animation.
 void BodyBase::Initialise()
 {
-    texture = LoadTexture(
-        "assets/images/TingoBingo/body/BodyBase.png"
-    );
+    Sprite::texture = LoadTexture("assets/images/TingoBingo/body/bodyBase.png");
+   
+    dimensions.bodyWidth = texture.width;
+    dimensions.bodyHeight = texture.height;
 
-    // Sprite sheet layout.
+    drawGeometry.width = texture.width;
+    drawGeometry.height = texture.height;
+
     const int COLUMNS = 1;
     const int ROWS = 1;
-
-    // Calculate the size of a single animation frame.
-    dimensions.bodyWidth = texture.width / COLUMNS;
-    dimensions.bodyHeight = texture.height / ROWS;
-
     const int TOTAL_FRAMES = COLUMNS * ROWS;
     const float FRAME_DURATION = 0.02f;
 
-    // Initialise the animation using the sprite sheet information.
-    animation.Initialise
+    Sprite::animation.Initialise
     (
         dimensions.bodyWidth,
         dimensions.bodyHeight,
@@ -2606,13 +2529,21 @@ void BodyBase::Initialise()
         FRAME_DURATION
     );
 
-    // BodyBase is positioned directly at Body's position.
     positionOffset = { 0.0f, 0.0f };
+
+    drawGeometry.origin = {
+        drawGeometry.width / 2.0f,
+        drawGeometry.height / 2.0f
+    };
+
+    Sprite::SetShapeName("bodyBase");
 }
 
 void BodyBase::SetTransform(MyTransform parentTransform)
 {
     Sprite::transform = MakeChildTransform(parentTransform, positionOffset);
+    
+    Sprite::SetScreenCoords();
 }
 
 
@@ -2622,16 +2553,63 @@ void BodyBase::SetTransform(MyTransform parentTransform)
 
 #include "Body/Legs/Foot.h"
 
-Foot::Foot(BodyDimensions& dimensions) :
-	dimensions(dimensions)
+Foot::Foot(BodyDimensions& dimensions, std::string side) :
+	Shape(CARDBOARD_DARK),
+	dimensions(dimensions),
+	side(side)
+
 {}
 
-void Foot::Initialise(){}
-void Foot::Update(float dt){}
-void Foot::Draw() const{}
-void Foot::SetRotation(float rotation){}
-void Foot::SetAnchorPoint(Vector2 anchorPoint){}
-void Foot::Shutdown(){}
+void Foot::Initialise()
+{
+	dimensions.footWidth = 100.0f; 
+    dimensions.footHeight = 60.0f;
+
+    Shape::drawGeometry.width = dimensions.footWidth;
+    Shape::drawGeometry.height = dimensions.footHeight;
+
+    if(side == "left")
+    {
+        positionOffset = {
+            -dimensions.shinWidth / 2.0f,
+            -dimensions.shinHeight
+        };
+		
+		Shape::drawGeometry.origin = {
+        	0,
+        	Shape::drawGeometry.height / 2.0f
+    	};
+    }
+
+    if(side == "right")
+    {
+        positionOffset = {
+			dimensions.shinWidth / 2.0f,
+            -dimensions.shinHeight
+        };
+
+		Shape::drawGeometry.origin = {
+        	Shape::drawGeometry.width,
+        	Shape::drawGeometry.height / 2.0f
+    	};
+    }
+}
+
+float kjhr = 0;
+void Foot::Update(float dt, Emotion emotion)
+{
+	kjhr *= dt;
+}
+
+void Foot::Draw() const{
+	Shape::Draw();
+}
+
+void Foot::SetTransform(MyTransform parentTransform)
+{
+	Shape::transform = MakeChildTransform(parentTransform, positionOffset);
+	Shape::SetScreenCoords();
+}
 
 
 =====================================
@@ -2639,18 +2617,67 @@ void Foot::Shutdown(){}
 =====================================
 
 #include "Body/Legs/Knee.h"
+#include "Constants.h"
 
-Knee::Knee(BodyDimensions& dimensions) :
-	dimensions(dimensions),
-	shin(dimensions)
+// Load the head sprite and initialise its animation.
+Knee::Knee(BodyDimensions& dimensions, std::string side) :
+    Shape(CARDBOARD_DARK),
+    dimensions(dimensions),
+    side(side),
+    shin(dimensions, side)
 {}
 
-void Knee::Initialise(){}
-void Knee::Update(float dt){}
-void Knee::Draw() const{}
-void Knee::SetRotation(float rotation){}
-void Knee::SetAnchorPoint(Vector2 anchorPoint){}
-void Knee::Shutdown(){}
+void Knee::Initialise()
+{
+    dimensions.kneeWidth = 85.0f; 
+    dimensions.kneeHeight = 85.0f;
+
+    Shape::drawGeometry.width = dimensions.kneeWidth;
+    Shape::drawGeometry.height = dimensions.kneeHeight;
+
+    if(side == "left")
+    {
+        positionOffset = {
+            0,
+            -dimensions.thighHeight
+        };
+    }
+
+    if(side == "right")
+    {
+        positionOffset = {
+			0,
+            -dimensions.thighHeight
+        };
+    }
+
+    Shape::drawGeometry.origin = {
+        Shape::drawGeometry.width / 2.0f,
+        Shape::drawGeometry.height / 2.0f
+    };
+
+    shin.Initialise();
+}
+
+void Knee::Update(float dt, Emotion emotion)
+{
+    shin.Update(dt, emotion);
+}
+
+void Knee::Draw() const
+{
+    shin.Draw();
+    Shape::Draw();
+}
+
+void Knee::SetTransform(MyTransform parentTransform)
+{
+    Shape::transform = MakeChildTransform(parentTransform, positionOffset);
+    
+    Shape::SetScreenCoords();
+
+    shin.SetTransform(Shape::transform);
+}
 
 
 =====================================
@@ -2673,14 +2700,13 @@ void Legs::Initialise()
 
 void Legs::Shutdown()
 {
-    leftThigh.Shutdown();
-    rightThigh.Shutdown();
+   
 }
 
-void Legs::Update(float dt)
+void Legs::Update(float dt, Emotion emotion)
 {
-    leftThigh.Update(dt);
-    rightThigh.Update(dt);
+    leftThigh.Update(dt, emotion);
+    rightThigh.Update(dt, emotion);
 }
 
 void Legs::Draw() const
@@ -2703,17 +2729,69 @@ void Legs::SetTransform(MyTransform parentTransform)
 
 #include "Body/Legs/Shin.h"
 
-Shin::Shin(BodyDimensions& dimensions) :
+Shin::Shin(BodyDimensions& dimensions, std::string side) :
+	Shape(CARDBOARD),
 	dimensions(dimensions),
-	foot(dimensions)
+	side(side),
+	foot(dimensions, side)
 {}
 
-void Shin::Initialise(){}
-void Shin::Update(float dt){}
-void Shin::Draw() const{}
-void Shin::SetRotation(float rotation){}
-void Shin::SetAnchorPoint(Vector2 anchorPoint){}
-void Shin::Shutdown(){}
+void Shin::Initialise()
+{
+    dimensions.shinWidth = 70.0f; 
+    dimensions.shinHeight = 150.0f;
+
+    Shape::drawGeometry.width = dimensions.shinWidth;
+    Shape::drawGeometry.height = dimensions.shinHeight;
+
+    if(side == "left")
+    {
+        positionOffset = {
+            0,
+            0
+        };
+    }
+
+    if(side == "right")
+    {
+        positionOffset = {
+			0,
+            0
+        };
+    }
+
+    Shape::drawGeometry.origin = {
+        Shape::drawGeometry.width / 2.0f,
+        0
+    };
+
+	foot.Initialise();
+}
+
+void Shin::Update(float dt, Emotion emotion)
+{
+    foot.Update(dt, emotion);
+}
+
+void Shin::Draw() const
+{
+    Shape::Draw();
+	foot.Draw();
+}
+
+void Shin::SetTransform(MyTransform parentTransform)
+{
+    Shape::transform = MakeChildTransform(parentTransform, positionOffset);
+
+	float angle = 20.0f;
+    if(side == "left") angle = -20.0f;
+
+    Shape::transform.rotation += angle;
+
+    Shape::SetScreenCoords();
+
+	foot.SetTransform(Shape::transform);
+}
 
 
 =====================================
@@ -2729,26 +2807,24 @@ Thigh::Thigh(BodyDimensions& dimensions, std::string side) :
     Shape(CARDBOARD),
     dimensions(dimensions),
     side(side),
-    knee(dimensions)
+    knee(dimensions, side)
 {}
 
 void Thigh::Initialise()
 {
     // Calculate the size of a single animation frame.
     dimensions.thighWidth = 80.0f; 
-    dimensions.thighHeight = 250.0f;
+    dimensions.thighHeight = 150.0f;
 
-    Shape::SetDimensions(
-        dimensions.thighWidth, 
-        dimensions.thighHeight
-    );
+    Shape::drawGeometry.width = dimensions.thighWidth;
+    Shape::drawGeometry.height = dimensions.thighHeight;
 
     if(side == "left")
     {
         positionOffset = {
             dimensions.pelvisWidth / 2.0f - 
             dimensions.thighWidth / 2.0f,
-            -dimensions.thighHeight / 2.0f
+            0
         };
     }
 
@@ -2757,26 +2833,40 @@ void Thigh::Initialise()
         positionOffset = {
             -dimensions.pelvisWidth / 2.0f + 
             dimensions.thighWidth / 2.0f,
-            -dimensions.thighHeight / 2.0f
+            0
         };
     }
-    
 
+    Shape::drawGeometry.origin = {
+        Shape::drawGeometry.width / 2.0f,
+        0
+    };
+
+    knee.Initialise();
 }
 
-void Thigh::Update(float dt)
+void Thigh::Update(float dt, Emotion emotion)
 {
-    knee.Update(dt);
+    knee.Update(dt, emotion);
 }
 
 void Thigh::Draw() const
 {
     Shape::Draw();
+    knee.Draw();
 }
 
 void Thigh::SetTransform(MyTransform parentTransform)
 {
-    transform = MakeChildTransform(parentTransform, positionOffset);
+    Shape::transform = MakeChildTransform(parentTransform, positionOffset);
+    
+    float angle = -20.0f;
+    if(side == "left") angle = 20.0f; 
+    Shape::transform.rotation += angle;
+
+    Shape::SetScreenCoords();
+
+    knee.SetTransform(Shape::transform);
 }
 
 
@@ -2788,6 +2878,7 @@ void Thigh::SetTransform(MyTransform parentTransform)
 #include "raylib.h"
 
 Neck::Neck(BodyDimensions& dimensions) :
+    Shape(CARDBOARD_DARK),
     dimensions(dimensions),
     positionOffset(),
     head(dimensions)
@@ -2798,7 +2889,9 @@ void Neck::Initialise()
 {
     dimensions.neckWidth = 50.0f;
     dimensions.neckHeight = 30.0f;
-    SetDimensions(dimensions.neckWidth, dimensions.neckHeight);
+
+    drawGeometry.width = dimensions.neckWidth;
+    drawGeometry.height = dimensions.neckHeight;
 
     head.Initialise();
 
@@ -2806,10 +2899,17 @@ void Neck::Initialise()
         0, 
         dimensions.bodyHeight / 2.0f + dimensions.neckHeight / 2.0f
     };
+
+    drawGeometry.origin = {
+        drawGeometry.width / 2.0f,
+        drawGeometry.height / 2.0f
+    };
+
+    Shape::SetShapeName("neck");
 }
 
-void Neck::Update(float dt, bool speaking, Emotion emotion) {
-    head.Update(dt, speaking, emotion);
+void Neck::Update(float dt, Emotion emotion) {
+    head.Update(dt, emotion);
 }
 
 void Neck::Draw() const
@@ -2821,7 +2921,8 @@ void Neck::Draw() const
 void Neck::SetTransform(MyTransform parentTransform)
 {
     Shape::transform = MakeChildTransform(parentTransform, positionOffset);
-    
+    Shape::SetScreenCoords();
+
     head.SetTransform(transform);
 }
 
@@ -2851,7 +2952,9 @@ void Pelvis::Initialise()
 {
     dimensions.pelvisWidth = 240.0f;
     dimensions.pelvisHeight = 70.0f;
-    SetDimensions(dimensions.pelvisWidth, dimensions.pelvisHeight);
+
+    Shape::drawGeometry.width = dimensions.pelvisWidth;
+    Shape::drawGeometry.height = dimensions.pelvisHeight;
 
     legs.Initialise();
 
@@ -2859,11 +2962,16 @@ void Pelvis::Initialise()
         0,
         -dimensions.bodyHeight / 2.0f - dimensions.pelvisHeight / 2.0f
     };
+
+    Shape::drawGeometry.origin = {
+        Shape::drawGeometry.width / 2.0f,
+        Shape::drawGeometry.height / 2.0f
+    };
 }
 
-void Pelvis::Update(float dt)
+void Pelvis::Update(float dt, Emotion emotion)
 {
-    legs.Update(dt);
+    legs.Update(dt, emotion);
 }
 
 void Pelvis::Draw() const 
@@ -2875,6 +2983,7 @@ void Pelvis::Draw() const
 void Pelvis::SetTransform(MyTransform parentTransform)
 {
     Shape::transform = MakeChildTransform(parentTransform, positionOffset);
+    Shape::SetScreenCoords();
 
     legs.SetTransform(transform);
 }
@@ -2925,68 +3034,24 @@ void Pelvis::Shutdown()
 #include "Emotion.h"
 #include "MyTransform.h"
 
-bool drawGrid = false;
 
-void DrawDebugGrid()
-{
-    const int gridSize = 100;
-
-    const int originX = SCREEN_WIDTH / 2;
-    const int originY = SCREEN_HEIGHT / 2;
-
-    // Vertical grid lines
-    for (int x = originX; x <= SCREEN_WIDTH; x += gridSize)
-        DrawLine(x, 0, x, SCREEN_HEIGHT, LIGHTGRAY);
-
-    for (int x = originX - gridSize; x >= 0; x -= gridSize)
-        DrawLine(x, 0, x, SCREEN_HEIGHT, LIGHTGRAY);
-
-    // Horizontal grid lines
-    for (int y = originY; y <= SCREEN_HEIGHT; y += gridSize)
-        DrawLine(0, y, SCREEN_WIDTH, y, LIGHTGRAY);
-
-    for (int y = originY - gridSize; y >= 0; y -= gridSize)
-        DrawLine(0, y, SCREEN_WIDTH, y, LIGHTGRAY);
-
-    // Cartesian axes
-    DrawLine(0, originY, SCREEN_WIDTH, originY, DARKGRAY);
-    DrawLine(originX, 0, originX, SCREEN_HEIGHT, DARKGRAY);
-}
-
-// Initialise the game and load required resources.
 void Game::Initialise()
 {
     InitWindow(SCREEN_WIDTH, SCREEN_HEIGHT, WINDOW_TITLE);
     InitAudioDevice();
 
     // Initialise robot
-	robotWorldPos = {0, 0};
+	robotWorldPos = {0, 30.0f};
     
 	MyTransform initialTransform
 	{
 		.position = robotWorldPos,
-		.pivot = {0, 0},
 		.rotation = 0.0f,
 		.scale = SCALE
 	};
-	robot.SetTransform(initialTransform);
+
 	robot.Initialise();
-
-    // Initialise ball
-    //ball.SetTextureFilename("./assets/images/toys/ball.png");
-    //ball.Initialise();
-	//ball.SetAnchorPoint({100, 100});
-    //ball.SetName("ball");
-
-    // Initialise banana
-    //banana.SetTextureFilename("./assets/images/toys/banana.png");
-    //banana.Initialise();
-	//banana.SetAnchorPoint({300, 300});
-    //banana.SetName("banana");
-
-    //objects = {&ball, &banana};
-
-    //robot.SetObjectPointers(objects);
+	robot.SetTransform(initialTransform);
 
     SetTargetFPS(TARGET_FPS);
 
@@ -2995,57 +3060,30 @@ void Game::Initialise()
     );
 }
 
-// Process keyboard input.
 void Game::HandleInput()
 {
-	if (IsKeyPressed(KEY_F3))
+
+	/*Neutral,
+    Happy,
+    Sad,
+    Angry,
+    Surprised*/
+	//Emotion remote control
+	
+	if(input.S_Pressed())
 	{
-		drawDebugOverlay = !drawDebugOverlay;
+		robot.NextState();
 	}
 
-	if (input.SpacePressed())
+	if(input.E_Pressed()) 
 	{
-		robot.Speak("Hello Alby, my name is tingo bingo");
-	}
-
-	if(input.H_Pressed())
-	{
-		robot.SetEmotion(Emotion::Happy);
-	}
-
-	if(input.RightPressed()){
-
-	}
-
-	if(input.G_Pressed())
-	{
-		drawGrid = !drawGrid;
+		robot.NextEmotion();
 	}
 }
 
 // Update the game state.
 void Game::Update(const float dt)
-{
-	ball.UpdateObject(
-			dt, input.MousePosition(),
-			input.LeftMouseButtonPressed()
-		);
-
-	banana.UpdateObject(
-			dt, input.MousePosition(), 
-			input.LeftMouseButtonPressed()
-		);
-
-	if(banana.IsHeldByMouse())
-	{
-		robot.OnObjectPickedUp(banana);
-	}
-	
-	if(ball.IsHeldByMouse())
-	{
-		robot.OnObjectPickedUp(ball);
-	}
-	
+{	
 	robot.Update(dt);
 }
 
@@ -3057,68 +3095,8 @@ void Game::Draw()
 	DrawTexture(background, 0, 0, WHITE);
 
 	robot.Draw();
-	
-	//ball.DrawCollisionBox();
-	//ball.Draw();
-	
-	//banana.DrawCollisionBox();
-	//banana.Draw();
-	
-	//DrawLineEx(robot.GetSearchRayOrigin(), robot.GetSearchRayEnd(), 2.0f, RED);
-
-	if(drawGrid) {
-		DrawDebugGrid();
-	}
-
-	if (drawDebugOverlay)
-	{
-		DrawDebugOverlay();
-	}
 }
 
-void Game::DrawDebugOverlay() const
-{
-	MyTransform robotTransform = robot.GetTransform();
-
-	Vector2 robotScreenPosition =
-	{
-		SCREEN_WIDTH / 2.0f + robotTransform.position.x * robotTransform.scale,
-		SCREEN_HEIGHT / 2.0f - robotTransform.position.y * robotTransform.scale
-	};
-
-	Vector2 pivotScreenPosition =
-	{
-		robotScreenPosition.x + robotTransform.pivot.x * robotTransform.scale,
-		robotScreenPosition.y - robotTransform.pivot.y * robotTransform.scale
-	};
-
-	Vector2 searchOrigin = robot.GetSearchRayOrigin();
-	Vector2 searchEnd = robot.GetSearchRayEnd();
-
-	DrawLineEx(searchOrigin, searchEnd, 2.0f, YELLOW);
-	DrawCircleV(searchOrigin, 6.0f, ORANGE);
-	DrawCircleV(searchEnd, 6.0f, RED);
-
-	DrawCircleV(robotScreenPosition, 7.0f, GREEN);
-	DrawCircleV(pivotScreenPosition, 5.0f, MAGENTA);
-	DrawLineEx(
-		robotScreenPosition,
-		{
-			robotScreenPosition.x + cosf(robotTransform.rotation * DEG2RAD) * 40.0f,
-			robotScreenPosition.y - sinf(robotTransform.rotation * DEG2RAD) * 40.0f
-		},
-		2.0f,
-		BLUE
-	);
-
-	DrawRectangle(8, 8, 285, 92, Fade(BLACK, 0.75f));
-	DrawText("F3 Debug Overlay", 18, 16, 18, WHITE);
-	DrawText("Green: robot position", 18, 39, 14, GREEN);
-	DrawText("Magenta: transform pivot", 18, 57, 14, MAGENTA);
-	DrawText("Yellow: search ray", 18, 75, 14, YELLOW);
-}
-
-// Release resources before exiting.
 void Game::Shutdown()
 {
 	robot.Shutdown();
@@ -3169,28 +3147,25 @@ void Game::Run()
 
 #include "Body/Head/Antenna.h"
 #include "Constants.h"
-#include "Animation.h"
 
 Antenna::Antenna(BodyDimensions& dimensions) : dimensions(dimensions)
 {}
 
 void Antenna::Initialise()
 {
-    // Load the antenna sprite sheet.
     texture = LoadTexture("assets/images/TingoBingo/head/antenna.png");
 
-    // Sprite sheet layout.
     const int COLUMNS = 4;
     const int ROWS = 2;
-
-    // Calculate the size of a single animation frame.
-    dimensions.antennaWidth = texture.width / COLUMNS;
-    dimensions.antennaHeight = texture.height / ROWS;
-
     const int TOTAL_FRAMES = COLUMNS * ROWS;
     const float FRAME_DURATION = 0.06f;
 
-    // Initialise the animation using the sprite sheet information.
+    dimensions.antennaWidth = texture.width / COLUMNS;
+    dimensions.antennaHeight = texture.height / ROWS;
+
+    drawGeometry.width = dimensions.antennaWidth;
+    drawGeometry.height = dimensions.antennaHeight;
+
     animation.Initialise
     (
         dimensions.antennaWidth,
@@ -3204,13 +3179,18 @@ void Antenna::Initialise()
         0,
         topOfHeadOffset
     };
+
+    drawGeometry.origin = {
+        drawGeometry.width / 2.0f,
+        drawGeometry.height / 2.0f
+    };
 }
 
-void Antenna::Update(float dt)
+void Antenna::Update(float dt, Emotion emotion)
 {
-     // Update the base sprite behaviour before handling antenna animation.
     Sprite::Update(dt);
-    
+
+    /*
     //Idle behavior
     //Wiggle the antenna at random intervals
     antennaAnimationTimer += dt;
@@ -3221,11 +3201,13 @@ void Antenna::Update(float dt)
         antennaAnimationTimer = 0.0f;
         nextAntennaAnimation = GetRandomValue(1000, 5000) / 1000.0f;
     }
+    */
 }
 
 void Antenna::SetTransform(MyTransform parentTransform)
 {
     transform = MakeChildTransform(parentTransform, positionOffset);
+    SetScreenCoords();
 }
 
 
@@ -3244,29 +3226,25 @@ void Antenna::SetTransform(MyTransform parentTransform)
 #include "Body/Head/Ears.h"
 #include "Constants.h"
 
-Ears::Ears(BodyDimensions& dimensions) : dimensions(dimensions)
+Ears::Ears(BodyDimensions& dimensions) : 
+    dimensions(dimensions)
 {}
 
 void Ears::Initialise()
 {
-    // Load the ear sprite sheet.
     texture = LoadTexture("assets/images/TingoBingo/head/ears.png");
-
-    // Sprite sheet layout.
+    
     const int COLUMNS = 5;
     const int ROWS = 1;
+    const int TOTAL_FRAMES = COLUMNS * ROWS;
+    const float FRAME_DURATION = 0.09f;
 
-    // Calculate the size of a single animation frame.
     dimensions.earsWidth = texture.width / COLUMNS;
     dimensions.earsHeight = texture.height / ROWS;
 
-    const int TOTAL_FRAMES = COLUMNS * ROWS;
+    drawGeometry.width = dimensions.earsWidth;
+    drawGeometry.height = dimensions.earsHeight;
 
-    // Animation settings.
-    const float ROTATION = 0.0f;
-    const float FRAME_DURATION = 0.09f;
-
-    // Initialise the animation using the sprite sheet information.
     animation.Initialise
     (
         dimensions.earsWidth,
@@ -3277,15 +3255,18 @@ void Ears::Initialise()
     );
 
     positionOffset = {0, 0};
+
+    drawGeometry.origin = {
+        drawGeometry.width / 2.0f,
+        drawGeometry.height / 2.0f
+    };
 }
 
-void Ears::Update(float dt)
+void Ears::Update(float dt, Emotion emotion)
 {
-    // Advance the ear animation.
     Sprite::Update(dt);
 
-    //Idle behavior
-    //Wiggle ears at random intervals
+    /*
     idleAnimationTimer += dt;
 
     if(idleAnimationTimer > nextIdleAnimation)
@@ -3293,12 +3274,13 @@ void Ears::Update(float dt)
         animation.Play(0, 4, AnimationPriority::Idle);
         idleAnimationTimer = 0.0f;
         nextIdleAnimation = GetRandomValue(1000, 5000) / 1000.0f;
-    }
+    }*/
 }
 
 void Ears::SetTransform(MyTransform parentTransform)
 {
     transform = MakeChildTransform(parentTransform, positionOffset);
+    SetScreenCoords();
 }
 
 
@@ -3316,28 +3298,26 @@ void Ears::SetTransform(MyTransform parentTransform)
 #include "Body/Head/Eyebrows.h"
 #include "Constants.h"
 #include "Emotion.h"
-#include "Animation.h"
 
-Eyebrows::Eyebrows(BodyDimensions& dimensions) : dimensions(dimensions)
+Eyebrows::Eyebrows(BodyDimensions& dimensions) : 
+    dimensions(dimensions)
 {}
 
 void Eyebrows::Initialise()
 {
-    // Load the eyebrow sprite sheet.
     texture = LoadTexture("assets/images/TingoBingo/head/eyebrows.png");
 
-    // Define the sprite sheet layout.
     const int COLUMNS = 1;
     const int ROWS = 1;
-
-    // Determine the dimensions of each frame.
-    dimensions.eyeBrowsWidth = texture.width / COLUMNS;
-    dimensions.eyeBrowsHeight = texture.height / ROWS;
-
     const int TOTAL_FRAMES = COLUMNS * ROWS;
     const float FRAME_DURATION = 0.3f;
 
-    // Create the animation from the sprite sheet.
+    dimensions.eyeBrowsWidth = texture.width / COLUMNS;
+    dimensions.eyeBrowsHeight = texture.height / ROWS;
+
+    drawGeometry.width = dimensions.eyeBrowsWidth;
+    drawGeometry.height = dimensions.eyeBrowsHeight;
+
     animation.Initialise
     (
         dimensions.eyeBrowsWidth,
@@ -3351,13 +3331,18 @@ void Eyebrows::Initialise()
         0,
         foreheadOffset
     };
+
+    drawGeometry.origin = {
+        drawGeometry.width / 2.0f,
+        drawGeometry.height / 2.0f
+    };
 }
 
-void Eyebrows::Update(float dt, bool speaking, Emotion emotion)
+void Eyebrows::Update(float dt, Emotion emotion)
 {
-    // Update the base sprite behaviour before handling eyebrow animation.
     Sprite::Update(dt);
 
+    /*
     // Speaking and happiness both use the expressive eyebrow animation.
     bool happy = speaking || emotion == Emotion::Happy;
 
@@ -3377,12 +3362,13 @@ void Eyebrows::Update(float dt, bool speaking, Emotion emotion)
     // While happy, occasionally repeat the eyebrow wiggle.
     if (happy)
     {
+        animation.Play(2, 3, AnimationPriority::Emotion);
+
         happyAnimationTimer += dt;
 
         if (happyAnimationTimer > nextHappyAnimation)
         {
-            animation.Play(2, 3, AnimationPriority::Emotion);
-
+    
             // Reset the timer and choose a new random interval.
             happyAnimationTimer = 0.0f;
             nextHappyAnimation =
@@ -3419,12 +3405,13 @@ void Eyebrows::Update(float dt, bool speaking, Emotion emotion)
         idleAnimationTimer = 0.0f;
         nextIdleAnimation =
             GetRandomValue(1000, 5000) / 1000.0f;
-    }
+    }*/
 }
 
 void Eyebrows::SetTransform(MyTransform parentTransform) 
 {
     Sprite::transform = MakeChildTransform(parentTransform, positionOffset);
+    SetScreenCoords();
 }
 
 
@@ -3453,22 +3440,22 @@ Eyes::Eyes(BodyDimensions& dimensions) :
 
 void Eyes::Initialise()
 {
-    // Load the eye sprite sheet.
-    texture = LoadTexture("assets/images/TingoBingo/head/eyes.png");
+    Sprite::texture = LoadTexture("assets/images/TingoBingo/head/eyes.png");
 
-    // Sprite sheet layout.
     const int COLUMNS = 5;
     const int ROWS = 1;
+    const int TOTAL_FRAMES = COLUMNS * ROWS;
+    const float FRAME_DURATION = 0.02f;
 
-    // Calculate the size of a single animation frame.
     dimensions.eyesWidth = texture.width / COLUMNS;
     dimensions.eyesHeight = texture.height / ROWS;
 
-    const int TOTAL_FRAMES = COLUMNS * ROWS;
-    const float FRAME_DURATION = 0.06f;
+    drawGeometry.width = dimensions.eyesWidth;
+    drawGeometry.height = dimensions.eyesHeight;
 
-    // Initialise the animation using the sprite sheet information.
-    animation.Initialise
+    dimensions.eyesYoffset = 30.0f;
+
+    Sprite::animation.Initialise
     (
         dimensions.eyesWidth,
         dimensions.eyesHeight,
@@ -3477,22 +3464,22 @@ void Eyes::Initialise()
         FRAME_DURATION
     );
 
-    dimensions.eyesYoffset = 30.0f;
-
     positionOffset = {
         0, dimensions.eyesYoffset
+    };
+
+    Sprite::drawGeometry.origin = {
+        drawGeometry.width / 2.0f,
+        drawGeometry.height / 2.0f
     };
 
     pupils.Initialise();
 }
 
-void Eyes::Update(float dt)
+void Eyes::Update(float dt, Emotion emotion)
 {
-    // Advance the eye animation.
     Sprite::Update(dt);
 
-    //Idle beahviour
-    //Blink at random intervals
     idleAnimationTimer += dt;
     
     if(idleAnimationTimer > nextIdleAnimation)
@@ -3502,7 +3489,7 @@ void Eyes::Update(float dt)
         nextIdleAnimation = GetRandomValue(1000, 5000) / 1000.0f;
     }
 
-    pupils.Update(dt);
+    pupils.Update(dt, emotion);
 }
 
 void Eyes::Draw() const
@@ -3513,7 +3500,8 @@ void Eyes::Draw() const
 
 void Eyes::SetTransform(MyTransform parentTransform)
 {
-    transform = MakeChildTransform(parentTransform, positionOffset);
+    Sprite::transform = MakeChildTransform(parentTransform, positionOffset);
+    Sprite::SetScreenCoords();
 
     pupils.SetTransform(transform);
 }
@@ -3535,8 +3523,8 @@ void Eyes::LookForward()
 
 void Eyes::Shutdown()
 {
+    UnloadTexture(texture);
     pupils.Shutdown();
-    Sprite::Shutdown();
 }
 
 
@@ -3598,24 +3586,23 @@ void Head::Initialise()
 void Head::Shutdown()
 {
     headBase.Shutdown();
-    antenna.Shutdown();
-    ears.Shutdown();
-    eyebrows.Shutdown();
     eyes.Shutdown();
     mouth.Shutdown();
+    ears.Shutdown();
+    antenna.Shutdown();
+    eyebrows.Shutdown();
     nose.Shutdown();
 }
 
 // Update every animated head component.
-void Head::Update(float dt, bool speaking, Emotion emotion)
+void Head::Update(float dt, Emotion emotion)
 {
-    headBase.Update(dt);
-    antenna.Update(dt);
-    ears.Update(dt);
-    eyebrows.Update(dt, speaking, emotion);
-    eyes.Update(dt);
-    mouth.UpdateMouth(dt, speaking, emotion);
-    nose.Update(dt);
+    antenna.Update(dt, emotion);
+    ears.Update(dt, emotion);
+    eyebrows.Update(dt, emotion);
+    eyes.Update(dt, emotion);
+    mouth.UpdateMouth(dt, emotion);
+    nose.Update(dt, emotion);
 }
 
 void Head::Draw() const
@@ -3678,21 +3665,20 @@ Headbase::Headbase(BodyDimensions& dimensions) :
 // Load the head sprite and initialise its animation.
 void Headbase::Initialise()
 {
-    texture = LoadTexture("assets/images/TingoBingo/head/HeadBase.png");
+    Sprite::texture = LoadTexture("assets/images/TingoBingo/head/headBase.png");
 
-    // Sprite sheet layout.
+    dimensions.headWidth = texture.width;
+    dimensions.headHeight = texture.height;
+
+    drawGeometry.width = texture.width;
+    drawGeometry.height = texture.height;
+
     const int COLUMNS = 1;
     const int ROWS = 1;
-
-    // Calculate the size of a single animation frame.
-    dimensions.headWidth = texture.width / COLUMNS;
-    dimensions.headHeight = texture.height / ROWS;
-
     const int TOTAL_FRAMES = COLUMNS * ROWS;
     const float FRAME_DURATION = 0.02f;
 
-    // Initialise the animation using the sprite sheet information.
-    animation.Initialise
+    Sprite::animation.Initialise
     (
         dimensions.headWidth,
         dimensions.headHeight,
@@ -3702,11 +3688,20 @@ void Headbase::Initialise()
     );
 
     positionOffset = {0.0f, 0.0f};
+
+    drawGeometry.origin = {
+        drawGeometry.width / 2.0f,
+        drawGeometry.height / 2.0f
+    };
+
+    Sprite::SetShapeName("headBase");
 }
 
 void Headbase::SetTransform(MyTransform parentTransform)
 {
     Sprite::transform = MakeChildTransform(parentTransform, positionOffset);
+    
+    Sprite::SetScreenCoords();
 }
 
 
@@ -3726,7 +3721,8 @@ void Headbase::SetTransform(MyTransform parentTransform)
 #include "Constants.h"
 #include "Emotion.h"
 
-Mouth::Mouth(BodyDimensions& dimensions) : dimensions(dimensions)
+Mouth::Mouth(BodyDimensions& dimensions) : 
+    dimensions(dimensions)
 {}
 
 // Load the mouth sprite sheet and initialise its animation.
@@ -3734,17 +3730,16 @@ void Mouth::Initialise()
 {
     texture = LoadTexture("assets/images/TingoBingo/head/mouth.png");
 
-    // Sprite sheet layout.
     const int COLUMNS = 3;
     const int ROWS = 1;
+    const int TOTAL_FRAMES = COLUMNS * ROWS;
 
-    // Calculate the size of a single animation frame.
     dimensions.mouthWidth = texture.width / COLUMNS;
     dimensions.mouthHeight = texture.height / ROWS;
 
-    const int TOTAL_FRAMES = COLUMNS * ROWS;
-
-    // Initialise the animation using the sprite sheet information.
+    drawGeometry.width = dimensions.mouthWidth;
+    drawGeometry.height = dimensions.mouthHeight;
+    
     animation.Initialise
     (
         dimensions.mouthWidth,
@@ -3758,13 +3753,19 @@ void Mouth::Initialise()
         0,
         0
     };
+
+    drawGeometry.origin = {
+        drawGeometry.width / 2.0f,
+        drawGeometry.height / 2.0f
+    };
 }
 
 // Advance the mouth animation.
-void Mouth::UpdateMouth(float dt, bool speaking, Emotion emotion)
+void Mouth::UpdateMouth(float dt, Emotion emotion)
 {
-    Sprite::Update(dt);
-    
+    Update(dt);
+
+    /*
     if (emotion == Emotion::Happy && !speaking)
     {
         frame = 0;
@@ -3789,12 +3790,13 @@ void Mouth::UpdateMouth(float dt, bool speaking, Emotion emotion)
         frameTimer -= FRAME_DURATION;
         frame = (frame == 1) ? 2 : 1;
         animation.SetFrame(frame);
-    }
+    }*/
 }
 
 void Mouth::SetTransform(MyTransform parentTransform)
 {
-    Sprite::transform = MakeChildTransform(parentTransform, positionOffset);
+    transform = MakeChildTransform(parentTransform, positionOffset);
+    SetScreenCoords();
 }
 
 
@@ -3851,33 +3853,19 @@ Nose::Nose(BodyDimensions& dimensions) : dimensions(dimensions)
 
 void Nose::Initialise()
 {
-    // Load the nose texture.
-    texture = LoadTexture(
-        "assets/images/TingoBingo/head/nose.png"
-    );
+    Sprite::texture = LoadTexture("assets/images/TingoBingo/head/nose.png");
 
-    //================================================
-    // Sprite Sheet Layout
-    //================================================
-
-    // The nose currently consists of a single frame.
     const int COLUMNS = 1;
     const int ROWS = 1;
-
-    // Calculate the dimensions of one animation frame.
-    dimensions.noseWidth =
-        texture.width / COLUMNS;
-
-    dimensions.noseHeight =
-        texture.height / ROWS;
-
-    const int TOTAL_FRAMES =
-        COLUMNS * ROWS;
-
-    // Time between animation frames.
+    const int TOTAL_FRAMES = COLUMNS * ROWS;
     const float FRAME_DURATION = 0.08f;
 
-    // Initialise the animation system.
+    dimensions.noseWidth = texture.width / COLUMNS;
+    dimensions.noseHeight = texture.height / ROWS;
+
+    Sprite::drawGeometry.width = dimensions.noseWidth;
+    Sprite::drawGeometry.height = dimensions.noseHeight;
+    
     animation.Initialise(
         dimensions.noseWidth,
         dimensions.noseHeight,
@@ -3889,6 +3877,11 @@ void Nose::Initialise()
     positionOffset = {
         0.0f,
         -slightPositionOffset
+    };
+
+    drawGeometry.origin = {
+        drawGeometry.width / 2.0f,
+        drawGeometry.height / 2.0f
     };
 
     homePosition = positionOffset;
@@ -3920,11 +3913,11 @@ void Nose::Initialise()
 //
 //====================================================
 
-void Nose::Update(float dt)
+void Nose::Update(float dt, Emotion emotion)
 {
-    // Update the base Sprite animation.
     Sprite::Update(dt);
-
+    
+    /*
     //================================================
     // Nose Rotation Idle Animation
     //================================================
@@ -4019,7 +4012,7 @@ void Nose::Update(float dt)
             // Restore the original LOCAL anchor position.
             positionOffset.x = homePosition.x;
         }
-    }
+    }*/
 }
 
 void Nose::Draw() const
@@ -4029,12 +4022,10 @@ void Nose::Draw() const
 
 void Nose::SetTransform(MyTransform parentTransform)
 {
-    transform = MakeChildTransform(parentTransform, positionOffset);
+    Sprite::transform = MakeChildTransform(parentTransform, positionOffset);
+    Sprite::transform.rotation = parentTransform.rotation + localRotation;
 
-    transform.rotation =
-        parentTransform.rotation + localRotation;
-
-    transform.pivot = { 0.0f, 0.0f };
+    Sprite::SetScreenCoords();
 }
 
 
@@ -4063,21 +4054,19 @@ Pupil::Pupil(BodyDimensions& dimensions) :
 // Load the pupil sprite and initialise its animation.
 void Pupil::Initialise()
 {
-    texture = LoadTexture("assets/images/TingoBingo/head/pupil.png");
+    Sprite::texture = LoadTexture("assets/images/TingoBingo/head/pupil.png");
 
-    // Sprite sheet layout.
     const int COLUMNS = 1;
     const int ROWS = 1;
+    const int TOTAL_FRAMES = COLUMNS * ROWS;
+    const float FRAME_DURATION = 0.08f;
 
-    // Calculate the size of a single animation frame.
     dimensions.pupilWidth = texture.width / COLUMNS;
     dimensions.pupilHeight = texture.height / ROWS;
 
-    const int TOTAL_FRAMES = COLUMNS * ROWS;
+    drawGeometry.width = dimensions.pupilWidth;
+    drawGeometry.height = dimensions.pupilHeight;
 
-    const float FRAME_DURATION = 0.08f;
-
-    // Initialise the animation using the sprite sheet information.
     animation.Initialise
     (
         dimensions.pupilWidth,
@@ -4096,10 +4085,14 @@ void Pupil::Initialise()
         positionOffset = {-sideOffset, 0};
     }
     
+    Sprite::drawGeometry.origin = {
+        dimensions.pupilWidth / 2.0f,
+        dimensions.pupilHeight / 2.0f
+    };
 }
 
 // Advance the pupil animation.
-void Pupil::Update(float dt)
+void Pupil::Update(float dt, Emotion emotion)
 {
     Sprite::Update(dt);
 }
@@ -4134,6 +4127,7 @@ void Pupil::SetRotation(float rotation)
 void Pupil::SetTransform(MyTransform parentTransform) 
 {
     Sprite::transform = MakeChildTransform(parentTransform, positionOffset);
+    Sprite::SetScreenCoords();
 }
 
 
@@ -4155,8 +4149,6 @@ void Pupil::SetTransform(MyTransform parentTransform)
 #include "raylib.h"
 #include "cmath"
 #include "raymath.h"
-
-Vector2 L;
 
 Pupils::Pupils(BodyDimensions& dimensions) : 
     dimensions(dimensions),
@@ -4183,10 +4175,10 @@ void Pupils::Shutdown()
 }
 
 // Update both pupil animations.
-void Pupils::Update(float dt)
+void Pupils::Update(float dt, Emotion emotion)
 {
-    leftPupil.Update(dt);
-    rightPupil.Update(dt);
+    leftPupil.Update(dt, emotion);
+    rightPupil.Update(dt, emotion);
 }
 
 // Draw both pupils.
@@ -4194,7 +4186,6 @@ void Pupils::Draw() const
 {
     leftPupil.Draw();
     rightPupil.Draw();
-    DrawCircle(L.x, L.y, 50, RED);
 }
 
 // Set both pupil anchor points relative to the head.
@@ -4271,8 +4262,6 @@ void Pupils::LookAt(Vector2 point)
         + dimensions.neckHeight 
         + dimensions.eyesYoffset) * scale
     };
-
-    L = rightEyeCentre;
 
     // Calculate the direction from each eye to the target.
     Vector2 leftDirection =
@@ -4378,11 +4367,6 @@ bool Input::SpacePressed() const
     return IsKeyDown(KEY_SPACE);
 }
 
-bool Input::H_Pressed() const
-{
-    return IsKeyDown(KEY_H);
-}
-
 bool Input::LeftMouseButtonPressed() const
 {
     return IsMouseButtonPressed(MOUSE_BUTTON_LEFT);
@@ -4391,6 +4375,16 @@ bool Input::LeftMouseButtonPressed() const
 bool Input::G_Pressed() const
 {
     return IsKeyDown(KEY_G);
+}
+
+bool Input::E_Pressed()
+{
+    return IsKeyPressed(KEY_E);
+}
+
+bool Input::S_Pressed()
+{
+    return IsKeyPressed(KEY_S);
 }
 
 
@@ -4418,575 +4412,10 @@ int main ()
 #include "raylib.h"
 #include <cmath>
 
-
-//====================================================
-// Initialise
-//
-// Sets up the object when it is first created.
-//
-// This function:
-//   1. Sets the starting position.
-//   2. Loads the object's image.
-//   3. Works out the size of one animation frame.
-//   4. Sets up the animation.
-//   5. Finds the visible part of the image.
-//   6. Creates a collision box around the visible part.
-//
-//====================================================
-
 void Object::Initialise()
 {
-    // -------------------------------------------------
-    // Starting position
-    // -------------------------------------------------
-    //
-    // anchorPoint is the position we use to control
-    // where the object is located in the game world.
-    //
-    // Starting at (0, 0) means the object begins at
-    // the top-left corner of the world.
-    //
-    //anchorPoint = Vector2(0, 0);
 
-
-    // -------------------------------------------------
-    // Load the object's texture
-    // -------------------------------------------------
-    //
-    // textureFilename contains the path to the image.
-    //
-    // c_str() converts the C++ std::string into the
-    // format that Raylib's LoadTexture() expects.
-    //
-    texture = LoadTexture(textureFilename.c_str());
-
-
-    // -------------------------------------------------
-    // Sprite sheet layout
-    // -------------------------------------------------
-    //
-    // A sprite sheet can contain multiple frames.
-    //
-    // For this object we currently have:
-    //
-    //     1 column
-    //     1 row
-    //
-    // So there is only one frame.
-    //
-    const int COLUMNS = 1;
-    const int ROWS = 1;
-
-
-    // -------------------------------------------------
-    // Calculate the size of one frame
-    // -------------------------------------------------
-    //
-    // The texture could contain multiple frames.
-    //
-    // For example, if the image was:
-    //
-    //     4 columns × 2 rows
-    //
-    // we would divide the total image width by 4
-    // and the total image height by 2.
-    //
-    // Because we currently have 1 × 1, the frame size
-    // is simply the size of the entire image.
-    //
-    FRAME_WIDTH = texture.width / COLUMNS;
-    FRAME_HEIGHT = texture.height / ROWS;
-
-
-    // Calculate how many frames exist in the sprite sheet.
-    //
-    // 1 column × 1 row = 1 frame.
-    //
-    const int TOTAL_FRAMES = COLUMNS * ROWS;
-
-
-    // -------------------------------------------------
-    // Animation settings
-    // -------------------------------------------------
-    //
-    // ROTATION is the object's starting rotation.
-    //
-    // 0 degrees means the object starts facing normally.
-    //
-    const float ROTATION = 0.0f;
-
-
-    // How long each animation frame should remain
-    // on screen.
-    //
-    // This is currently irrelevant for a 1-frame
-    // animation, but becomes important when we have
-    // multiple frames.
-    //
-    const float FRAME_DURATION = 0.06f;
-
-
-    // -------------------------------------------------
-    // Set up the animation
-    // -------------------------------------------------
-    //
-    // Give the Animation class all the information it
-    // needs to understand the sprite sheet.
-    //
-    animation.Initialise
-    (
-        FRAME_WIDTH,       // Width of one frame
-        FRAME_HEIGHT,      // Height of one frame
-        TOTAL_FRAMES,      // Number of frames
-        COLUMNS,           // Number of columns
-        FRAME_DURATION     // Time between frames
-    );
-
-
-    // Set the object's starting rotation.
-    //rotation = ROTATION;
-
-
-    // Set the object's starting scale.
-    //
-    // 1 means normal size.
-    // 0.5 would be half size.
-    // 2 would be double size.
-    //
-    //scale = 1;
-
-
-    //=================================================
-    // Find the visible part of the image
-    //=================================================
-    //
-    // PNG images often contain transparent space around
-    // the actual object.
-    //
-    // We don't want that transparent space to be part
-    // of the collision box.
-    //
-    // So we load the image and examine every pixel.
-    //
-    Image image = LoadImage(textureFilename.c_str());
-
-
-    // -------------------------------------------------
-    // Start with the largest possible bounds
-    // -------------------------------------------------
-    //
-    // These four variables will eventually describe the
-    // smallest rectangle that surrounds every visible
-    // (non-transparent) pixel in the image.
-    //
-    // We are going to scan through the entire image and
-    // adjust these values whenever we find a visible pixel.
-    //
-    //
-    // LEFT and TOP
-    // -------------
-    //
-    // We are looking for the SMALLEST x and y values.
-    //
-    // So we start them at the largest possible values:
-    //
-    //     left = image.width
-    //     top  = image.height
-    //
-    // For example, if the image is 100 pixels wide:
-    //
-    //     left = 100
-    //
-    // and we find a visible pixel at x = 30:
-    //
-    //     30 < 100  ->  YES
-    //
-    // so left becomes:
-    //
-    //     left = 30
-    //
-    //
-    // RIGHT and BOTTOM
-    // ----------------
-    //
-    // We are looking for the LARGEST x and y values.
-    //
-    // So we start them at zero:
-    //
-    //     right  = 0
-    //     bottom = 0
-    //
-    // As we scan through the image, these values will
-    // increase whenever we find a pixel further to the
-    // right or further down.
-    //
-
-    int left = image.width;
-    int top = image.height;
-
-    int right = 0;
-    int bottom = 0;
-
-
-    // -------------------------------------------------
-    // Check every pixel in the image
-    // -------------------------------------------------
-    //
-    // The outer loop moves down through every row.
-    //
-    //     y = 0
-    //     y = 1
-    //     y = 2
-    //     y = 3
-    //     ...
-    //
-    // The inner loop moves across each row.
-    //
-    //     x = 0
-    //     x = 1
-    //     x = 2
-    //     x = 3
-    //     ...
-    //
-    // Together, these two loops check EVERY pixel in
-    // the image.
-    //
-    for (int y = 0; y < image.height; ++y)
-    {
-        for (int x = 0; x < image.width; ++x)
-        {
-            // -------------------------------------------------
-            // Check whether this pixel is visible
-            // -------------------------------------------------
-            //
-            // GetImageColor() gets the colour of the pixel
-            // at position x, y.
-            //
-            // ".a" gives us the pixel's alpha value.
-            //
-            // Alpha controls transparency:
-            //
-            //     0       = completely transparent
-            //     1-254   = partially transparent
-            //     255     = completely opaque
-            //
-            // Therefore:
-            //
-            //     .a > 0
-            //
-            // means the pixel is at least partially visible.
-            //
-            // We only care about visible pixels because we
-            // want the collision box to fit the actual object,
-            // rather than the transparent padding around it.
-
-            if (GetImageColor(image, x, y).a > 0)
-            {
-                // =================================================
-                // Find the LEFT-most visible pixel
-                // =================================================
-                //
-                // We want the SMALLEST X coordinate.
-                //
-                // For example:
-                //
-                //     left = 30
-                //
-                // If we find a visible pixel at:
-                //
-                //     x = 20
-                //
-                // then:
-                //
-                //     20 < 30
-                //
-                // so we need to change left to 20.
-                //
-                // The ternary statement below does this:
-                //
-                //     If x is smaller than left,
-                //     use x.
-                //     Otherwise keep left.
-                //
-                // -------------------------------------------------
-                // Easier-to-read IF version:
-                // -------------------------------------------------
-                //
-                // if (x < left)
-                // {
-                //     left = x;
-                // }
-                //
-                // -------------------------------------------------
-
-                left = x < left ? x : left;
-
-
-                // =================================================
-                // Find the TOP-most visible pixel
-                // =================================================
-                //
-                // We want the SMALLEST Y coordinate.
-                //
-                // Remember:
-                //
-                //     y = 0  is the top of the image
-                //
-                // As Y increases, we move down the image.
-                //
-                // For example:
-                //
-                //     top = 20
-                //
-                // and we find:
-                //
-                //     y = 10
-                //
-                // Because:
-                //
-                //     10 < 20
-                //
-                // we update:
-                //
-                //     top = 10
-                //
-                // -------------------------------------------------
-                // Easier-to-read IF version:
-                // -------------------------------------------------
-                //
-                // if (y < top)
-                // {
-                //     top = y;
-                // }
-                //
-                // -------------------------------------------------
-
-                top = y < top ? y : top;
-
-
-                // =================================================
-                // Find the RIGHT-most visible pixel
-                // =================================================
-                //
-                // Here we want the LARGEST X coordinate.
-                //
-                // Notice that we use:
-                //
-                //     x + 1
-                //
-                // instead of just x.
-                //
-                // A pixel at x = 20 occupies the space:
-                //
-                //     20 → 21
-                //
-                // So its RIGHT EDGE is at 21.
-                //
-                // This is important because later we calculate:
-                //
-                //     width = right - left
-                //
-                // For example:
-                //
-                //     left  = 10
-                //     right = 15
-                //
-                //     width = 15 - 10
-                //           = 5 pixels
-                //
-                // -------------------------------------------------
-                // Easier-to-read IF version:
-                // -------------------------------------------------
-                //
-                // if (x + 1 > right)
-                // {
-                //     right = x + 1;
-                // }
-                //
-                // -------------------------------------------------
-
-                right = x + 1 > right ? x + 1 : right;
-
-
-                // =================================================
-                // Find the BOTTOM-most visible pixel
-                // =================================================
-                //
-                // We want the LARGEST Y coordinate.
-                //
-                // Just like "right", we use y + 1 because
-                // we are recording the EDGE AFTER the pixel.
-                //
-                // For example:
-                //
-                //     bottom pixel = y 50
-                //
-                // That pixel occupies:
-                //
-                //     50 → 51
-                //
-                // Therefore:
-                //
-                //     bottom = 51
-                //
-                // -------------------------------------------------
-                // Easier-to-read IF version:
-                // -------------------------------------------------
-                //
-                // if (y + 1 > bottom)
-                // {
-                //     bottom = y + 1;
-                // }
-                //
-                // -------------------------------------------------
-
-                bottom = y + 1 > bottom ? y + 1 : bottom;
-            }
-        }
-    }
-
-    // -------------------------------------------------
-    // We no longer need the CPU-side image.
-    // -------------------------------------------------
-    //
-    // The texture is still loaded for drawing.
-    //
-    // This Image was only needed temporarily so we
-    // could inspect its pixels.
-    //
-    UnloadImage(image);
-
-
-    //=================================================
-    // Calculate the visible object's size
-    //=================================================
-    //
-    // Example:
-    //
-    // left   = 20
-    // right  = 220
-    //
-    // visible width = 220 - 20 = 200 pixels
-    //
-    const float visibleWidth =
-        static_cast<float>(right - left);
-
-
-    // Same idea for height.
-    //
-    const float visibleHeight =
-        static_cast<float>(bottom - top);
-
-
-    //=================================================
-    // Calculate the visible object's offset
-    //=================================================
-    //
-    // The sprite's anchor is in the CENTRE of the
-    // entire animation frame.
-    //
-    // But the visible object might not be centred
-    // inside that frame.
-    //
-    // collisionOffset tells us how far the visible
-    // object's top-left corner is from the centre
-    // of the sprite frame.
-    //
-    collisionOffset =
-    {
-      /*  (left - FRAME_WIDTH / 2.0f) * scale,
-
-        (top - FRAME_HEIGHT / 2.0f) * scale*/
-    };
-
-
-    //=================================================
-    // Set the drawing anchor
-    //=================================================
-    //
-    // DrawTexturePro uses the origin/anchor point when
-    // positioning, rotating and scaling the sprite.
-    //
-    // We want that point to be the centre of the
-    // animation frame.
-    //
-    // Therefore:
-    //
-    //     half the frame width
-    //     half the frame height
-    //
-    /*anchorOffset =
-    {
-        FRAME_WIDTH / 2.0f,
-        FRAME_HEIGHT / 2.0f
-    };*/
-
-
-    //=================================================
-    // Create the collision rectangle
-    //=================================================
-    //
-    // The collision box starts at:
-    //
-    //     anchor position
-    //          +
-    //     visible image offset
-    //
-    // This means the collision box lines up with the
-    // actual visible pixels rather than the transparent
-    // padding around the image.
-    //
-    collisionBox = Rectangle
-    (
-        //anchorPoint.x + collisionOffset.x,
-        //anchorPoint.y + collisionOffset.y,
-
-        // Width of the visible part.
-        //visibleWidth * scale,
-
-        // Height of the visible part.
-        //visibleHeight * scale
-    );
 }
-
-
-
-//====================================================
-// SetTextureFilename
-//
-// Stores the filename/path of the image that this
-// object will use.
-//
-// The actual texture is loaded later by Initialise().
-//
-//====================================================
-
-void Object::SetTextureFilename(std::string textureFileName)
-{
-    // "this->textureFilename" means:
-    //
-    //     the textureFilename belonging to THIS object.
-    //
-    // We are copying the function parameter
-    // "textureFileName" into it.
-    //
-    this->textureFilename = textureFileName;
-}
-
-
-
-//====================================================
-// UpdateObject
-//
-// Called every frame to update the object.
-//
-// This handles:
-//   - animation
-//   - mouse clicking
-//   - dragging
-//   - collision box movement
-//
-//====================================================
 
 void Object::UpdateObject(
     float dt,
@@ -4994,18 +4423,7 @@ void Object::UpdateObject(
     bool mousePressed
 )
 {
-    // -------------------------------------------------
-    // Update animation
-    // -------------------------------------------------
-    //
-    // Pass the elapsed time to the Sprite class.
-    //
-    // "dt" is normally the amount of time that has
-    // passed since the previous frame.
-    //
-    Sprite::Update(dt);
-
-
+    
     //=================================================
     // Check whether the mouse clicked the object
     //=================================================
@@ -5192,1311 +4610,163 @@ std::string Object::GetName()
 =====================================
 
 #include "Robot.h"
-#include "raylib.h"
-#include "Constants.h"
 #include "RobotBrain.h"
-#include <string>
 #include "Emotion.h"
-#include "SfxController.h"
 
-// Initialise the robot's brain.
 Robot::Robot() :
-    dimensions(),
-    transform(),
     body(dimensions),
-    robotBrain(*this, dimensions)
+    robotBrain(*this)
 {}
 
-// Initialise the robot and apply its world transform to the body.
 void Robot::Initialise()
 {
     body.Initialise();
-    body.SetTransform(transform);
-    sfxController.Initialise();
 }
 
-// Update the robot's behaviour through RobotBrain,
-// then update the body using the current speech state
-// and emotional state.
 void Robot::Update(float dt)
 {
-    robotBrain.Update(dt);
-    body.Update(dt, speaking, robotBrain.GetEmotion());
+    body.Update(dt, robotBrain.GetEmotion());
+
 }
 
-// Pass a speech request to RobotBrain.
-// RobotBrain is responsible for handling the speech behaviour.
-void Robot::Speak(const std::string& text)
-{
-    robotBrain.Speak(text);
-}
-
-// Set whether the robot is currently speaking.
-// The head uses this state to drive facial animations.
-void Robot::SetSpeaking(bool state)
-{
-    speaking = state;
-}
-
-// Set the robot's world transform and pass it to the body.
 void Robot::SetTransform(MyTransform transform)
 {
     this->transform = transform;
     body.SetTransform(this->transform);
 }
 
-// Return the robot's current world transform.
-MyTransform Robot::GetTransform() const
-{
-    return transform;
-}
-
-/*
-// Return the current transform of the robot's head.
-Vector2 Robot::GetHeadTransform() const
-{
-    return body.GetHeadTransform();
-}*/
-
-// Draw the robot.
 void Robot::Draw() const
 {
     body.Draw();
     robotBrain.Draw();
 }
 
-// Release the resources owned by the robot's body.
 void Robot::Shutdown()
 {
     body.Shutdown();
-    sfxController.Shutdown();
 }
 
-// Make the robot look towards a specific point.
-void Robot::LookAt(Vector2 point)
-{
-    body.GetHead().LookAt(point);
-}
-
-// Change the robot's emotional state through RobotBrain.
 void Robot::SetEmotion(Emotion emotion)
 {
     robotBrain.SetEmotion(emotion);
 }
 
-// Tell RobotBrain that the robot has picked up an object.
-void Robot::OnObjectPickedUp(Object& object)
+Emotion Robot::GetEmotion()
 {
-    robotBrain.OnObjectPickedUp(object);
+    return robotBrain.GetEmotion();
 }
 
-// Make the robot return its gaze to the forward position.
-void Robot::LookForward()
+void Robot::NextState()
 {
-    body.GetHead().LookForward();
+    robotBrain.NextState();
 }
 
-// Return the origin point of RobotBrain's search ray.
-Vector2 Robot::GetSearchRayOrigin() const
+void Robot::NextEmotion()
 {
-    return robotBrain.GetSearchRayOrigin();
+    robotBrain.NextEmotion();
 }
-
-// Return the end point of RobotBrain's search ray.
-Vector2 Robot::GetSearchRayEnd() const
-{
-    return robotBrain.GetSearchRayEnd();
-}
-
-// Give RobotBrain access to the toys available in the game.
-void Robot::SetObjectPointers(std::vector<Object*> toys)
-{
-    robotBrain.SetObjectPointers(toys);
-}
-
-void Robot::PlaySfx(std::string sound)
-{
-    sfxController.PlaySfx(sound);
-}
-
-void Robot::SwingArm(std::string side, bool swinging)
-{
-    body.SwingArm(side, swinging);
-}
-
-/*
-Vector2 Robot::GetHeadWorldPosition()
-{
-    return body.GetHeadWorldPosition();
-}
-*/
 
 
 =====================================
 .\src\RobotBrain.cpp
 =====================================
 
-// ============================================================
-// ROBOTBRAIN OVERVIEW
-// ============================================================
-//
-// RobotBrain is Tingo's high-level behaviour coordinator.
-//
-// It acts as the decision-making layer between the robot's
-// physical systems and the things happening in the game.
-//
-// RobotBrain does not draw Tingo or directly perform low-level
-// actions. Instead, it keeps track of Tingo's current behaviour,
-// emotion, speech, and interactions, then tells the appropriate
-// systems what to do.
-//
-// The main behaviour flow is:
-//
-//     Idle
-//       |
-//       | 10 seconds
-//       v
-//     Searching
-//       |
-//       | search ray detects object
-//       v
-//     Reacting
-//       |
-//       | reaction complete
-//       v
-//     Idle
-//
-// RobotBrain also handles:
-//
-//     - Speech requests and speech state
-//     - Tingo's emotional state
-//     - Looking at objects
-//     - Objects being held by the mouse
-//     - Objects detected by the search ray
-//     - Search-ray generation and collision detection
-//     - Object reaction cooldowns
-//     - Behaviour timers
-//
-// Other systems perform the actual work:
-//
-//     Robot
-//         Handles Tingo's physical and visual behaviour.
-//
-//     SpeechController
-//         Handles speech generation, loading, playback, and
-//         completion.
-//
-//     Object
-//         Provides object information and collision boxes.
-//
-// RobotBrain therefore acts as the coordinator:
-//
-//     Game events
-//          |
-//          v
-//     RobotBrain
-//          |
-//          +----> Robot
-//          |
-//          +----> SpeechController
-//          |
-//          +----> Object interaction
-//
-// The brain decides WHAT Tingo should be doing.
-// The other systems handle HOW that action is performed.
-// ============================================================
 
 #include "RobotBrain.h"
 #include "Robot.h"
-#include "Input.h"
-#include "SpeechController.h"
-#include <string>
 #include "Emotion.h"
-#include <cmath>
-#include <iostream>
 #include "BodyDimensions.h"
+#include "raylib.h"
 
-Vector2 P;
 
-RobotBrain::RobotBrain(Robot& robot, BodyDimensions& dimensions)
+RobotBrain::RobotBrain(Robot& robot)
     : robot(robot),
       state(State::Idle),
-      emotion(Emotion::Neutral),
-      targetObject(nullptr),
-      detectedObject(nullptr),
-      dimensions(dimensions)
+      emotion(Emotion::Neutral)
+{}
+
+inline int rrrr = 0;
+void RobotBrain::Update(float dt)
 {
+    rrrr = dt;
 }
-
-
-// ============================================================
-// SetState
-// ============================================================
-//
-// Changes the brain's current high-level behaviour state.
-//
-// The state itself does not perform any behaviour here.
-//
-// For example:
-//
-//     SetState(State::Searching);
-//
-// simply changes:
-//
-//     state = Searching
-//
-// The actual Searching behaviour is performed later by
-// RobotBrain::Update(), which checks the current state every
-// frame.
-//
-// This means SetState() is a simple state setter rather than
-// a complete state-transition system.
-// ============================================================
 
 void RobotBrain::SetState(State state)
 {
     this->state = state;
 }
 
-
-// ============================================================
-// SetEmotion
-// ============================================================
-//
-// Changes Tingo's current emotional state.
-//
-// Most emotions are simply stored:
-//
-//     emotion = newEmotion;
-//
-// Happy has an additional side effect. Whenever Happy is
-// requested, the happyTimer is reset to zero.
-//
-// This means that calling SetEmotion(Happy) is not merely
-// changing the emotion -- it also restarts the Happy timer.
-//
-// It is therefore important to remember that repeatedly calling
-// SetEmotion(Happy) will repeatedly reset happyTimer.
-//
-// The current RobotBrain implementation calls SetEmotion(Happy)
-// from several behaviours, including while an object is being
-// held or detected.
-// ============================================================
-
 void RobotBrain::SetEmotion(Emotion newEmotion)
 {
     emotion = newEmotion;
 }
-
-
-// ============================================================
-// Update
-// ============================================================
-//
-// This is the main RobotBrain update function.
-//
-// It is called once per frame and coordinates the different
-// systems controlled by the brain.
-//
-// The order here is important because several independent
-// sections can change Tingo's state, emotion, gaze, and speech
-// during the same update.
-//
-// The function handles:
-//
-//     1. SpeechController updates
-//     2. Visual speaking state
-//     3. Speech completion
-//     4. Idle behaviour
-//     5. Searching behaviour
-//     6. Object reaction cooldown
-//     7. Currently-held object behaviour
-//     8. Search-detected object behaviour
-//
-// These are separate if statements rather than one large
-// if/else-if state machine.
-//
-// Therefore a change made earlier in Update() can affect code
-// later in the same Update() call.
-//
-// For example, Search() can change state to Reacting and also
-// set detectedObject. Later in this same Update() call, the
-// detectedObject block can then process that object.
-// ============================================================
-
-void RobotBrain::Update(float dt)
-{
-    // --------------------------------------------------------
-    // Update the speech system first.
-    //
-    // SpeechController is responsible for managing the speech
-    // lifecycle. The brain updates it before checking its state
-    // so that the brain is working with the latest information
-    // about sound generation/loading/playback.
-    // --------------------------------------------------------
-
-    speechController.Update();
-
-
-    // --------------------------------------------------------
-    // SPEECH ACTIVE
-    //
-    // SoundLoaded() tells the brain that the generated audio
-    // now exists and is ready for playback/use.
-    //
-    // SpeechFinished() must still be false because the speech
-    // lifecycle has not completed.
-    //
-    // This allows the brain to distinguish between a speech
-    // request that is still being generated and speech that
-    // has progressed far enough to be considered active.
-    //
-    // When this condition is true:
-    //
-    //     Robot is marked as speaking.
-    //     Tingo becomes Happy.
-    //
-    // The actual speech generation/playback is handled by
-    // SpeechController, not by RobotBrain.
-    // --------------------------------------------------------
-
-    if
-    (
-        speechController.SoundLoaded() &&
-        !speechController.SpeechFinished()
-    )
-    {
-        robot.SetSpeaking(true);
-        SetEmotion(Emotion::Happy);
-    }
-
-
-    // --------------------------------------------------------
-    // SPEECH FINISHED
-    //
-    // SpeechFinished() represents completion of the speech
-    // lifecycle.
-    //
-    // When speech has completely finished, RobotBrain clears
-    // the visual speaking state and returns Tingo's emotion
-    // to Neutral.
-    //
-    // This check is separate from SoundLoaded() because
-    // generating/loading a sound and completing playback are
-    // different stages of the speech lifecycle.
-    // --------------------------------------------------------
-
-    if(speechController.SpeechFinished())
-    {
-        robot.SetSpeaking(false);
-        SetEmotion(Emotion::Neutral);
-    }
-
-
-    // ========================================================
-    // IDLE BEHAVIOUR
-    // ========================================================
-    //
-    // Idle is Tingo's normal resting behaviour.
-    //
-    // While Idle:
-    //
-    //     - Tingo looks forward.
-    //     - idleTimer counts how long Tingo has remained idle.
-    //
-    // After 10 seconds, Tingo leaves Idle and enters Searching.
-    //
-    // The timers are reset when the transition happens so that
-    // the next Idle/Search cycle starts cleanly.
-    // ========================================================
-
-    if(state == State::Idle)
-    {
-        // Keep Tingo facing forward while nothing else is
-        // controlling his gaze.
-        robot.LookForward();
-
-        // dt is the amount of time that passed since the
-        // previous frame. Adding dt makes the timer independent
-        // of frame rate.
-        idleTimer += dt;
-
-
-        // ----------------------------------------------------
-        // Transition from Idle to Searching.
-        //
-        // The search timer is cleared because a new search is
-        // about to begin.
-        //
-        // The idle timer is also cleared so the next time Tingo
-        // enters Idle, the ten-second countdown starts again.
-        // ----------------------------------------------------
-
-        
-        SwingArm("left", true);
-        SwingArm("right", true);
-
-        if(idleTimer >= idleTimeLimit)
-        {
-            searchTimer = 0.0f;
-            idleTimer = 0.0f;
-
-            state = State::Searching;
-
-            SwingArm("left", false);
-            SwingArm("right", false);
-        }
-    }
-
-
-    // ========================================================
-    // SEARCHING BEHAVIOUR
-    // ========================================================
-    //
-    // While Searching, Search() is called every frame.
-    //
-    // Search() is responsible for:
-    //
-    //     - advancing the search angle
-    //     - creating the search direction
-    //     - creating the search ray
-    //     - moving Tingo's gaze
-    //     - testing objects against the ray
-    //
-    // searchTimer measures how long the current search has
-    // been running.
-    //
-    // In this implementation the search ends after 5 seconds
-    // unless an object is detected first.
-    // ========================================================
-
-    if(state == State::Searching)
-    {
-        searchTimer += dt;
-
-        // Perform one frame of searching.
-        //
-        // Search() may change the state to Reacting if an
-        // object is found.
-        Search(dt);
-
-
-        // ----------------------------------------------------
-        // End the search after five seconds.
-        //
-        // If no object has caused the search to transition into
-        // another behaviour, Tingo returns to Idle.
-        // ----------------------------------------------------
-
-        if(searchTimer >= 5.0f)
-        {
-            idleTimer = 0.0f;
-            searchTimer = 0.0f;
-
-            state = State::Idle;
-        }
-    }
-
-
-    // ========================================================
-    // OBJECT REACTION COOLDOWN
-    // ========================================================
-    //
-    // reactionCoolDown prevents Tingo from repeatedly speaking
-    // every time an object interaction is triggered.
-    //
-    // When the cooldown is active, its timer advances.
-    //
-    // After ten seconds, the cooldown is cleared and another
-    // object reaction can trigger speech.
-    //
-    // The cooldown is separate from the detected-object timer.
-    // They control different parts of Tingo's behaviour.
-    // ========================================================
-
-    if(reactionCoolDown)
-    {
-        reactionCoolDownTimer += dt;
-    }
-
-
-    // --------------------------------------------------------
-    // Cooldown expiration.
-    //
-    // Once ten seconds have passed, allow another object
-    // reaction and reset the cooldown timer.
-    // --------------------------------------------------------
-
-    if(reactionCoolDownTimer >= 10.0)
-    {
-        reactionCoolDown = false;
-        reactionCoolDownTimer = 0;
-    }
-
-
-    // ========================================================
-    // CURRENTLY HELD OBJECT
-    // ========================================================
-    //
-    // targetObject represents the object Tingo is currently
-    // interacting with, specifically an object that was picked
-    // up through the mouse interaction system.
-    //
-    // This is separate from detectedObject.
-    //
-    // targetObject:
-    //     Object being actively held/interacted with.
-    //
-    // detectedObject:
-    //     Object found by the search ray.
-    // ========================================================
-
-    if(targetObject != nullptr)
-    {
-        // ----------------------------------------------------
-        // The object is still being held.
-        //
-        // Tingo continuously looks at the held object while
-        // the mouse is holding it.
-        //
-        // The state is changed to Reacting because Tingo is
-        // actively responding to the object rather than being
-        // in a normal Idle state.
-        // ----------------------------------------------------
-
-        if(targetObject->IsHeldByMouse())
-        {
-            //robot.LookAt(targetObject->GetAnchorPoint());
-            SetState(State::Reacting);
-
-            //P = targetObject->GetAnchorPoint();
-
-            // ------------------------------------------------
-            // Ball and banana are currently recognised as
-            // objects that make Tingo Happy.
-            //
-            // SetEmotion(Happy) also resets happyTimer.
-            //
-            // Because this code runs every frame while the
-            // object is held, happyTimer will also be reset
-            // every frame during this interaction.
-            // ------------------------------------------------
-
-            if
-            (
-                targetObject->GetName() == "ball" ||
-                targetObject->GetName() == "banana"
-            )
-            {
-                SetEmotion(Emotion::Happy);
-            }
-        }
-        else
-        {
-            // ------------------------------------------------
-            // The object has been released.
-            //
-            // The interaction is immediately ended:
-            //
-            //     - return to Idle
-            //     - return to Neutral emotion
-            //     - remove the target pointer
-            //     - clear the reaction cooldown
-            //     - reset the cooldown timer
-            //
-            // Setting targetObject to nullptr is important
-            // because it tells the brain that there is no
-            // longer an active held-object interaction.
-            // ------------------------------------------------
-
-            SetState(State::Idle);
-            SetEmotion(Emotion::Neutral);
-
-            targetObject = nullptr;
-
-            reactionCoolDown = false;
-            reactionCoolDownTimer = 0;
-        }
-    }
-
-
-    // ========================================================
-    // DETECTED OBJECT REACTION
-    // ========================================================
-    //
-    // detectedObject is populated by Search() when the search
-    // ray intersects an object's collision rectangle.
-    //
-    // Once an object is detected, Tingo:
-    //
-    //     - tracks the object with his gaze
-    //     - enters Reacting
-    //     - becomes Happy for recognised objects
-    //     - waits for the reaction timer
-    //     - speaks the appropriate reaction
-    //     - clears the detected object
-    //     - returns to Idle
-    //
-    // This creates the behaviour of Tingo finding something,
-    // looking at it, and then reacting to it.
-    // ========================================================
-
-    if(detectedObject != nullptr)
-    {
-        // Count how long Tingo has been reacting to the
-        // detected object.
-        detectedTimer += dt;
-
-        // Once the object has been detected, the rotating
-        // search ray is no longer what controls Tingo's gaze.
-        //
-        // Instead, Tingo looks directly at the object's current
-        // position.
-        //robot.LookAt(detectedObject->GetAnchorPoint());
-
-        // The object has become the focus of Tingo's behaviour.
-        SetState(State::Reacting);
-
-
-        // ----------------------------------------------------
-        // Ball and banana are recognised as objects that make
-        // Tingo Happy.
-        // ----------------------------------------------------
-
-        if
-        (
-            detectedObject->GetName() == "ball" ||
-            detectedObject->GetName() == "banana"
-        )
-        {
-            SetEmotion(Emotion::Happy);
-        }
-
-
-        // ----------------------------------------------------
-        // Complete the detected-object reaction after five
-        // seconds.
-        //
-        // The five-second delay allows Tingo to remain focused
-        // on the object before delivering the final reaction.
-        // ----------------------------------------------------
-
-        if(detectedTimer >= 5.0f)
-        {
-            // ------------------------------------------------
-            // Banana-specific reaction.
-            // ------------------------------------------------
-
-            if(detectedObject->GetName() == "banana")
-            {
-                Speak("OI! GIMME THE BANANA");
-            }
-
-
-            // ------------------------------------------------
-            // Ball-specific reaction.
-            // ------------------------------------------------
-
-            if(detectedObject->GetName() == "ball")
-            {
-                Speak("ALBY! GIMME THE BALL");
-            }
-
-
-            // ------------------------------------------------
-            // The detected-object reaction is now complete.
-            //
-            // Return to Neutral, reset the reaction timer,
-            // return to Idle, and clear detectedObject.
-            //
-            // Clearing detectedObject is especially important:
-            // if the pointer remained set, the brain would
-            // continue treating the same object as an active
-            // detection on subsequent frames.
-            // ------------------------------------------------
-
-            SetEmotion(Emotion::Neutral);
-
-            detectedTimer = 0.0f;
-
-            SetState(State::Idle);
-
-            detectedObject = nullptr;
-        }
-    }
-}
-
-
-// ============================================================
-// Speak
-// ============================================================
-//
-// Starts a new speech request.
-//
-// RobotBrain does not generate or play the audio itself.
-// It passes the text to SpeechController.
-//
-// A new request is only started when SpeechController reports
-// that the previous speech lifecycle has completely finished.
-//
-// speaking is set to true here, while Robot::SetSpeaking(true)
-// is also triggered by Update() once SoundLoaded() confirms
-// that the generated sound is ready.
-//
-// This creates an important distinction:
-//
-//     Speak()
-//         means a speech request has been started.
-//
-//     SoundLoaded()
-//         means generated audio is available.
-//
-//     SpeechFinished()
-//         means the complete speech lifecycle has ended.
-// ============================================================
-
-void RobotBrain::Speak(const std::string& text)
-{
-    // Do not start another speech request while the previous
-    // speech lifecycle is still active.
-    if(speechController.SpeechFinished())
-    {
-        speaking = true;
-
-        speechController.Speak(text);
-    }
-}
-
-
-// ============================================================
-// GetEmotion
-// ============================================================
-//
-// Returns the emotion currently stored by RobotBrain.
-//
-// Other systems can use this value to determine which emotional
-// animation or visual behaviour should be displayed.
-// ============================================================
 
 Emotion RobotBrain::GetEmotion()
 {
     return emotion;
 }
 
-
-// ============================================================
-// OnObjectPickedUp
-// ============================================================
-//
-// Called when the object interaction system reports that an
-// object has been picked up.
-//
-// The object address is stored in targetObject so RobotBrain
-// can continue tracking that object while it is being held.
-//
-// RobotBrain does not create or destroy the object here.
-// It simply stores a pointer to the existing Object.
-//
-// The object's lifetime therefore needs to remain valid while
-// RobotBrain is using this pointer.
-// ============================================================
-
-void RobotBrain::OnObjectPickedUp(Object& object)
+const char* RobotBrain::RobotStateToString(State state)
 {
-    // Store the address of the object currently being
-    // interacted with.
-    targetObject = &object;
-
-
-    // ========================================================
-    // BALL PICKUP
-    // ========================================================
-    //
-    // The ball has a specific spoken reaction.
-    //
-    // The reaction only occurs if the cooldown is inactive.
-    // Once the reaction is triggered, the cooldown is enabled
-    // to prevent repeated speech from the same interaction.
-    // ========================================================
-
-    if(object.GetName() == "ball")
+    switch (state)
     {
-        if(!reactionCoolDown)
-        {
-            Speak("Ha ha ha ha, lets play with the ball");
-
-            reactionCoolDown = true;
-        }
-    }
-
-
-    // ========================================================
-    // BANANA PICKUP
-    // ========================================================
-    //
-    // The banana follows the same cooldown mechanism as the
-    // ball but has different speech.
-    // ========================================================
-
-    if(object.GetName() == "banana")
-    {
-        if(!reactionCoolDown)
-        {
-            Speak("Hey! A banana.");
-
-            reactionCoolDown = true;
-        }
+        case State::Idle:      return "Idle";
+        case State::Speaking:  return "Speaking";
+        case State::Thinking:  return "Thinking";
+        case State::Listening: return "Listening";
+        case State::Reacting:  return "Reacting";
+        default:               return "Unknown";
     }
 }
 
-
-// ============================================================
-// Search
-// ============================================================
-//
-// Performs one frame of Tingo's search behaviour.
-//
-// The search is based around a continuously rotating angle.
-//
-// The angle is converted into a direction vector:
-//
-//     X = cos(angle)
-//     Y = sin(angle)
-//
-// This produces a unit direction pointing around Tingo in a
-// circle.
-//
-// That same direction is then used for two things:
-//
-//     1. Tingo's visual gaze.
-//     2. The collision-detection search ray.
-//
-// Using the same direction for both keeps the visual search
-// and the actual collision test synchronised.
-//
-// Search() does not itself decide how long searching lasts.
-// Update() controls the overall search timer.
-// ============================================================
-
-void RobotBrain::Search(float dt)
+const char* RobotBrain::EmotionToString(Emotion emotion)
 {
-    // --------------------------------------------------------
-    // Advance the search angle.
-    //
-    // searchSpeed controls how quickly Tingo rotates the
-    // search direction.
-    //
-    // Multiplying by dt makes the rotation time-based rather
-    // than dependent on the number of frames being rendered.
-    // --------------------------------------------------------
-
-    searchAngle += searchSpeed * dt;
-
-
-    // --------------------------------------------------------
-    // Convert the angle into a 2D direction vector.
-    //
-    // cosf() provides the X component.
-    // sinf() provides the Y component.
-    //
-    // Together they create a direction around the unit circle.
-    //
-    // As searchAngle increases, this vector continuously rotates.
-    // --------------------------------------------------------
-
-    Vector2 searchDirection =
+    switch (emotion)
     {
-        cosf(searchAngle),
-        sinf(searchAngle)
-    };
+        case Emotion::Neutral:   return "Neutral";
+        case Emotion::Happy:     return "Happy";
+        case Emotion::Sad:       return "Sad";
+        case Emotion::Angry:     return "Angry";
+        case Emotion::Surprised: return "Surprised";
+        default:                 return "Unknown";
+    }
+}
 
+void RobotBrain::NextEmotion()
+{
+    int next = static_cast<int>(emotion) + 1;
 
-    // --------------------------------------------------------
-    // The search ray begins at Tingo's head position.
-    //
-    // This ensures the ray originates from the same location
-    // that visually represents where Tingo is looking from.
-    // --------------------------------------------------------
-
-    //searchRayOrigin = robot.GetHeadWorldPosition();
-    //searchRayOrigin.y = robot.GetHeadWorldPosition().y - dimensions.eyesYoffset * SCALE;
-
-
-    // --------------------------------------------------------
-    // Calculate the end of the search ray.
-    //
-    // The direction vector is multiplied by 300 pixels to
-    // create a ray extending 300 pixels from Tingo's head.
-    //
-    // Conceptually:
-    //
-    //     end = origin + direction * distance
-    //
-    // The result is a line from Tingo's head into the current
-    // search direction.
-    // --------------------------------------------------------
-
-    searchRayEnd =
+    if (next >= static_cast<int>(Emotion::Count))
     {
-        searchRayOrigin.x + searchDirection.x * 300.0f,
-        searchRayOrigin.y + searchDirection.y * 300.0f
-    };
+        next = 0;
+    }
 
+    emotion = static_cast<Emotion>(next);
+}
 
-    // --------------------------------------------------------
-    // Make Tingo's eyes look in the same direction as the
-    // search ray.
-    //
-    // This is important because the ray and the visual gaze
-    // are driven by the same search calculation.
-    //
-    // Therefore, when Tingo visually looks somewhere, the
-    // collision ray is looking in that same direction.
-    // --------------------------------------------------------
+void RobotBrain::NextState()
+{
+    int next = static_cast<int>(state) + 1;
 
-    robot.LookAt(searchRayEnd);
+    if (next >= static_cast<int>(State::Count))
+    {
+        next = 0;
+    }
 
+    state = static_cast<State>(next);
+}
 
-    // --------------------------------------------------------
-    // Test the search ray against all registered objects.
-    //
-    // DetectCollision() returns:
-    //
-    //     Object*
-    //
-    // if an object was hit, or:
-    //
-    //     nullptr
-    //
-    // if the ray did not intersect any registered object.
-    // --------------------------------------------------------
-
-    detectedObject = DetectCollision
-    (
-        searchRayOrigin,
-        searchRayEnd
+void RobotBrain::Draw() const
+{
+    DrawText(
+        TextFormat("RobotBrain State: %s", RobotStateToString(state)),
+        10, 10, 20, WHITE
     );
 
-
-    // ========================================================
-    // OBJECT DETECTED
-    // ========================================================
-    //
-    // Once DetectCollision() returns an object, the search has
-    // found something.
-    //
-    // The state changes to Reacting immediately.
-    //
-    // The detectedObject pointer remains populated so the
-    // later detected-object section of Update() can track the
-    // object and manage the five-second reaction period.
-    // ========================================================
-
-    if(detectedObject != nullptr)
-    {
-        SetState(State::Reacting);
-
-
-        // ----------------------------------------------------
-        // Immediate banana detection speech.
-        //
-        // This happens as soon as the search ray finds the
-        // banana.
-        // ----------------------------------------------------
-
-        if(detectedObject->GetName() == "banana")
-        {
-            robot.PlaySfx("boing");
-            Speak("I found a banana");
-        }
-
-
-        // ----------------------------------------------------
-        // Immediate ball detection speech.
-        //
-        // This happens as soon as the search ray finds the
-        // ball.
-        // ----------------------------------------------------
-
-        if(detectedObject->GetName() == "ball")
-        {
-            robot.PlaySfx("boing");
-            Speak("I found a ball");
-        }
-    }
-}
-
-
-// ============================================================
-// GetSearchRayOrigin
-// ============================================================
-//
-// Returns the current starting point of the search ray.
-//
-// This allows another system, such as rendering/debug code,
-// to access the ray position without directly accessing the
-// RobotBrain member.
-// ============================================================
-
-Vector2 RobotBrain::GetSearchRayOrigin() const
-{
-    return searchRayOrigin;
-}
-
-
-// ============================================================
-// GetSearchRayEnd
-// ============================================================
-//
-// Returns the current endpoint of the search ray.
-//
-// Together with GetSearchRayOrigin(), this can be used by
-// another system to draw or inspect the current search ray.
-// ============================================================
-
-Vector2 RobotBrain::GetSearchRayEnd() const
-{
-    return searchRayEnd;
-}
-
-
-// ============================================================
-// SetObjectPointers
-// ============================================================
-//
-// Gives RobotBrain a collection of pointers to the objects
-// that it is allowed to detect.
-//
-// RobotBrain stores the vector of pointers but does not create
-// the objects and does not take ownership of them.
-//
-// This means the system responsible for creating the Objects
-// must keep those objects alive for as long as RobotBrain
-// may attempt to access them.
-//
-// DetectCollision() later loops through this list when the
-// search ray is being tested.
-// ============================================================
-
-void RobotBrain::SetObjectPointers(std::vector<Object*> objects)
-{
-    this->objects = objects;
-}
-
-
-// ============================================================
-// DetectCollision
-// ============================================================
-//
-// Tests the supplied ray against every registered object.
-//
-// The function receives:
-//
-//     rayOrigin
-//         Starting point of the search ray.
-//
-//     rayEnd
-//         Ending point of the search ray.
-//
-// Each Object provides a collision rectangle.
-//
-// The rectangle is represented by four corners:
-//
-//             topLeft -------- topRight
-//                |                |
-//                |                |
-//                |                |
-//             bottomLeft ----- bottomRight
-//
-// The function tests whether the ray:
-//
-//     1. Starts inside the rectangle.
-//     2. Intersects the top edge.
-//     3. Intersects the right edge.
-//     4. Intersects the bottom edge.
-//     5. Intersects the left edge.
-//
-// If any test succeeds, the corresponding Object pointer is
-// returned immediately.
-//
-// If the entire list is checked without a collision, nullptr
-// is returned.
-//
-// This function therefore performs the actual geometric
-// detection, while Search() decides when and why the ray
-// should be used.
-// ============================================================
-
-Object* RobotBrain::DetectCollision(
-    Vector2 rayOrigin,
-    Vector2 rayEnd)
-{
-    // --------------------------------------------------------
-    // Check every object registered with RobotBrain.
-    //
-    // object is a pointer because RobotBrain does not own these
-    // Objects; it is simply using references to existing ones.
-    // --------------------------------------------------------
-
-    for(Object* object : objects)
-    {
-        // Get the rectangle used to represent this object's
-        // collision area.
-        Rectangle box = object->GetCollisionBox();
-
-
-        // ----------------------------------------------------
-        // Calculate the four corners of the collision rectangle.
-        //
-        // Raylib Rectangle uses:
-        //
-        //     x
-        //     y
-        //     width
-        //     height
-        //
-        // so the opposite sides are calculated by adding width
-        // and height to the starting coordinates.
-        // ----------------------------------------------------
-
-        Vector2 topLeft =
-        {
-            box.x,
-            box.y
-        };
-
-
-        Vector2 topRight =
-        {
-            box.x + box.width,
-            box.y
-        };
-
-
-        Vector2 bottomLeft =
-        {
-            box.x,
-            box.y + box.height
-        };
-
-
-        Vector2 bottomRight =
-        {
-            box.x + box.width,
-            box.y + box.height
-        };
-
-
-        // ====================================================
-        // RAY / RECTANGLE COLLISION TEST
-        // ====================================================
-        //
-        // The first test:
-        //
-        //     CheckCollisionPointRec(rayOrigin, box)
-        //
-        // handles the special case where the ray begins inside
-        // the collision rectangle.
-        //
-        // The remaining four tests check the ray against each
-        // edge of the rectangle.
-        //
-        // CheckCollisionLines() determines whether the search
-        // ray intersects the line segment representing an edge.
-        //
-        // The final nullptr argument means the intersection
-        // point itself is not needed here. We only need to know
-        // whether a collision occurred.
-        //
-        // The tests cover the complete perimeter of the object:
-        //
-        //     top
-        //     right
-        //     bottom
-        //     left
-        //
-        // If any one is true, the ray has detected this object.
-        // ====================================================
-
-        if
-        (
-            // The ray begins inside the object's collision box.
-            CheckCollisionPointRec(rayOrigin, box) ||
-
-
-            // Check the top edge.
-            CheckCollisionLines(
-                rayOrigin,
-                rayEnd,
-                topLeft,
-                topRight,
-                nullptr
-            ) ||
-
-
-            // Check the right edge.
-            CheckCollisionLines(
-                rayOrigin,
-                rayEnd,
-                topRight,
-                bottomRight,
-                nullptr
-            ) ||
-
-
-            // Check the bottom edge.
-            CheckCollisionLines(
-                rayOrigin,
-                rayEnd,
-                bottomRight,
-                bottomLeft,
-                nullptr
-            ) ||
-
-
-            // Check the left edge.
-            CheckCollisionLines(
-                rayOrigin,
-                rayEnd,
-                bottomLeft,
-                topLeft,
-                nullptr
-            )
-        )
-        {
-            // ------------------------------------------------
-            // This object's collision rectangle was hit.
-            //
-            // Return immediately rather than checking the
-            // remaining objects.
-            //
-            // The caller receives the actual Object pointer,
-            // allowing RobotBrain to store it in detectedObject
-            // and react to that specific object.
-            // ------------------------------------------------
-
-            return object;
-        }
-    }
-
-
-    // --------------------------------------------------------
-    // No registered object's collision rectangle intersected
-    // the ray.
-    //
-    // nullptr is used to represent "nothing detected".
-    // --------------------------------------------------------
-
-    return nullptr;
-}
-
-void RobotBrain::SwingArm(std::string side, bool swinging)
-{
-    robot.SwingArm(side, swinging);
-}
-
-void RobotBrain::Draw() const {
-    //DrawCircle(P.x,P.y,10,BLUE);
+    DrawText(
+        TextFormat("RobotBrain Emotion: %s", EmotionToString(emotion)),
+        10, 30, 20, WHITE
+    );
 }
 
 
@@ -6532,89 +4802,41 @@ void SfxController::Shutdown()
 
 #include "Shape.h"
 #include <cmath>
+#include <iostream>
 
 void Shape::Draw() const
-{
-    // ------------------------------------------------------------
-    // TingoBingo Cartesian coordinate system
-    //
-    // +X = right
-    // +Y = up
-    //
-    // transform.position = centre of the object
-    // transform.pivot    = local rotation point
-    // transform.rotation = Cartesian rotation
-    // transform.scale    = object scale
-    // ------------------------------------------------------------
+{    
+    float scale = transform.scale;
 
-    float scaledWidth =
-        width * transform.scale;
-
-    float scaledHeight =
-        height * transform.scale;
-
-    // Convert the object's WORLD POSITION to screen coordinates.
-    Vector2 screenPosition =
-    {
-        SCREEN_WIDTH / 2.0f + transform.position.x,
-        SCREEN_HEIGHT / 2.0f - transform.position.y
+    Rectangle rectangle = {
+        screenX,
+        screenY,
+        drawGeometry.width * scale,
+        drawGeometry.height * scale
     };
-
-    // Keep the rectangle centred on transform.position.
-    Rectangle rectangle =
-    {
-        screenPosition.x - scaledWidth / 2.0f,
-        screenPosition.y - scaledHeight / 2.0f,
-        scaledWidth,
-        scaledHeight
-    };
-
-    // Convert our Cartesian pivot into the rectangle's local
-    // coordinate space.
-    //
-    // Rectangle coordinates have:
-    //     +X = right
-    //     +Y = down
-    //
-    // Our Cartesian coordinates have:
-    //     +X = right
-    //     +Y = up
-    //
-    // Therefore pivot Y is inverted here.
-    Vector2 origin =
-    {
-        scaledWidth / 2.0f +
-            transform.pivot.x * transform.scale,
-
-        scaledHeight / 2.0f -
-            transform.pivot.y * transform.scale
-    };
-
-    // Convert Cartesian rotation to the screen rotation direction.
-    float screenRotation =
-        -transform.rotation;
 
     DrawRectanglePro(
         rectangle,
-        origin,
-        screenRotation,
+        {
+            drawGeometry.origin.x * scale,
+            drawGeometry.origin.y * scale
+        },
+        -transform.rotation,
         color
     );
 }
 
-void Shape::SetDimensions(float width, float height)
+void Shape::SetScreenCoords()
 {
-    this->width = width;
-    this->height = height;
+    float scale = transform.scale;
+
+    screenX = SCREEN_WIDTH / 2.0f + transform.position.x * scale;
+    screenY = SCREEN_HEIGHT / 2.0f - transform.position.y * scale;
 }
 
-void Shape::Shutdown()
+void Shape::SetShapeName(std::string name) 
 {
-}
-
-void Shape::SetTransform(MyTransform transform)
-{
-    this->transform = transform;
+    this->name = name;
 }
 
 
@@ -7600,135 +5822,117 @@ bool SpeechGenerator::GenerateSpeech
 .\src\Sprite.cpp
 =====================================
 
-//====================================================
-// Sprite.cpp
-//
-// Provides a base class for drawable sprites.
-//
-// A Sprite stores its texture, anchor point, rotation,
-// scale and animation. Derived classes only need to
-// load their textures and configure their animations.
-//====================================================
-
 #include "Sprite.h"
 #include <cmath>
+#include <iostream>
 
-/*
-    Tingo uses its own Cartesian coordinate system for all transform
-    calculations. In our system, (0, 0) is the centre of the screen,
-    +X points right, and +Y points up.
+void Sprite::Draw() const
+{    
+    Rectangle source = animation.GetSourceRectangle();
 
-    Raylib uses screen coordinates instead: (0, 0) is the top-left
-    of the screen, +X points right, and +Y points down.
+    float scale = transform.scale;
 
-    Therefore, before rendering, we convert our Cartesian coordinates
-    into Raylib's screen coordinates. This conversion happens here,
-    at the rendering boundary, so the rest of Tingo's transform system
-    can continue to work entirely in Cartesian coordinates.
-
-    DrawTexturePro() also combines the sprite's position and rotation
-    around an origin. Its destination position represents where that
-    origin is located on screen. Our transform system keeps position
-    and pivot as separate concepts, so we calculate the screen-space
-    position of our pivot and give that to DrawTexturePro() as its
-    destination position.
-
-    The origin must also be converted into Raylib's local coordinate
-    system. Raylib measures the origin from the top-left of the
-    destination rectangle, whereas our pivot is stored as a Cartesian
-    offset from the centre of the sprite. Therefore, we start at the
-    centre of the rendered sprite (width / 2, height / 2) and add the
-    pivot offset. The Y component is inverted because Cartesian +Y
-    points upward while Raylib's local +Y points downward.
-
-    In other words:
-
-        Tingo coordinates
-                |
-                |  Cartesian -> screen conversion
-                v
-        screenPosition / pivotScreen
-                |
-                |  translate our position + pivot into
-                |  Raylib's destination + origin system
-                v
-        DrawTexturePro()
-                |
-                v
-            Rendered sprite
-
-    This keeps Raylib's coordinate/origin requirements contained
-    inside this function without changing the meaning of MyTransform.
-*/
-
-void DrawTextureCartesian(
-    Texture2D texture,
-    Rectangle source,
-    MyTransform transform
-)
-{
-    Vector2 screenPosition =
-    {
-        SCREEN_WIDTH / 2.0f + transform.position.x * transform.scale,
-        SCREEN_HEIGHT / 2.0f - transform.position.y * transform.scale
-    };
-
-    Vector2 pivotScreen =
-    {
-        screenPosition.x + transform.pivot.x * transform.scale,
-        screenPosition.y - transform.pivot.y * transform.scale
-    };
-
-    float width = source.width * transform.scale;
-    float height = source.height * transform.scale;
-
-    Vector2 origin =
-    {
-        width / 2.0f + transform.pivot.x * transform.scale,
-        height / 2.0f - transform.pivot.y * transform.scale
-    };
-
-    Rectangle destination =
-    {
-        pivotScreen.x,
-        pivotScreen.y,
-        width,
-        height
+    Rectangle destination = {
+        screenX,
+        screenY,
+        drawGeometry.width * scale,
+        drawGeometry.height * scale
     };
 
     DrawTexturePro(
         texture,
         source,
         destination,
-        origin,
+        {
+            drawGeometry.origin.x * scale,
+            drawGeometry.origin.y * scale
+        },
         -transform.rotation,
         WHITE
     );
+
+    //DebugDraw();
 }
 
-// Update the sprite's animation.
-void Sprite::Update(float dt)
+void Sprite::Update(float dt) 
 {
     animation.Update(dt);
 }
 
-void Sprite::Draw() const
+void Sprite::SetScreenCoords()
 {
-    Rectangle source = animation.GetSourceRectangle();
+    float scale = transform.scale;
 
-    DrawTextureCartesian(texture, source, transform);
+    screenX = SCREEN_WIDTH / 2.0f + transform.position.x * scale;
+    screenY = SCREEN_HEIGHT / 2.0f - transform.position.y * scale;
 }
 
-// Release the sprite's texture.
+void Sprite::SetShapeName(std::string name) 
+{
+    this->name = name;
+}
+
 void Sprite::Shutdown()
 {
     UnloadTexture(texture);
 }
 
-void Sprite::SetTransform(MyTransform transform)
+void Sprite::DebugDraw() const
 {
-    this->transform = transform;
+    if(name != "bodyBase")
+    {
+        return;
+    }
+
+    float scale = transform.scale;
+    float destinationX = screenX - drawGeometry.origin.x * scale;
+    float destinationY = screenY - drawGeometry.origin.y * scale;
+    float destinationWidth = drawGeometry.width * scale;
+    float destinationHeight = drawGeometry.height * scale;
+    float raylibOriginX = drawGeometry.origin.x * scale;
+    float raylibOriginY = drawGeometry.origin.y * scale;
+
+    DrawText(
+        TextFormat(
+            "bodyBase "
+            "cart(%.1f, %.1f) "
+            "screen(%.1f, %.1f) "
+            "size(%.1f, %.1f) "
+            "origin(%.1f, %.1f) "
+            "dest(%.1f, %.1f)",
+            transform.position.x,
+            transform.position.y,
+            screenX,
+            screenY,
+            drawGeometry.width,
+            drawGeometry.height,
+            raylibOriginX,
+            raylibOriginY,
+            destinationX,
+            destinationY
+        ),
+        10,
+        20,
+        18,
+        WHITE
+    );
+
+    DrawRectangleLines(
+        (int)destinationX,
+        (int)destinationY,
+        (int)destinationWidth,
+        (int)destinationHeight,
+        YELLOW
+    );
+
+    DrawCircle(
+        (int)screenX,
+        (int)screenY,
+        7.0f,
+        RED
+    );
 }
+
 
 
 =====================================

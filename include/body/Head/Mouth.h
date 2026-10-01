@@ -17,10 +17,6 @@ class Mouth : public Sprite
     private:
         BodyDimensions& dimensions;
         Vector2 positionOffset;
-
-        int frame = 0;
-        float frameTimer = 0.0f;
-        const float FRAME_DURATION = 0.3f;
-
+        
         float mouthDisplayOffset = 28.0f;
 };

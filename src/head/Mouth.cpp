@@ -22,6 +22,7 @@ void Mouth::Initialise()
     const int COLUMNS = 3;
     const int ROWS = 1;
     const int TOTAL_FRAMES = COLUMNS * ROWS;
+    const float FRAME_DURATION = 0.5;
 
     dimensions.mouthWidth = texture.width / COLUMNS;
     dimensions.mouthHeight = texture.height / ROWS;
@@ -53,33 +54,6 @@ void Mouth::Initialise()
 void Mouth::UpdateMouth(float dt, Emotion emotion)
 {
     Update(dt);
-
-    /*
-    if (emotion == Emotion::Happy && !speaking)
-    {
-        frame = 0;
-        frameTimer = 0.0f;
-        animation.SetFrame(frame);
-        return;
-    }
-
-    if (!speaking)
-    {
-        frame = 1;
-        frameTimer = 0.0f;
-        animation.SetFrame(frame);
-        return;
-    }
-
-    //Animate mouth while speaking
-    frameTimer += dt;
-
-    if (frameTimer >= FRAME_DURATION)
-    {
-        frameTimer -= FRAME_DURATION;
-        frame = (frame == 1) ? 2 : 1;
-        animation.SetFrame(frame);
-    }*/
 }
 
 void Mouth::SetTransform(MyTransform parentTransform)

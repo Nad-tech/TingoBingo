@@ -1,13 +1,3 @@
-//====================================================
-// Pupils.cpp
-//
-// Controls both of the robot's pupils.
-//
-// This class keeps the pupils positioned inside the
-// eyes and moves them towards a target point to give
-// the illusion that the robot is looking around.
-//====================================================
-
 #include "Body/Head/Pupils.h"
 #include "raylib.h"
 #include "cmath"
@@ -20,7 +10,6 @@ Pupils::Pupils(BodyDimensions& dimensions) :
     rightPupil(dimensions)
 {}
 
-// Initialise both pupil sprites.
 void Pupils::Initialise()
 {
     leftPupil.SetSide("left");
@@ -30,28 +19,24 @@ void Pupils::Initialise()
     rightPupil.Initialise();
 }
 
-// Release resources used by both pupils.
 void Pupils::Shutdown()
 {
     leftPupil.Shutdown();
     rightPupil.Shutdown();
 }
 
-// Update both pupil animations.
 void Pupils::Update(float dt, Emotion emotion)
 {
     leftPupil.Update(dt, emotion);
     rightPupil.Update(dt, emotion);
 }
 
-// Draw both pupils.
 void Pupils::Draw() const
 {
     leftPupil.Draw();
     rightPupil.Draw();
 }
 
-// Set both pupil anchor points relative to the head.
 void Pupils::SetTransform(MyTransform parentTransform)
 {
     transform = parentTransform;
@@ -73,7 +58,6 @@ Vector2 Pupils::RotateVector(Vector2 v, float rotation)
     };
 }
 
-// Rotate the pupils so they remain aligned with the head.
 void Pupils::SetRotation(float rotation)
 {
     Vector2 rotatedLeft =
@@ -96,11 +80,8 @@ void Pupils::SetRotation(float rotation)
         transform.position.x + rotatedRight.x,
         transform.position.y + rotatedRight.y
     });
-
 }
 
-// Move the pupils towards a target point while limiting
-// how far they can travel within the eye.
 void Pupils::LookAt(Vector2 point)
 {
     float scale = transform.scale;
@@ -126,7 +107,6 @@ void Pupils::LookAt(Vector2 point)
         + dimensions.eyesYoffset) * scale
     };
 
-    // Calculate the direction from each eye to the target.
     Vector2 leftDirection =
     {
         point.x - leftEyeCentre.x,
@@ -142,7 +122,6 @@ void Pupils::LookAt(Vector2 point)
     leftDirection = Vector2Normalize(leftDirection);
     rightDirection = Vector2Normalize(rightDirection);
 
-    // Convert the direction into a small movement offset.
     leftLookOffset =
     {
         leftDirection.x * LOOK_DISTANCE,

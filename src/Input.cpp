@@ -47,11 +47,6 @@ bool Input::SpacePressed() const
     return IsKeyDown(KEY_SPACE);
 }
 
-bool Input::H_Pressed() const
-{
-    return IsKeyDown(KEY_H);
-}
-
 bool Input::LeftMouseButtonPressed() const
 {
     return IsMouseButtonPressed(MOUSE_BUTTON_LEFT);
@@ -60,4 +55,14 @@ bool Input::LeftMouseButtonPressed() const
 bool Input::G_Pressed() const
 {
     return IsKeyDown(KEY_G);
+}
+
+bool Input::E_Pressed()
+{
+    return IsKeyPressed(KEY_E);
+}
+
+bool Input::S_Pressed()
+{
+    return IsKeyPressed(KEY_S);
 }

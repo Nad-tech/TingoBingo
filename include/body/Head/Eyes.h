@@ -28,8 +28,8 @@ class Eyes : public Sprite
         BodyDimensions& dimensions;
         Vector2 positionOffset;
         
-        float idleAnimationTimer = 0.0f;
-        float nextIdleAnimation = 0.0f;
+        float blinkAnimationTimer = 0.0f;
+        float nextBlinkAnimation = 0.0f;
 
         Pupils pupils;
 }; 

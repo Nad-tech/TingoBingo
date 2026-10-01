@@ -8,7 +8,10 @@ public:
     bool RightPressed() const;
     bool SpacePressed() const;
     Vector2 MousePosition() const;
-    bool H_Pressed() const;
+  
     bool LeftMouseButtonPressed() const;
     bool G_Pressed() const;
+
+    bool E_Pressed();
+    bool S_Pressed();
 };
