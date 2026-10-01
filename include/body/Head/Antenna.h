@@ -1,9 +1,9 @@
 #pragma once
 
-#include "Shape.h"
+#include "Sprite.h"
 #include "BodyDimensions.h"
 
-class Antenna : public Shape 
+class Antenna : public Sprite 
 {
     public:
         Antenna(BodyDimensions& dimensions);
@@ -17,6 +17,7 @@ class Antenna : public Shape
     private:
         BodyDimensions& dimensions;
         Vector2 positionOffset;
+        
         float antennaAnimationTimer = 0.0f;
         float nextAntennaAnimation = 3.0f;
         float topOfHeadOffset = 46.0f;

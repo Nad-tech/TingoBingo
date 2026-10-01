@@ -9,28 +9,57 @@
 #include "Constants.h"
 #include "Emotion.h"
 
-Eyebrows::Eyebrows(BodyDimensions& dimensions) : dimensions(dimensions)
+Eyebrows::Eyebrows(BodyDimensions& dimensions) : 
+    dimensions(dimensions)
 {}
 
 void Eyebrows::Initialise()
 {
-    dimensions.eyeBrowsWidth = 100;
-    dimensions.eyeBrowsHeight = 100;
+    texture = LoadTexture("assets/images/TingoBingo/head/eyebrows.png");
+
+    const int COLUMNS = 1;
+    const int ROWS = 1;
+    const int TOTAL_FRAMES = COLUMNS * ROWS;
+    const float FRAME_DURATION = 0.3f;
+
+    dimensions.eyeBrowsWidth = texture.width / COLUMNS;
+    dimensions.eyeBrowsHeight = texture.height / ROWS;
+
+    drawGeometry.width = dimensions.eyeBrowsWidth;
+    drawGeometry.height = dimensions.eyeBrowsHeight;
+
+    animation.Initialise
+    (
+        dimensions.eyeBrowsWidth,
+        dimensions.eyeBrowsHeight,
+        TOTAL_FRAMES,
+        COLUMNS,
+        FRAME_DURATION
+    );
 
     positionOffset = {
         0,
         foreheadOffset
     };
+
+    drawGeometry.origin = {
+        drawGeometry.width / 2.0f,
+        drawGeometry.height / 2.0f
+    };
 }
 
 void Eyebrows::Update(float dt, bool speaking, Emotion emotion)
 {
+    Sprite::Update(dt);
+
     // Speaking and happiness both use the expressive eyebrow animation.
     bool happy = speaking || emotion == Emotion::Happy;
 
     // Start the happy animation immediately when entering the happy state.
     if (happy && !wasHappy)
     {
+        animation.Play(2, 3, AnimationPriority::Emotion);
+
         // Reset the timer and choose a random delay before the next wiggle.
         happyAnimationTimer = 0.0f;
         nextHappyAnimation = GetRandomValue(1000, 5000) / 1000.0f;
@@ -42,6 +71,8 @@ void Eyebrows::Update(float dt, bool speaking, Emotion emotion)
     // While happy, occasionally repeat the eyebrow wiggle.
     if (happy)
     {
+        animation.Play(2, 3, AnimationPriority::Emotion);
+
         happyAnimationTimer += dt;
 
         if (happyAnimationTimer > nextHappyAnimation)
@@ -59,7 +90,9 @@ void Eyebrows::Update(float dt, bool speaking, Emotion emotion)
     // Restore the idle animation when the happy state ends.
     if (wasHappy)
     {
-    
+        animation.Stop();
+        animation.Play(0, 1, AnimationPriority::Idle);
+
         // Reset the idle timer so the next idle animation is delayed.
         idleAnimationTimer = 0.0f;
         nextIdleAnimation =
@@ -74,7 +107,9 @@ void Eyebrows::Update(float dt, bool speaking, Emotion emotion)
 
     if (idleAnimationTimer > nextIdleAnimation)
     {
-    
+        animation.Stop();
+        animation.Play(0, 1, AnimationPriority::Idle);
+
         // Reset the timer and randomise the next idle movement.
         idleAnimationTimer = 0.0f;
         nextIdleAnimation =
@@ -84,5 +119,6 @@ void Eyebrows::Update(float dt, bool speaking, Emotion emotion)
 
 void Eyebrows::SetTransform(MyTransform parentTransform) 
 {
-    Shape::transform = MakeChildTransform(parentTransform, positionOffset);
+    Sprite::transform = MakeChildTransform(parentTransform, positionOffset);
+    SetScreenCoords();
 }

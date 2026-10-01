@@ -53,6 +53,7 @@ void Head::Shutdown()
 {
     headBase.Shutdown();
     eyes.Shutdown();
+    mouth.Shutdown();
 }
 
 // Update every animated head component.

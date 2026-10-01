@@ -1,24 +1,26 @@
 #pragma once
 
-#include "Shape.h"
+#include "Sprite.h"
 #include "Emotion.h"
 #include "BodyDimensions.h"
 
-class Mouth : public Shape
+class Mouth : public Sprite
 {
     public:
         Mouth(BodyDimensions& dimensions);
+        
         void Initialise() override;
         void UpdateMouth(float dt, bool speaking, Emotion emotion);
+        
         void SetTransform(MyTransform parentTransform);
 
     private:
         BodyDimensions& dimensions;
+        Vector2 positionOffset;
 
         int frame = 0;
         float frameTimer = 0.0f;
         const float FRAME_DURATION = 0.3f;
 
-        Vector2 positionOffset = {};
         float mouthDisplayOffset = 28.0f;
 };

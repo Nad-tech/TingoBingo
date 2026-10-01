@@ -1,17 +1,19 @@
 #pragma once
 
-#include "Shape.h"
+#include "Sprite.h"
 #include "Emotion.h"
 #include "BodyDimensions.h"
 
-class Eyebrows : public Shape
+class Eyebrows : public Sprite
 {
     public:
         Eyebrows(BodyDimensions& dimensions);
         
         void Initialise() override;
 
+        using Sprite::Update;
         void Update(float dt, bool speaking, Emotion emotion);
+        
         void SetTransform(MyTransform transform);
 
     private:

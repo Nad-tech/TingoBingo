@@ -10,29 +10,55 @@
 #include "Constants.h"
 #include "Emotion.h"
 
-Mouth::Mouth(BodyDimensions& dimensions) : dimensions(dimensions)
+Mouth::Mouth(BodyDimensions& dimensions) : 
+    dimensions(dimensions)
 {}
 
 // Load the mouth sprite sheet and initialise its animation.
 void Mouth::Initialise()
 {
-    dimensions.mouthWidth = 100;
-    dimensions.mouthHeight = 100;
+    texture = LoadTexture("assets/images/TingoBingo/head/mouth.png");
+
+    const int COLUMNS = 3;
+    const int ROWS = 1;
+    const int TOTAL_FRAMES = COLUMNS * ROWS;
+
+    dimensions.mouthWidth = texture.width / COLUMNS;
+    dimensions.mouthHeight = texture.height / ROWS;
+
+    drawGeometry.width = dimensions.mouthWidth;
+    drawGeometry.height = dimensions.mouthHeight;
+    
+    animation.Initialise
+    (
+        dimensions.mouthWidth,
+        dimensions.mouthHeight,
+        TOTAL_FRAMES,
+        COLUMNS,
+        FRAME_DURATION
+    );
 
     positionOffset = {
         0,
         0
+    };
+
+    drawGeometry.origin = {
+        drawGeometry.width / 2.0f,
+        drawGeometry.height / 2.0f
     };
 }
 
 // Advance the mouth animation.
 void Mouth::UpdateMouth(float dt, bool speaking, Emotion emotion)
 {
-    
+    Update(dt);
+
     if (emotion == Emotion::Happy && !speaking)
     {
         frame = 0;
         frameTimer = 0.0f;
+        animation.SetFrame(frame);
         return;
     }
 
@@ -40,6 +66,7 @@ void Mouth::UpdateMouth(float dt, bool speaking, Emotion emotion)
     {
         frame = 1;
         frameTimer = 0.0f;
+        animation.SetFrame(frame);
         return;
     }
 
@@ -50,10 +77,12 @@ void Mouth::UpdateMouth(float dt, bool speaking, Emotion emotion)
     {
         frameTimer -= FRAME_DURATION;
         frame = (frame == 1) ? 2 : 1;
+        animation.SetFrame(frame);
     }
 }
 
 void Mouth::SetTransform(MyTransform parentTransform)
 {
-    Shape::transform = MakeChildTransform(parentTransform, positionOffset);
+    transform = MakeChildTransform(parentTransform, positionOffset);
+    SetScreenCoords();
 }

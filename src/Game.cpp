@@ -69,7 +69,7 @@ void Game::Initialise()
     InitAudioDevice();
 
     // Initialise robot
-	robotWorldPos = {0, 0};
+	robotWorldPos = {0, 30.0f};
     
 	MyTransform initialTransform
 	{
