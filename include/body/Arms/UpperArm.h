@@ -4,17 +4,11 @@
 #include "Body/Arms/Elbow.h"
 #include "BodyDimensions.h"
 #include "RobotState.h"
+#include "WaveState.h"
 
 class UpperArm : public Shape
 {
     public:
-        enum class WaveState
-        {
-            None,
-            Raising,
-            Lowering
-        };
-
         UpperArm
         (
             BodyDimensions& dimensions, 
@@ -29,10 +23,11 @@ class UpperArm : public Shape
         
         void SetTransform(MyTransform parentTransform);
 
-        void Wave();
-        void WaveArm(float dt);
+        void WaveArm();
 
     private:
+        void AdvanceWave(float dt);
+
         BodyDimensions& dimensions;
         Vector2 positionOffset;
         MyTransform tempParentTransform;

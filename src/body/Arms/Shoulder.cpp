@@ -72,3 +72,8 @@ void Shoulder::SetTransform(MyTransform parentTransform)
 
     upperArm.SetTransform(transform);
 }
+
+void Shoulder::WaveArm()
+{
+    upperArm.WaveArm();
+}

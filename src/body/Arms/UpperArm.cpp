@@ -41,23 +41,18 @@ void UpperArm::Initialise()
     };
 
     elbow.Initialise();
-
-    if(side == "left") {Shape::SetShapeName("leftUpperArm");}
-    if(side == "right") {Shape::SetShapeName("rightUpperArm");}
 }
 
 void UpperArm::Update(float dt)
 {
     if(waveState != WaveState::None)
     {
-        WaveArm(dt);
+        AdvanceWave(dt);
     }
 
     elbow.Update(dt);
 }
 
-
-// Draw the upper arm.
 void UpperArm::Draw() const
 {
     Shape::Draw();
@@ -76,7 +71,7 @@ void UpperArm::SetTransform(MyTransform parentTransform)
     elbow.SetTransform(Shape::transform);
 }
 
-void UpperArm::Wave()
+void UpperArm::WaveArm()
 {
     if(waveState == WaveState::None)
     {
@@ -84,30 +79,50 @@ void UpperArm::Wave()
     }
 }
 
-void UpperArm::WaveArm(float dt)
+void UpperArm::AdvanceWave(float dt)
 {
-    const float speed = 100.0f;
-    const float maxRotation = -60.0f;
+    const float speed = 250.0f;
+
+    float minRotation = 0.0f;
+    float maxRotation = 0.0f;
+
+    if(side == "right")
+    {
+        minRotation = 0.0f;
+        maxRotation = -120.0f;
+    }
+
+    if(side == "left")
+    {
+        minRotation = 0.0f;
+        maxRotation = 120.0f;
+    }
 
     if(waveState == WaveState::Raising)
     {
         localRotation -= speed * dt;
-
+        
         if(localRotation <= maxRotation)
         {
             localRotation = maxRotation;
-            elbow.SetWaveState(Elbow::WaveState::Waving);
+            waveState = WaveState::Waving;
+            elbow.WaveArm();
+        }
+    }
+    else if(waveState == WaveState::Waving)
+    {
+        if(!robotState.gestures.waveRight)
+        {
+            waveState = WaveState::Lowering;
         }
     }
     else if(waveState == WaveState::Lowering)
     {
-        elbow.SetWaveState(Elbow::WaveState::None);
-
         localRotation += speed * dt;
 
-        if(localRotation >= 0.0f)
+        if(localRotation >= minRotation)
         {
-            localRotation = 0.0f;
+            localRotation = minRotation;
             waveState = WaveState::None;
         }
     }

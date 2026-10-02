@@ -17,6 +17,8 @@ class Arms
         void Draw() const;
         
         void SetTransform(MyTransform parentTransform);
+
+        void WaveArm();
         
     private:
         BodyDimensions& dimensions;

@@ -40,11 +40,7 @@ void Elbow::Update(float dt)
 {
     if(waveState == WaveState::Waving)
     {
-        foreArm.SetWaveState(ForeArm::WaveState::Raising);
-    }
-    else
-    {
-        foreArm.SetWaveState(ForeArm::WaveState::None);
+        foreArm.SetWaveState(WaveState::Raising);
     }
 
     foreArm.Update(dt);
@@ -65,7 +61,7 @@ void Elbow::SetTransform(MyTransform parentTransform)
     foreArm.SetTransform(transform);
 }
 
-void Elbow::SetWaveState(WaveState waveState)
+void Elbow::WaveArm()
 {
-    this->waveState = waveState; 
+    foreArm.WaveArm();
 }

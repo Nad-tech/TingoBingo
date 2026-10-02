@@ -4,7 +4,7 @@ ForeArm::ForeArm
 (
     BodyDimensions& dimensions, 
     std::string side,
-    RobotState& RobotState
+    RobotState& robotState
 ) :
 	Shape(CARDBOARD_LIGHT),
     dimensions(dimensions),
@@ -40,7 +40,7 @@ void ForeArm::Update(float dt)
 {
     if(waveState != WaveState::None)
     {
-        WaveArm(dt);
+        AdvanceWave(dt);
     }
 
     hand.Update(dt);
@@ -57,6 +57,7 @@ void ForeArm::SetTransform(MyTransform parentTransform)
     tempParentTransform = parentTransform;
 
     Shape::transform = MakeChildTransform(parentTransform, positionOffset);
+    Shape::transform.rotation += localRotation;
     Shape::SetScreenCoords();
 
     hand.SetTransform(Shape::transform);
@@ -67,16 +68,45 @@ void ForeArm::SetWaveState(WaveState waveState)
     this->waveState = waveState;
 }
 
-void ForeArm::WaveArm(float dt)
+void ForeArm::WaveArm()
 {
-    const float speed = 100.0f;
-    const float maxRotation = -60.0f;
+    if(waveState == WaveState::None)
+    {
+        waveState = WaveState::Raising;
+    }
+}
 
+void ForeArm::AdvanceWave(float dt)
+{
+    const float speed = 400.0f;
+    float minRotation = 0.0f;
+    float maxRotation = 0.0f;
+
+    if(side == "right")
+    {
+        minRotation = 0.0f;
+        maxRotation = -90.0f;
+    }
+
+    if(side == "left")
+    {
+        minRotation = 0.0f;
+        maxRotation = 90.0f;
+    }
+        
     if(waveState == WaveState::Raising)
     {
         localRotation -= speed * dt;
-
+        
         if(localRotation <= maxRotation)
+        {
+            localRotation = maxRotation;
+            waveState = WaveState::Lowering;
+        }
+    }
+    else if(waveState == WaveState::Waving)
+    {
+        if(!robotState.gestures.waveRight)
         {
             waveState = WaveState::Lowering;
         }
@@ -85,9 +115,17 @@ void ForeArm::WaveArm(float dt)
     {
         localRotation += speed * dt;
 
-        if(localRotation >= 0.0f)
+        if(localRotation >= minRotation)
         {
-            localRotation = 0.0f;
+            localRotation = minRotation;
+            
+            if(robotState.gestures.waveRight)
+            {
+                waveState = WaveState::Raising;
+            }
+            else {
+                waveState = WaveState::None;
+            }
         }
     }
 

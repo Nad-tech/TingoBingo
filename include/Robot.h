@@ -17,6 +17,11 @@ public:
     void Draw() const;
     
     void SetTransform(MyTransform transform);
+
+    void CycleState();
+    void CycleEmotion();
+    void ToggleSpeaking();
+    void ToggleGesture(RobotState::Gesture gesture);
     
 private:
     BodyDimensions dimensions;

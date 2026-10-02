@@ -21,6 +21,8 @@ class Shoulder : public Shape
         void Draw() const;
         
         void SetTransform(MyTransform parentTransform);
+
+        void WaveArm();
         
     private:
         BodyDimensions& dimensions;

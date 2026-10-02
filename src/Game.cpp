@@ -61,17 +61,18 @@ void Game::Initialise()
 
 void Game::HandleInput()
 {
-	if(input.S_Pressed())
-	{
-	}
+	if (input.S_Pressed()) robot.CycleState();
+	if (input.E_Pressed()) robot.CycleEmotion();
+	if (input.G_Pressed()) robot.ToggleSpeaking();
 
-	if(input.E_Pressed()) 
-	{
-	}
-
-	if(input.G_Pressed())
-	{
-	}
+	if (IsKeyPressed(KEY_ONE)) robot.ToggleGesture(RobotState::Gesture::Idle);
+	if (IsKeyPressed(KEY_TWO)) robot.ToggleGesture(RobotState::Gesture::Nod);
+	if (IsKeyPressed(KEY_THREE)) robot.ToggleGesture(RobotState::Gesture::ShakeHead);
+	if (IsKeyPressed(KEY_FOUR)) robot.ToggleGesture(RobotState::Gesture::WaveLeft);
+	if (IsKeyPressed(KEY_FIVE)) robot.ToggleGesture(RobotState::Gesture::WaveRight);
+	if (IsKeyPressed(KEY_SIX)) robot.ToggleGesture(RobotState::Gesture::Shrug);
+	if (IsKeyPressed(KEY_SEVEN)) robot.ToggleGesture(RobotState::Gesture::Point);
+	if (IsKeyPressed(KEY_EIGHT)) robot.ToggleGesture(RobotState::Gesture::Celebrate);
 }
 
 void Game::Update(const float dt)

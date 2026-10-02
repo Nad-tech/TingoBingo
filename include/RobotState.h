@@ -14,6 +14,19 @@ class RobotState
             bool point = false;
             bool celebrate = false;
         };
+        Gestures gestures;
+
+        enum class Gesture
+        {
+            Idle,
+            Nod,
+            ShakeHead,
+            WaveLeft,
+            WaveRight,
+            Shrug,
+            Point,
+            Celebrate
+        };
 
         enum class State
         {
@@ -25,7 +38,7 @@ class RobotState
         State state = State::Idle;
         bool speaking = false;
 
-        enum class Emotion
+        enum class Emotions
         {
             Neutral,
             Happy,
@@ -33,4 +46,5 @@ class RobotState
             Angry,
             Surprised
         };
+        Emotions emotion = Emotions::Neutral;
 };

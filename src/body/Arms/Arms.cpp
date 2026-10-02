@@ -20,6 +20,8 @@ void Arms::Shutdown()
 
 void Arms::Update(float dt)
 {
+    WaveArm();
+
     leftShoulder.Update(dt);
     rightShoulder.Update(dt);
 }
@@ -34,4 +36,16 @@ void Arms::SetTransform(MyTransform parentTransform)
 {
     leftShoulder.SetTransform(parentTransform);
     rightShoulder.SetTransform(parentTransform);
+}
+
+void Arms::WaveArm()
+{
+    if(robotState.gestures.waveRight) {
+        rightShoulder.WaveArm();
+    }
+
+    if(robotState.gestures.waveLeft)
+    {
+        leftShoulder.WaveArm();
+    }
 }

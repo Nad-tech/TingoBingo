@@ -5,17 +5,11 @@
 #include "Shape.h"
 #include "Hand.h"
 #include "RobotState.h"
+#include "WaveState.h"
 
 class ForeArm : public Shape
 {
     public:
-        enum class WaveState
-        {
-            None,
-            Raising,
-            Lowering
-        };
-
         ForeArm(
             BodyDimensions& dimensions, 
             std::string side,
@@ -31,9 +25,11 @@ class ForeArm : public Shape
 
         void SetWaveState(WaveState waveState);
 
-        void WaveArm(float dt);
-
+        void WaveArm();
+        
     private:
+        void AdvanceWave(float dt);
+
         BodyDimensions& dimensions;
         Vector2 positionOffset;
         MyTransform tempParentTransform;
@@ -41,6 +37,7 @@ class ForeArm : public Shape
         RobotState& robotState;
         
         WaveState waveState = WaveState::None;
+        float waveTimer = 0;
 
         float localRotation = 0.0f;
         float homeRotation = 0.0f;

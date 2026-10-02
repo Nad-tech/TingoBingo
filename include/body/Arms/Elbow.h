@@ -9,12 +9,6 @@
 class Elbow : public Shape
 {
     public:
-        enum class WaveState
-        {
-            None,
-            Waving
-        };
-
         Elbow
         (
             BodyDimensions& dimensions,
@@ -29,7 +23,7 @@ class Elbow : public Shape
 
         void SetTransform(MyTransform parentTransform);
 
-        void SetWaveState(WaveState waveState);
+        void WaveArm();
 
     private:
         BodyDimensions& dimensions;
