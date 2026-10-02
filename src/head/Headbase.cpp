@@ -12,8 +12,9 @@
 #include "Constants.h"
 #include "raylib.h"
 
-Headbase::Headbase(BodyDimensions& dimensions) : 
-    dimensions(dimensions)
+Headbase::Headbase(BodyDimensions& dimensions, RobotState& robotState) :
+    dimensions(dimensions),
+    robotState(robotState)
 {}
 
 // Load the head sprite and initialise its animation.

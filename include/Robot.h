@@ -1,10 +1,10 @@
 #pragma once
 
 #include "RobotBrain.h"
-#include "Emotion.h"
 #include "Body/Body.h"
 #include "BodyDimensions.h"
 #include "MyTransform.h"
+#include "RobotState.h"
 
 class Robot
 {
@@ -18,18 +18,12 @@ public:
     
     void SetTransform(MyTransform transform);
     
-    void SetEmotion(Emotion emotion);
-    Emotion GetEmotion();
-
-    void NextState();
-    void NextEmotion();
-
-    Body& GetBody();
-    
 private:
     BodyDimensions dimensions;
     MyTransform transform;
    
+    RobotState robotState;
+
     Body body;
     RobotBrain robotBrain;
 };

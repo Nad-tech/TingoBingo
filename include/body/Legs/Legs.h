@@ -4,23 +4,24 @@
 #include "BodyDimensions.h"
 #include "Shape.h"
 #include "MyTransform.h"
-#include "Emotion.h"
 #include "Thigh.h"
+#include "RobotState.h"
 
 class Legs : Shape
 {
     public:
-        Legs(BodyDimensions& dimensions);
+        Legs(BodyDimensions& dimensions, RobotState& robotState);
         void Initialise();
         void Shutdown();
         
-        void Update(float dt, Emotion emotion);
+        void Update(float dt);
         void Draw() const;
 
         void SetTransform(MyTransform parentTransform);
 
     private:
         BodyDimensions& dimensions;
+        RobotState& robotState;
         Thigh rightThigh;
         Thigh leftThigh;
 };

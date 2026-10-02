@@ -1,11 +1,12 @@
 #include "Body/Neck.h"
 #include "raylib.h"
 
-Neck::Neck(BodyDimensions& dimensions) :
+Neck::Neck(BodyDimensions& dimensions, RobotState& robotState) :
     Shape(CARDBOARD_DARK),
     dimensions(dimensions),
+    robotState(robotState),
     positionOffset(),
-    head(dimensions)
+    head(dimensions, robotState)
 {
 }
 
@@ -32,8 +33,8 @@ void Neck::Initialise()
     Shape::SetShapeName("neck");
 }
 
-void Neck::Update(float dt, Emotion emotion) {
-    head.Update(dt, emotion);
+void Neck::Update(float dt) {
+    head.Update(dt);
 }
 
 void Neck::Draw() const
@@ -48,11 +49,6 @@ void Neck::SetTransform(MyTransform parentTransform)
     Shape::SetScreenCoords();
 
     head.SetTransform(transform);
-}
-
-Head& Neck::GetHead()
-{
-    return head;
 }
 
 void Neck::Shutdown()

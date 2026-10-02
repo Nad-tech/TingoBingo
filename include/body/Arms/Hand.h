@@ -3,16 +3,21 @@
 #include "BodyDimensions.h"
 #include "Shape.h"
 #include <string>
-#include "Emotion.h"
+#include "RobotState.h"
 
 class Hand : public Shape
 {
     public:
-        Hand(BodyDimensions& dimensions, std::string side);
+        Hand
+        (
+            BodyDimensions& dimensions, 
+            std::string side,
+            RobotState& RobotState
+        );
         
         void Initialise() override;
         
-        void Update(float dt, Emotion emotion);
+        void Update(float dt);
         void Draw() const;
         
         void SetTransform(MyTransform parentTransform);
@@ -21,5 +26,7 @@ class Hand : public Shape
         BodyDimensions& dimensions;
         Vector2 positionOffset;
         
+        RobotState& robotState;
+
         std::string side = "";
 };

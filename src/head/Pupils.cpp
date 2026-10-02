@@ -3,11 +3,12 @@
 #include "cmath"
 #include "raymath.h"
 
-Pupils::Pupils(BodyDimensions& dimensions) : 
+Pupils::Pupils(BodyDimensions& dimensions, RobotState& robotState) :
     dimensions(dimensions),
+    robotState(robotState),
     transform(),
-    leftPupil(dimensions),
-    rightPupil(dimensions)
+    leftPupil(dimensions, robotState),
+    rightPupil(dimensions, robotState)
 {}
 
 void Pupils::Initialise()
@@ -25,10 +26,10 @@ void Pupils::Shutdown()
     rightPupil.Shutdown();
 }
 
-void Pupils::Update(float dt, Emotion emotion)
+void Pupils::Update(float dt)
 {
-    leftPupil.Update(dt, emotion);
-    rightPupil.Update(dt, emotion);
+    leftPupil.Update(dt);
+    rightPupil.Update(dt);
 }
 
 void Pupils::Draw() const

@@ -11,9 +11,10 @@
 #include "Constants.h"
 #include <cmath>
 
-Eyes::Eyes(BodyDimensions& dimensions) : 
+Eyes::Eyes(BodyDimensions& dimensions, RobotState& robotState) :
     dimensions(dimensions),
-    pupils(dimensions)
+    robotState(robotState),
+    pupils(dimensions, robotState)
 {
 }
 
@@ -55,7 +56,7 @@ void Eyes::Initialise()
     pupils.Initialise();
 }
 
-void Eyes::Update(float dt, Emotion emotion)
+void Eyes::Update(float dt)
 {
     Sprite::Update(dt);
 
@@ -68,7 +69,7 @@ void Eyes::Update(float dt, Emotion emotion)
         nextBlinkAnimation = GetRandomValue(1000, 5000) / 1000.0f;
     }
 
-    pupils.Update(dt, emotion);
+    pupils.Update(dt);
 }
 
 void Eyes::Draw() const

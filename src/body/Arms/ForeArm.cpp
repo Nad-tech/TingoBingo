@@ -1,10 +1,16 @@
 #include "Body/Arms/ForeArm.h"
 
-ForeArm::ForeArm(BodyDimensions& dimensions, std::string side) :
+ForeArm::ForeArm
+(
+    BodyDimensions& dimensions, 
+    std::string side,
+    RobotState& RobotState
+) :
 	Shape(CARDBOARD_LIGHT),
     dimensions(dimensions),
+    robotState(robotState),
 	side(side),
-	hand(dimensions, side)
+	hand(dimensions, side, robotState)
 {}
 
 void ForeArm::Initialise()
@@ -30,9 +36,14 @@ void ForeArm::Initialise()
 }
 
 
-void ForeArm::Update(float dt, Emotion emotion)
+void ForeArm::Update(float dt)
 {
-    hand.Update(dt, emotion);
+    if(waveState != WaveState::None)
+    {
+        WaveArm(dt);
+    }
+
+    hand.Update(dt);
 }
 
 void ForeArm::Draw() const 
@@ -43,13 +54,42 @@ void ForeArm::Draw() const
 
 void ForeArm::SetTransform(MyTransform parentTransform)
 {
+    tempParentTransform = parentTransform;
+
     Shape::transform = MakeChildTransform(parentTransform, positionOffset);
-
-    float angle = -20.0f;
-    if(side == "left") angle = 20.0f; 
-    Shape::transform.rotation += angle;
-
     Shape::SetScreenCoords();
 
     hand.SetTransform(Shape::transform);
+}
+
+void ForeArm::SetWaveState(WaveState waveState)
+{
+    this->waveState = waveState;
+}
+
+void ForeArm::WaveArm(float dt)
+{
+    const float speed = 100.0f;
+    const float maxRotation = -60.0f;
+
+    if(waveState == WaveState::Raising)
+    {
+        localRotation -= speed * dt;
+
+        if(localRotation <= maxRotation)
+        {
+            waveState = WaveState::Lowering;
+        }
+    }
+    else if(waveState == WaveState::Lowering)
+    {
+        localRotation += speed * dt;
+
+        if(localRotation >= 0.0f)
+        {
+            localRotation = 0.0f;
+        }
+    }
+
+    SetTransform(tempParentTransform);
 }

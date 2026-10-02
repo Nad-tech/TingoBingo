@@ -31,7 +31,6 @@
 
 #include "Game.h"
 #include "Constants.h"
-#include "Emotion.h"
 #include "MyTransform.h"
 
 
@@ -62,32 +61,24 @@ void Game::Initialise()
 
 void Game::HandleInput()
 {
-
-	/*Neutral,
-    Happy,
-    Sad,
-    Angry,
-    Surprised*/
-	//Emotion remote control
-	
 	if(input.S_Pressed())
 	{
-		robot.NextState();
 	}
 
 	if(input.E_Pressed()) 
 	{
-		robot.NextEmotion();
+	}
+
+	if(input.G_Pressed())
+	{
 	}
 }
 
-// Update the game state.
 void Game::Update(const float dt)
 {	
 	robot.Update(dt);
 }
 
-// Draw the current frame.
 void Game::Draw()
 {
 	ClearBackground(BLACK);

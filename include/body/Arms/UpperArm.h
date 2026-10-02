@@ -3,33 +3,45 @@
 #include "Shape.h"
 #include "Body/Arms/Elbow.h"
 #include "BodyDimensions.h"
-#include "Emotion.h"
+#include "RobotState.h"
 
 class UpperArm : public Shape
 {
     public:
-        UpperArm(BodyDimensions& dimensions, std::string side);
+        enum class WaveState
+        {
+            None,
+            Raising,
+            Lowering
+        };
+
+        UpperArm
+        (
+            BodyDimensions& dimensions, 
+            std::string side, 
+            RobotState& robotState
+        );
 
         void Initialise() override;
      
-        void Update(float dt, Emotion emotion);
+        void Update(float dt);
         void Draw() const;
         
         void SetTransform(MyTransform parentTransform);
 
-        void SwingArm(float dt, float swingMinAngle, float swingMaxAngle);
+        void Wave();
+        void WaveArm(float dt);
 
     private:
         BodyDimensions& dimensions;
         Vector2 positionOffset;
+        MyTransform tempParentTransform;
+        RobotState& robotState;
+
+        WaveState waveState = WaveState::None;
 
         float localRotation = 0.0f;
         std::string side = "";
-
-        const float SWING_MIN = 0.0f;
-        const float SWING_MAX = 180.0f;
-        const float SWING_SPEED = 1.0f;
-        float swingTime = 0;
 
         Elbow elbow;
 };

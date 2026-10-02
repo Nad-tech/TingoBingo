@@ -3,8 +3,9 @@
 #include <cmath>
 #include <string>
 
-Pupil::Pupil(BodyDimensions& dimensions) :
-    dimensions(dimensions)
+Pupil::Pupil(BodyDimensions& dimensions, RobotState& robotState) :
+    dimensions(dimensions),
+    robotState(robotState)
 {}
 
 // Load the pupil sprite and initialise its animation.
@@ -48,7 +49,7 @@ void Pupil::Initialise()
 }
 
 // Advance the pupil animation.
-void Pupil::Update(float dt, Emotion emotion)
+void Pupil::Update(float dt)
 {
     Sprite::Update(dt);
 }

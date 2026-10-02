@@ -4,13 +4,17 @@
 #include <iostream>
 #include "raymath.h"
 
-// Construct a shoulder using the shared body dimensions
-// and the side of the body that the shoulder belongs to.
-Shoulder::Shoulder(BodyDimensions& dimensions, std::string side) :
+Shoulder::Shoulder
+(
+    BodyDimensions& dimensions, 
+    std::string side,
+    RobotState& robotState
+) :
     Shape(CARDBOARD_DARK),
     dimensions(dimensions),
+    robotState(robotState),
     side(side),
-    upperArm(dimensions, side)
+    upperArm(dimensions, side, robotState)
 {
 }
 
@@ -38,8 +42,6 @@ void Shoulder::Initialise()
             -dimensions.bodyWidth / 2.0f - dimensions.shoulderWidth / 2.0f,
             dimensions.bodyHeight / 2.0f - dimensions.shoulderHeight / 2.0f
         };
-
-        Shape::SetShapeName("rightShoulder");
     }
 
     drawGeometry.origin = {
@@ -51,9 +53,9 @@ void Shoulder::Initialise()
 }
 
 // Update the shoulder and its child upper arm.
-void Shoulder::Update(float dt, Emotion emotion)
+void Shoulder::Update(float dt)
 {
-    upperArm.Update(dt, emotion);
+    upperArm.Update(dt);
 }
 
 void Shoulder::Draw() const 
@@ -69,13 +71,4 @@ void Shoulder::SetTransform(MyTransform parentTransform)
     Shape::SetScreenCoords();
 
     upperArm.SetTransform(transform);
-}
-
-void Shoulder::SwingArm(
-    float dt,
-    float swingMinAngle,
-    float swingMaxAngle
-)
-{
-    upperArm.SwingArm(dt, swingMinAngle, swingMaxAngle);
 }

@@ -14,19 +14,19 @@
 //====================================================
 
 #include "Body/Head/Head.h"
-#include "Emotion.h"
 #include <cmath>
 
 // Initialise the head's transform and idle animation state.
-Head::Head(BodyDimensions& dimensions) :
+Head::Head(BodyDimensions& dimensions, RobotState& robotState) :
     dimensions(dimensions),
-    headBase(dimensions),
-    eyes(dimensions),
-    antenna(dimensions),
-    ears(dimensions),
-    eyebrows(dimensions),
-    mouth(dimensions),
-    nose(dimensions)
+    robotState(robotState),
+    headBase(dimensions, robotState),
+    eyes(dimensions, robotState),
+    antenna(dimensions, robotState),
+    ears(dimensions, robotState),
+    eyebrows(dimensions, robotState),
+    mouth(dimensions, robotState),
+    nose(dimensions, robotState)
 {
 }
 
@@ -61,14 +61,14 @@ void Head::Shutdown()
 }
 
 // Update every animated head component.
-void Head::Update(float dt, Emotion emotion)
+void Head::Update(float dt)
 {
-    antenna.Update(dt, emotion);
-    ears.Update(dt, emotion);
-    eyebrows.Update(dt, emotion);
-    eyes.Update(dt, emotion);
-    mouth.UpdateMouth(dt, emotion);
-    nose.Update(dt, emotion);
+    antenna.Update(dt);
+    ears.Update(dt);
+    eyebrows.Update(dt);
+    eyes.Update(dt);
+    mouth.UpdateMouth(dt);
+    nose.Update(dt);
 }
 
 void Head::Draw() const

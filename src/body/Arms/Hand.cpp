@@ -1,8 +1,14 @@
 #include "Body/Arms/Hand.h"
 
-Hand::Hand(BodyDimensions& dimensions, std::string side) :
+Hand::Hand
+(
+    BodyDimensions& dimensions, 
+    std::string side,
+    RobotState& RobotState
+) :
 	Shape(CARDBOARD_DARK),
     dimensions(dimensions),
+    robotState(robotState),
 	side(side)
 {}
 
@@ -26,7 +32,7 @@ void Hand::Initialise()
 }
 
 float r = 0.0f;
-void Hand::Update(float dt, Emotion emotion)
+void Hand::Update(float dt)
 {
     r += dt*50.0;
 }

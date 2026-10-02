@@ -1,13 +1,13 @@
 #include "Body/Body.h"
 #include <cmath>
-#include "Emotion.h"
 
-Body::Body(BodyDimensions& dimensions) :
+Body::Body(BodyDimensions& dimensions, RobotState& robotState) :
     dimensions(dimensions),
+    robotState(robotState),
     bodyBase(dimensions),
-    neck(dimensions),
-    pelvis(dimensions),
-    arms(dimensions)
+    neck(dimensions, robotState),
+    pelvis(dimensions, robotState),
+    arms(dimensions, robotState)
 {}
 
 void Body::Initialise()
@@ -25,11 +25,11 @@ void Body::Shutdown()
     pelvis.Shutdown();
 }
 
-void Body::Update(float dt, Emotion emotion)
+void Body::Update(float dt)
 {
-    neck.Update(dt, emotion);
-    arms.Update(dt, emotion);
-    pelvis.Update(dt, emotion);
+    neck.Update(dt);
+    arms.Update(dt);
+    pelvis.Update(dt);
 }
 
 void Body::Draw() const

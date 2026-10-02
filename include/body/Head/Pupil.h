@@ -4,17 +4,17 @@
 #include <string>
 #include "BodyDimensions.h"
 #include "MyTransform.h"
-#include "Emotion.h"
+#include "RobotState.h"
 
 class Pupil : public Sprite
 {
     public:
-        Pupil(BodyDimensions& dimensions);
+        Pupil(BodyDimensions& dimensions, RobotState& robotState);
         
         void Initialise() override;
         
         using Sprite::Update;
-        void Update(float dt, Emotion emotion);
+        void Update(float dt);
         
         void SetSide(std::string side);
         float GetSideOffset();
@@ -27,6 +27,7 @@ class Pupil : public Sprite
 
     private:
         BodyDimensions& dimensions;
+        RobotState& robotState;
         Vector2 positionOffset;
 
         std::string side; // "left" or "right"

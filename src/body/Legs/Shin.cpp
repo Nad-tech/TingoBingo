@@ -1,10 +1,11 @@
 #include "Body/Legs/Shin.h"
 
-Shin::Shin(BodyDimensions& dimensions, std::string side) :
+Shin::Shin(BodyDimensions& dimensions, std::string side, RobotState& robotState) :
 	Shape(CARDBOARD),
 	dimensions(dimensions),
+    robotState(robotState),
 	side(side),
-	foot(dimensions, side)
+    foot(dimensions, side, robotState)
 {}
 
 void Shin::Initialise()
@@ -39,9 +40,9 @@ void Shin::Initialise()
 	foot.Initialise();
 }
 
-void Shin::Update(float dt, Emotion emotion)
+void Shin::Update(float dt)
 {
-    foot.Update(dt, emotion);
+    foot.Update(dt);
 }
 
 void Shin::Draw() const
@@ -53,12 +54,6 @@ void Shin::Draw() const
 void Shin::SetTransform(MyTransform parentTransform)
 {
     Shape::transform = MakeChildTransform(parentTransform, positionOffset);
-
-	float angle = 20.0f;
-    if(side == "left") angle = -20.0f;
-
-    Shape::transform.rotation += angle;
-
     Shape::SetScreenCoords();
 
 	foot.SetTransform(Shape::transform);

@@ -2,11 +2,12 @@
 #include "Constants.h"
 
 // Load the head sprite and initialise its animation.
-Knee::Knee(BodyDimensions& dimensions, std::string side) :
+Knee::Knee(BodyDimensions& dimensions, std::string side, RobotState& robotState) :
     Shape(CARDBOARD_DARK),
     dimensions(dimensions),
+    robotState(robotState),
     side(side),
-    shin(dimensions, side)
+    shin(dimensions, side, robotState)
 {}
 
 void Knee::Initialise()
@@ -41,9 +42,9 @@ void Knee::Initialise()
     shin.Initialise();
 }
 
-void Knee::Update(float dt, Emotion emotion)
+void Knee::Update(float dt)
 {
-    shin.Update(dt, emotion);
+    shin.Update(dt);
 }
 
 void Knee::Draw() const

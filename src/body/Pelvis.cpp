@@ -1,9 +1,10 @@
 #include "Body/Pelvis.h"
 #include "raymath.h"
 
-Pelvis::Pelvis(BodyDimensions& dimensions) :
+Pelvis::Pelvis(BodyDimensions& dimensions, RobotState& robotState) :
     dimensions(dimensions),
-    legs(dimensions)
+    robotState(robotState),
+    legs(dimensions, robotState)
 {}
 void Pelvis::Initialise()
 {
@@ -26,9 +27,9 @@ void Pelvis::Initialise()
     };
 }
 
-void Pelvis::Update(float dt, Emotion emotion)
+void Pelvis::Update(float dt)
 {
-    legs.Update(dt, emotion);
+    legs.Update(dt);
 }
 
 void Pelvis::Draw() const 

@@ -3,11 +3,12 @@
 #include <string>
 
 // Load the head sprite and initialise its animation.
-Thigh::Thigh(BodyDimensions& dimensions, std::string side) :
+Thigh::Thigh(BodyDimensions& dimensions, std::string side, RobotState& robotState) :
     Shape(CARDBOARD),
     dimensions(dimensions),
+    robotState(robotState),
     side(side),
-    knee(dimensions, side)
+    knee(dimensions, side, robotState)
 {}
 
 void Thigh::Initialise()
@@ -45,9 +46,9 @@ void Thigh::Initialise()
     knee.Initialise();
 }
 
-void Thigh::Update(float dt, Emotion emotion)
+void Thigh::Update(float dt)
 {
-    knee.Update(dt, emotion);
+    knee.Update(dt);
 }
 
 void Thigh::Draw() const
@@ -59,11 +60,6 @@ void Thigh::Draw() const
 void Thigh::SetTransform(MyTransform parentTransform)
 {
     Shape::transform = MakeChildTransform(parentTransform, positionOffset);
-    
-    float angle = -20.0f;
-    if(side == "left") angle = 20.0f; 
-    Shape::transform.rotation += angle;
-
     Shape::SetScreenCoords();
 
     knee.SetTransform(Shape::transform);

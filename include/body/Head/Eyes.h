@@ -3,18 +3,18 @@
 #include "Sprite.h"
 #include "BodyDimensions.h"
 #include "Pupils.h"
-#include "Emotion.h"
+#include "RobotState.h"
 
 class Eyes : public Sprite
 {
     public:
-        Eyes(BodyDimensions& dimensions);
+        Eyes(BodyDimensions& dimensions, RobotState& robotState);
         
         void Initialise() override;
         void Shutdown();
 
         using Sprite::Update;
-        void Update(float dt, Emotion emotion);
+        void Update(float dt);
         void Draw() const;
 
         void SetTransform(MyTransform parentTransform);
@@ -26,6 +26,7 @@ class Eyes : public Sprite
 
     private:
         BodyDimensions& dimensions;
+        RobotState& robotState;
         Vector2 positionOffset;
         
         float blinkAnimationTimer = 0.0f;

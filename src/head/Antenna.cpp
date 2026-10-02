@@ -9,7 +9,9 @@
 #include "Body/Head/Antenna.h"
 #include "Constants.h"
 
-Antenna::Antenna(BodyDimensions& dimensions) : dimensions(dimensions)
+Antenna::Antenna(BodyDimensions& dimensions, RobotState& robotState) :
+    dimensions(dimensions),
+    robotState(robotState)
 {}
 
 void Antenna::Initialise()
@@ -47,7 +49,7 @@ void Antenna::Initialise()
     };
 }
 
-void Antenna::Update(float dt, Emotion emotion)
+void Antenna::Update(float dt)
 {
     Sprite::Update(dt);
 }

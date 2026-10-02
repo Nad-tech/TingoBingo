@@ -1,9 +1,9 @@
 #include "Robot.h"
 #include "RobotBrain.h"
-#include "Emotion.h"
 
 Robot::Robot() :
-    body(dimensions),
+    robotState(robotState),
+    body(dimensions, robotState),
     robotBrain(*this)
 {}
 
@@ -14,7 +14,8 @@ void Robot::Initialise()
 
 void Robot::Update(float dt)
 {
-    body.Update(dt, robotBrain.GetEmotion());
+    body.Update(dt);
+    robotBrain.Update(dt);
 }
 
 void Robot::SetTransform(MyTransform transform)
@@ -26,35 +27,9 @@ void Robot::SetTransform(MyTransform transform)
 void Robot::Draw() const
 {
     body.Draw();
-    robotBrain.Draw();
 }
 
 void Robot::Shutdown()
 {
     body.Shutdown();
-}
-
-void Robot::SetEmotion(Emotion emotion)
-{
-    robotBrain.SetEmotion(emotion);
-}
-
-Emotion Robot::GetEmotion()
-{
-    return robotBrain.GetEmotion();
-}
-
-void Robot::NextState()
-{
-    robotBrain.NextState();
-}
-
-void Robot::NextEmotion()
-{
-    robotBrain.NextEmotion();
-}
-
-Body& Robot::GetBody()
-{
-    return body;
 }

@@ -2,16 +2,16 @@
 
 #include "BodyDimensions.h"
 #include "Shape.h"
+#include "RobotState.h"
 #include <string>
-#include "Emotion.h"
 
 class Foot : public Shape
 {
     public:
-        Foot(BodyDimensions& dimensions, std::string side);
+        Foot(BodyDimensions& dimensions, std::string side, RobotState& robotState);
         
         void Initialise() override;
-        void Update(float dt, Emotion emotion);
+        void Update(float dt);
         
         void Draw() const;
         
@@ -19,6 +19,7 @@ class Foot : public Shape
 
     private:
         BodyDimensions& dimensions;
+        RobotState& robotState;
         Vector2 positionOffset;
 
         std::string side;

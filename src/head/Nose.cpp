@@ -3,7 +3,9 @@
 #include <iostream>
 #include <cmath>
 
-Nose::Nose(BodyDimensions& dimensions) : dimensions(dimensions)
+Nose::Nose(BodyDimensions& dimensions, RobotState& robotState) :
+    dimensions(dimensions),
+    robotState(robotState)
 {}
 
 void Nose::Initialise()
@@ -41,7 +43,7 @@ void Nose::Initialise()
 }
 
 
-void Nose::Update(float dt, Emotion emotion)
+void Nose::Update(float dt)
 {
     Sprite::Update(dt);
 }

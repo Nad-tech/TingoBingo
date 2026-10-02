@@ -1,15 +1,23 @@
 #include "Body/Arms/UpperArm.h"
 #include "Constants.h"
+#include "raylib.h"
 #include <cmath>
 #include <iostream>
+#include <string>
 
 // Construct the upper arm using the shared body dimensions
 // and the side of the body that the arm belongs to.
-UpperArm::UpperArm(BodyDimensions& dimensions, std::string side) :
+UpperArm::UpperArm
+(
+    BodyDimensions& dimensions, 
+    std::string side, 
+    RobotState& robotState
+) :
     Shape(CARDBOARD_LIGHT),
     dimensions(dimensions),
+    robotState(robotState),
     side(side),
-    elbow(dimensions, side)
+    elbow(dimensions, side, robotState)
 {
 }
 
@@ -38,10 +46,14 @@ void UpperArm::Initialise()
     if(side == "right") {Shape::SetShapeName("rightUpperArm");}
 }
 
-// Update the upper arm and its child elbow.
-void UpperArm::Update(float dt, Emotion emotion)
+void UpperArm::Update(float dt)
 {
-    elbow.Update(dt, emotion);
+    if(waveState != WaveState::None)
+    {
+        WaveArm(dt);
+    }
+
+    elbow.Update(dt);
 }
 
 
@@ -52,65 +64,53 @@ void UpperArm::Draw() const
     elbow.Draw();
 }
 
-
-// Swing the upper arm between the supplied minimum
-// and maximum angles.
-void UpperArm::SwingArm(
-    float dt,
-    float swingMinAngle,
-    float swingMaxAngle
-)
-{
-    // Advance the animation timer.
-    swingTime += dt * SWING_SPEED;
-
-    // Keep the timer inside one complete sine-wave cycle.
-    if (swingTime >= 2.0f * PI)
-    {
-        swingTime -= 2.0f * PI;
-    }
-
-    // sinf() produces a value between -1 and +1.
-    //
-    // Convert that into a value between 0 and 1.
-    //
-    // This gives us a percentage that represents where we are
-    // between the minimum and maximum swing angles.
-    float unitAngle = 0;
-
-    // The left arm uses the normal direction of the sine wave.
-    if(side == "left")
-    {
-        unitAngle = (sinf(swingTime) + 1.0f) / 2.0f;
-    }
-
-    // The right arm swings in the opposite direction.
-    if(side == "right")
-    {
-        unitAngle = -(sinf(swingTime) + 1.0f) / 2.0f;
-    }
-
-    // Convert the 0-to-1 value into the requested angle range.
-    //
-    // For example:
-    //
-    //     unitAngle = 0   -> swingMinAngle
-    //     unitAngle = 0.5 -> halfway between the two
-    //     unitAngle = 1   -> swingMaxAngle
-    //
-    // The result becomes the arm's local rotation.
-    localRotation =
-        swingMinAngle +
-        unitAngle * (swingMaxAngle - swingMinAngle);
-}
-
-
 void UpperArm::SetTransform(MyTransform parentTransform)
-{
+{   
+    tempParentTransform = parentTransform;
+
     Shape::transform = MakeChildTransform(parentTransform, positionOffset);
     Shape::transform.rotation += localRotation;
 
     Shape::SetScreenCoords();
 
     elbow.SetTransform(Shape::transform);
+}
+
+void UpperArm::Wave()
+{
+    if(waveState == WaveState::None)
+    {
+        waveState = WaveState::Raising;
+    }
+}
+
+void UpperArm::WaveArm(float dt)
+{
+    const float speed = 100.0f;
+    const float maxRotation = -60.0f;
+
+    if(waveState == WaveState::Raising)
+    {
+        localRotation -= speed * dt;
+
+        if(localRotation <= maxRotation)
+        {
+            localRotation = maxRotation;
+            elbow.SetWaveState(Elbow::WaveState::Waving);
+        }
+    }
+    else if(waveState == WaveState::Lowering)
+    {
+        elbow.SetWaveState(Elbow::WaveState::None);
+
+        localRotation += speed * dt;
+
+        if(localRotation >= 0.0f)
+        {
+            localRotation = 0.0f;
+            waveState = WaveState::None;
+        }
+    }
+
+    SetTransform(tempParentTransform);
 }

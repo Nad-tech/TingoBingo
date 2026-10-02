@@ -1,8 +1,9 @@
 #include "Body/Legs/Foot.h"
 
-Foot::Foot(BodyDimensions& dimensions, std::string side) :
+Foot::Foot(BodyDimensions& dimensions, std::string side, RobotState& robotState) :
 	Shape(CARDBOARD_DARK),
 	dimensions(dimensions),
+	robotState(robotState),
 	side(side)
 
 {}
@@ -43,7 +44,7 @@ void Foot::Initialise()
 }
 
 float kjhr = 0;
-void Foot::Update(float dt, Emotion emotion)
+void Foot::Update(float dt)
 {
 	kjhr *= dt;
 }

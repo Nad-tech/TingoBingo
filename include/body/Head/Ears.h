@@ -2,21 +2,22 @@
 
 #include "Sprite.h"
 #include "BodyDimensions.h"
-#include "Emotion.h"
+#include "RobotState.h"
 
 class Ears : public Sprite
 {
      public:
-        Ears(BodyDimensions& dimensions);
+        Ears(BodyDimensions& dimensions, RobotState& robotState);
         
         void Initialise() override;
         
         using Sprite::Update;
-        void Update(float dt, Emotion emotion);
+        void Update(float dt);
         
         void SetTransform(MyTransform parentTransform);
 
     private:
         BodyDimensions& dimensions;
+        RobotState& robotState;
         Vector2 positionOffset;
 };

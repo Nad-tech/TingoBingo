@@ -2,22 +2,23 @@
 
 #include "Sprite.h"
 #include "BodyDimensions.h"
-#include "Emotion.h"
+#include "RobotState.h"
 
 class Antenna : public Sprite 
 {
     public:
-        Antenna(BodyDimensions& dimensions);
+        Antenna(BodyDimensions& dimensions, RobotState& robotState);
         
         void Initialise() override;
         
         using Sprite::Update;
-        void Update(float dt, Emotion emotion);
+        void Update(float dt);
         
         void SetTransform(MyTransform parentTransform);
 
     private:
         BodyDimensions& dimensions;
+        RobotState& robotState;
         Vector2 positionOffset;
         
         float topOfHeadOffset = 46.0f;

@@ -9,9 +9,9 @@
 #include "Body/Head/Headbase.h"
 #include "Body/Head/Nose.h"
 #include "Body/Head/Pupils.h"
-#include "Emotion.h"
 #include "BodyDimensions.h"
 #include "MyTransform.h"
+#include "RobotState.h"
 
 //====================================================
 // Head
@@ -29,12 +29,12 @@
 class Head
 {
 public:
-    Head(BodyDimensions& dimensions);
+    Head(BodyDimensions& dimensions, RobotState& robotState);
     
     void Initialise();
     void Shutdown();
     
-    void Update(float dt, Emotion emotion);
+    void Update(float dt);
     void Draw() const;
 
     void SetTransform(MyTransform parentTransform);
@@ -46,6 +46,8 @@ private:
     BodyDimensions& dimensions;
     MyTransform transform;
     Vector2 positionOffset;
+    
+    RobotState& robotState;
 
     Headbase headBase;
     Eyes eyes;

@@ -2,16 +2,16 @@
 #include "Body/Legs/Legs.h"
 #include "Shape.h"
 #include "BodyDimensions.h"
-#include "Emotion.h"
+#include "RobotState.h"
 
 class Pelvis : Shape
 {
     public:
-        Pelvis(BodyDimensions& dimensions);
+        Pelvis(BodyDimensions& dimensions, RobotState& robotState);
         void Initialise() override;
         void Shutdown();
         
-        void Update(float dt, Emotion emotion);
+        void Update(float dt);
         void Draw() const;
         
         void SetTransform(MyTransform parentTransform);
@@ -19,6 +19,8 @@ class Pelvis : Shape
     private:
         BodyDimensions& dimensions;
         Vector2 positionOffset;
+
+        RobotState& robotState;
         
         Legs legs;
 };

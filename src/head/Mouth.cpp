@@ -8,10 +8,10 @@
 
 #include "Body/Head/Mouth.h"
 #include "Constants.h"
-#include "Emotion.h"
 
-Mouth::Mouth(BodyDimensions& dimensions) : 
-    dimensions(dimensions)
+Mouth::Mouth(BodyDimensions& dimensions, RobotState& robotState) :
+    dimensions(dimensions),
+    robotState(robotState)
 {}
 
 // Load the mouth sprite sheet and initialise its animation.
@@ -51,7 +51,7 @@ void Mouth::Initialise()
 }
 
 // Advance the mouth animation.
-void Mouth::UpdateMouth(float dt, Emotion emotion)
+void Mouth::UpdateMouth(float dt)
 {
     Update(dt);
 }

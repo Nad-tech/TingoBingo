@@ -1,9 +1,10 @@
 #include "Body/Arms/Arms.h"
 
-Arms::Arms(BodyDimensions& dimensions)
-    : dimensions(dimensions),
-      leftShoulder(dimensions, "left"),
-      rightShoulder(dimensions, "right")
+Arms::Arms(BodyDimensions& dimensions, RobotState& robotState) : 
+    dimensions(dimensions),
+    robotState(robotState),
+    leftShoulder(dimensions, "left", robotState),
+    rightShoulder(dimensions, "right", robotState)
 {
 }
 
@@ -17,20 +18,10 @@ void Arms::Shutdown()
 {
 }
 
-void Arms::Update(float dt, Emotion emotion)
+void Arms::Update(float dt)
 {
-    leftShoulder.Update(dt, emotion);
-    rightShoulder.Update(dt, emotion);
-
-    if(swingLeftArm)
-    {
-        leftShoulder.SwingArm(dt, 0, 180);
-    }
-
-    if(swingRightArm)
-    {
-        rightShoulder.SwingArm(dt, 0, 180);
-    }
+    leftShoulder.Update(dt);
+    rightShoulder.Update(dt);
 }
 
 void Arms::Draw() const 
@@ -43,25 +34,4 @@ void Arms::SetTransform(MyTransform parentTransform)
 {
     leftShoulder.SetTransform(parentTransform);
     rightShoulder.SetTransform(parentTransform);
-}
-
-void Arms::SwingArm(std::string side, bool swing)
-{
-    if(side == "left" && swing)
-    {
-        swingLeftArm = true;
-    }
-    else if(side == "left" && !swing)
-    {
-        swingLeftArm = false;
-    }
-
-    if(side == "right" && swing)
-    {
-        swingRightArm = true;
-    }
-    else if(side == "right" && !swing)
-    {
-        swingRightArm = false;
-    }
 }

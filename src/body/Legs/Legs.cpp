@@ -1,9 +1,10 @@
 #include "Body/Legs/Legs.h"
 
-Legs::Legs(BodyDimensions& dimensions) :
+Legs::Legs(BodyDimensions& dimensions, RobotState& robotState) :
     dimensions(dimensions),
-    rightThigh(dimensions, "right"),
-    leftThigh(dimensions, "left")
+    robotState(robotState),
+    rightThigh(dimensions, "right", robotState),
+    leftThigh(dimensions, "left", robotState)
 {}
 
 void Legs::Initialise()
@@ -17,10 +18,10 @@ void Legs::Shutdown()
    
 }
 
-void Legs::Update(float dt, Emotion emotion)
+void Legs::Update(float dt)
 {
-    leftThigh.Update(dt, emotion);
-    rightThigh.Update(dt, emotion);
+    leftThigh.Update(dt);
+    rightThigh.Update(dt);
 }
 
 void Legs::Draw() const

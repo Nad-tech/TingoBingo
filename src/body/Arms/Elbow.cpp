@@ -2,11 +2,17 @@
 #include <cmath>
 #include <iostream>
 
-Elbow::Elbow(BodyDimensions& dimensions, std::string side) :
+Elbow::Elbow
+(
+    BodyDimensions& dimensions, 
+    std::string side,
+    RobotState& robotState
+) :
     Shape(CARDBOARD_DARK),
     dimensions(dimensions),
+    robotState(robotState),
     side(side),
-    foreArm(dimensions, side)
+    foreArm(dimensions, side, robotState)
 {}
 
 void Elbow::Initialise()
@@ -30,9 +36,18 @@ void Elbow::Initialise()
     foreArm.Initialise();
 }
 
-void Elbow::Update(float dt, Emotion emotion)
+void Elbow::Update(float dt)
 {
-    foreArm.Update(dt, emotion);
+    if(waveState == WaveState::Waving)
+    {
+        foreArm.SetWaveState(ForeArm::WaveState::Raising);
+    }
+    else
+    {
+        foreArm.SetWaveState(ForeArm::WaveState::None);
+    }
+
+    foreArm.Update(dt);
 }
 
 void Elbow::Draw() const 
@@ -48,4 +63,9 @@ void Elbow::SetTransform(MyTransform parentTransform)
     Shape::SetScreenCoords();
     
     foreArm.SetTransform(transform);
+}
+
+void Elbow::SetWaveState(WaveState waveState)
+{
+    this->waveState = waveState; 
 }

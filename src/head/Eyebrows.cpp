@@ -1,9 +1,9 @@
 #include "Body/Head/Eyebrows.h"
 #include "Constants.h"
-#include "Emotion.h"
 
-Eyebrows::Eyebrows(BodyDimensions& dimensions) : 
-    dimensions(dimensions)
+Eyebrows::Eyebrows(BodyDimensions& dimensions, RobotState& robotState) :
+    dimensions(dimensions),
+    robotState(robotState)
 {}
 
 void Eyebrows::Initialise()
@@ -41,7 +41,7 @@ void Eyebrows::Initialise()
     };
 }
 
-void Eyebrows::Update(float dt, Emotion emotion)
+void Eyebrows::Update(float dt)
 {
     Sprite::Update(dt);
 }

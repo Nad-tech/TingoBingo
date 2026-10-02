@@ -1,8 +1,9 @@
 #include "Body/Head/Ears.h"
 #include "Constants.h"
 
-Ears::Ears(BodyDimensions& dimensions) : 
-    dimensions(dimensions)
+Ears::Ears(BodyDimensions& dimensions, RobotState& robotState) :
+    dimensions(dimensions),
+    robotState(robotState)
 {}
 
 void Ears::Initialise()
@@ -37,7 +38,7 @@ void Ears::Initialise()
     };
 }
 
-void Ears::Update(float dt, Emotion emotion)
+void Ears::Update(float dt)
 {
     Sprite::Update(dt);
 }
