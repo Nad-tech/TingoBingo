@@ -50,3 +50,8 @@ void Pelvis::Shutdown()
 {
     legs.Shutdown();
 }
+
+void Pelvis::Crouch()
+{
+    legs.Crouch();
+}

@@ -8,7 +8,15 @@
 class Shin : public Shape
 {
     public:
-        public:
+        enum class CrouchState
+        {
+            None,
+            Raising,
+            Crouching,
+            Returning
+        };
+
+
         Shin(BodyDimensions& dimensions, std::string side, RobotState& robotState);
         
         void Initialise() override;
@@ -18,7 +26,11 @@ class Shin : public Shape
         
         void SetTransform(MyTransform parentTrnsform);
 
+        void Crouch();
+
     private:
+        void AdvanceCrouch(float dt);
+
         BodyDimensions& dimensions;
         RobotState& robotState;
         Vector2 positionOffset;
@@ -26,4 +38,8 @@ class Shin : public Shape
         std::string side;
 
         Foot foot;
+
+        CrouchState crouchState = CrouchState::None;
+        MyTransform tempParentTransform;
+        float localRotation = 0.0f;
 };

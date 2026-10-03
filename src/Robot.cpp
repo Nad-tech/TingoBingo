@@ -17,10 +17,10 @@ void Robot::Update(float dt)
     robotBrain.Update(dt);
 }
 
-void Robot::SetTransform(MyTransform transform)
+void Robot::SetTransform(MyTransform initialTransform)
 {
-    this->transform = transform;
-    body.SetTransform(this->transform);
+    transform = initialTransform;
+    body.SetTransform(transform);
 }
 
 void Robot::Draw() const
@@ -50,12 +50,118 @@ void Robot::Draw() const
     const auto& gestures = robotState.gestures;
     const int x = 12;
     int y = 12;
-    const int lineHeight = 18;
-    DrawText("ROBOT STATE", x, y, 16, YELLOW); y += lineHeight;
-    DrawText(TextFormat("State: %s", stateName), x, y, 14, RAYWHITE); y += lineHeight;
-    DrawText(TextFormat("Emotion: %s  Speaking: %s", emotionName, flag(robotState.speaking)), x, y, 14, RAYWHITE); y += lineHeight;
-    DrawText(TextFormat("Gestures: idle %s | nod %s | shake %s", flag(gestures.idle), flag(gestures.nod), flag(gestures.shakeHead)), x, y, 14, RAYWHITE); y += lineHeight;
-    DrawText(TextFormat("           waveL %s | waveR %s | shrug %s", flag(gestures.waveLeft), flag(gestures.waveRight), flag(gestures.shrug)), x, y, 14, RAYWHITE); y += lineHeight;
+    const int fontSize = 20;
+    const int lineHeight = fontSize + 4;
+    
+    DrawText("ROBOT STATE", x, y, 16, YELLOW); 
+    
+    y += lineHeight;
+    
+    DrawText(
+        TextFormat
+        (
+            "State: %s", stateName
+        ), 
+        x, 
+        y, 
+        fontSize, 
+        RAYWHITE
+    ); 
+    
+    y += lineHeight;
+    
+    DrawText(
+        TextFormat
+        (
+            "Emotion: %s  Speaking: %s",
+            emotionName, flag(robotState.speaking)
+        ), 
+        x, 
+        y, 
+        fontSize, 
+        RAYWHITE
+    ); 
+    
+    y += lineHeight;
+    
+    DrawText
+    (
+        TextFormat
+        (
+            "idle %s | nod %s | shake %s", 
+            flag(gestures.idle), 
+            flag(gestures.nod), 
+            flag(gestures.shakeHead)
+        ), 
+        x, 
+        y, 
+        fontSize, 
+        RAYWHITE
+    ); 
+        
+    y += lineHeight;
+    
+    DrawText
+    (
+        TextFormat
+        (
+            "waveL %s | waveR %s", 
+            flag(gestures.waveLeft), 
+            flag(gestures.waveRight)
+        ),  
+        x, 
+        y, 
+        fontSize, 
+        RAYWHITE
+    );
+          
+    y += lineHeight;
+
+    DrawText
+    (
+        TextFormat
+        (
+            "kickL %s | kickR %s", 
+            flag(gestures.kickLeft), 
+            flag(gestures.kickRight)
+        ),  
+        x, 
+        y, 
+        fontSize, 
+        RAYWHITE
+    );
+    
+    y += lineHeight;
+
+    DrawText
+    (
+        TextFormat
+        (
+            "jump %s | shrug %s | celebrate %s", 
+            flag(gestures.jump), 
+            flag(gestures.shrug),
+            flag(gestures.celebrate)
+        ),  
+        x, 
+        y, 
+        fontSize, 
+        RAYWHITE
+    );
+
+    y += lineHeight;
+
+    DrawText
+    (
+        TextFormat
+        (
+            "crouch %s |", 
+            flag(gestures.crouch)
+        ),  
+        x, 
+        y, 
+        fontSize, 
+        RAYWHITE
+    );
 }
 
 void Robot::CycleState()
@@ -86,17 +192,66 @@ void Robot::ToggleSpeaking()
     robotState.speaking = !robotState.speaking;
 }
 
-void Robot::ToggleGesture(RobotState::Gesture gesture)
+RobotState::Gestures& Robot::GetGestures()
 {
-    switch (gesture)
+    return robotState.gestures;
+}
+
+void Robot::ToggleGesture(std::string gesture)
+{
+    if(gesture == "idle") 
     {
-        case RobotState::Gesture::Idle: robotState.gestures.idle = !robotState.gestures.idle; break;
-        case RobotState::Gesture::Nod: robotState.gestures.nod = !robotState.gestures.nod; break;
-        case RobotState::Gesture::ShakeHead: robotState.gestures.shakeHead = !robotState.gestures.shakeHead; break;
-        case RobotState::Gesture::WaveLeft: robotState.gestures.waveLeft = !robotState.gestures.waveLeft; break;
-        case RobotState::Gesture::WaveRight: robotState.gestures.waveRight = !robotState.gestures.waveRight; break;
-        case RobotState::Gesture::Shrug: robotState.gestures.shrug = !robotState.gestures.shrug; break;
-        case RobotState::Gesture::Celebrate: robotState.gestures.celebrate = !robotState.gestures.celebrate; break;
+        robotState.gestures.idle = !robotState.gestures.idle;
+    }
+    
+    if(gesture == "nod") 
+    {
+        robotState.gestures.nod = !robotState.gestures.nod;
+    }
+    
+    if(gesture == "shakeHead") 
+    {
+        robotState.gestures.shakeHead = !robotState.gestures.shakeHead;
+    }
+
+    if(gesture == "waveLeft") 
+    {
+        robotState.gestures.waveLeft = !robotState.gestures.waveLeft;
+    }
+    
+    if(gesture == "waveRight") 
+    {
+        robotState.gestures.waveRight = !robotState.gestures.waveRight;
+    }
+    
+    if(gesture == "kickLeft") 
+    {
+        robotState.gestures.kickLeft = !robotState.gestures.kickLeft;
+    }
+
+    if(gesture == "kickRight") 
+    {
+        robotState.gestures.kickRight = !robotState.gestures.kickRight;
+    }
+
+    if(gesture == "jump") 
+    {
+        robotState.gestures.jump = !robotState.gestures.jump;
+    }
+
+    if(gesture == "shrug") 
+    {
+        robotState.gestures.shrug = !robotState.gestures.shrug;
+    }
+
+    if(gesture == "celebrate") 
+    {
+        robotState.gestures.celebrate = !robotState.gestures.celebrate;
+    }
+
+    if(gesture == "crouch")
+    {
+        robotState.gestures.crouch = !robotState.gestures.crouch;
     }
 }
 

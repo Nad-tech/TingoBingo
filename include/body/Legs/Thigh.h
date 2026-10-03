@@ -11,15 +11,28 @@
 class Thigh : public Shape
 {
     public:
+        enum class CrouchState
+        {
+            None,
+            Raising,
+            Crouching,
+            Returning
+        };
+
         Thigh(BodyDimensions& dimensions, std::string side, RobotState& robotState);
+        
         void Initialise() override;
         
         void Update(float dt);
         void Draw() const;
 
         void SetTransform(MyTransform parentTransform);
+
+        void Crouch();
         
     private:
+        void AdvanceCrouch(float dt);    
+
         BodyDimensions& dimensions;
         RobotState& robotState;
         Vector2 positionOffset;
@@ -27,4 +40,9 @@ class Thigh : public Shape
         std::string side;
         
         Knee knee;
+
+        CrouchState crouchState = CrouchState::None;
+        MyTransform tempParentTransform;
+
+        float localRotation = 0.0f;
 };

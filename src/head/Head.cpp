@@ -1,18 +1,3 @@
-//====================================================
-// Head.cpp
-//
-// Coordinates all of the robot's head components.
-//
-// The Head class owns the individual facial features
-// (head base, eyes, mouth, ears, antenna, nose,
-// eyebrows and pupils) and keeps them synchronised by
-// updating, drawing, positioning and rotating them as
-// a single unit.
-//
-// It also controls the head's idle animations,
-// including bobbing and wiggling.
-//====================================================
-
 #include "Body/Head/Head.h"
 #include <cmath>
 
@@ -63,10 +48,7 @@ void Head::Shutdown()
 // Update every animated head component.
 void Head::Update(float dt)
 {
-    if(robotState.gestures.nod)
-    {
-        Nod();
-    }
+    Nod();
 
     if(nodState != NodState::None)
     {
@@ -121,9 +103,9 @@ void Head::LookForward()
 
 void Head::Nod()
 {
-    if(nodState == NodState::None)
+    if(robotState.gestures.nod && nodState == NodState::None)
     {
-        nodState = NodState::Raising;
+        nodState = NodState::Lowering;
     }
 }
 
@@ -150,7 +132,7 @@ void Head::AdvanceNod(float dt)
         if(nodOffsetY <= minOffset)
         {
             nodOffsetY = minOffset;
-
+        
             if(robotState.gestures.nod)
             {
                 nodState = NodState::Raising;

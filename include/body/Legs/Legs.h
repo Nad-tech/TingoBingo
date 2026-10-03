@@ -19,6 +19,8 @@ class Legs : Shape
 
         void SetTransform(MyTransform parentTransform);
 
+        void Crouch();
+
     private:
         BodyDimensions& dimensions;
         RobotState& robotState;

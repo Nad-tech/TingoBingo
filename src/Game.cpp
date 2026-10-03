@@ -65,13 +65,17 @@ void Game::HandleInput()
 	if (input.E_Pressed()) robot.CycleEmotion();
 	if (input.G_Pressed()) robot.ToggleSpeaking();
 
-	if (IsKeyPressed(KEY_ONE)) robot.ToggleGesture(RobotState::Gesture::Idle);
-	if (IsKeyPressed(KEY_TWO)) robot.ToggleGesture(RobotState::Gesture::Nod);
-	if (IsKeyPressed(KEY_THREE)) robot.ToggleGesture(RobotState::Gesture::ShakeHead);
-	if (IsKeyPressed(KEY_FOUR)) robot.ToggleGesture(RobotState::Gesture::WaveLeft);
-	if (IsKeyPressed(KEY_FIVE)) robot.ToggleGesture(RobotState::Gesture::WaveRight);
-	if (IsKeyPressed(KEY_SIX)) robot.ToggleGesture(RobotState::Gesture::Shrug);
-	if (IsKeyPressed(KEY_EIGHT)) robot.ToggleGesture(RobotState::Gesture::Celebrate);
+	if (IsKeyPressed(KEY_ONE)) robot.ToggleGesture("idle");
+	if (IsKeyPressed(KEY_TWO)) robot.ToggleGesture("nod");
+	if (IsKeyPressed(KEY_THREE)) robot.ToggleGesture("shakeHead");
+	if (IsKeyPressed(KEY_FOUR)) robot.ToggleGesture("waveLeft");
+	if (IsKeyPressed(KEY_FIVE)) robot.ToggleGesture("waveRight");
+	if (IsKeyPressed(KEY_SIX)) robot.ToggleGesture("kickLeft");
+	if (IsKeyPressed(KEY_SEVEN)) robot.ToggleGesture("kickRight");
+	if (IsKeyPressed(KEY_EIGHT)) robot.ToggleGesture("jump");
+	if (IsKeyPressed(KEY_NINE)) robot.ToggleGesture("shrug");
+	if (IsKeyPressed(KEY_ZERO)) robot.ToggleGesture("celebrate");
+	if (IsKeyPressed(KEY_C)) robot.ToggleGesture("crouch");
 }
 
 void Game::Update(const float dt)

@@ -14,6 +14,14 @@
 class Body
 {
 public:
+    enum class CrouchState
+    {
+        None,
+        Lowering,
+        Crouching,
+        Returning
+    };
+
     Body(BodyDimensions& dimensions, RobotState& robotState);
     void Initialise();
     void Shutdown();
@@ -21,9 +29,13 @@ public:
     void Update(float dt);
     void Draw() const;
     
-    void SetTransform(MyTransform transform);
+    void SetTransform(MyTransform parentTransform);
+
+    void Crouch();
 
 private:
+    void AdvanceCrouch(float dt);
+
     BodyDimensions &dimensions;
     MyTransform transform;
     RobotState& robotState;
@@ -32,5 +44,9 @@ private:
     Neck neck;
     Pelvis pelvis;
     Arms arms;
+
+    CrouchState crouchState = CrouchState::None;
+    MyTransform tempParentTransform;
+    float crouchOffsetY = 0.0f;
 
 };

@@ -10,21 +10,14 @@ class RobotState
             bool shakeHead = false;
             bool waveLeft = false;
             bool waveRight = false;
+            bool kickLeft = false;
+            bool kickRight = false;
+            bool jump = false;
             bool shrug = false;
             bool celebrate = false;
+            bool crouch = false;
         };
         Gestures gestures;
-
-        enum class Gesture
-        {
-            Idle,
-            Nod,
-            ShakeHead,
-            WaveLeft,
-            WaveRight,
-            Shrug,
-            Celebrate
-        };
 
         enum class State
         {

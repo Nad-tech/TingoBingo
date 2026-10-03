@@ -16,12 +16,14 @@ public:
     void Update(float dt);
     void Draw() const;
     
-    void SetTransform(MyTransform transform);
+    void SetTransform(MyTransform initialTransform);
 
     void CycleState();
     void CycleEmotion();
     void ToggleSpeaking();
-    void ToggleGesture(RobotState::Gesture gesture);
+    void ToggleGesture(std::string gesture);
+   
+    RobotState::Gestures& GetGestures();
     
 private:
     BodyDimensions dimensions;

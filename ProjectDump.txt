@@ -172,34 +172,30 @@ private:
 #include "Shoulder.h"
 #include "BodyDimensions.h"
 #include "MyTransform.h"
-#include "Emotion.h"
+#include "RobotState.h"
 
 class Arms
 {
     public:
-        Arms(BodyDimensions& dimensions);
+        Arms(BodyDimensions& dimensions, RobotState& robotState);
 
         void Initialise();
         void Shutdown();
 
-        void Update(float dt, Emotion emotion);
+        void Update(float dt);
         void Draw() const;
         
         void SetTransform(MyTransform parentTransform);
-        
-        void SwingArm(std::string side, bool swing);
+
+        void WaveArm();
         
     private:
         BodyDimensions& dimensions;
+        RobotState& robotState;
 
         Shoulder leftShoulder;
         Shoulder rightShoulder;
-
-        bool swingLeftArm = false;
-        bool swingRightArm = false;
 };
-
-
 
 
 =====================================
@@ -211,25 +207,32 @@ class Arms
 #include "Shape.h"
 #include "ForeArm.h"
 #include "BodyDimensions.h"
-#include "Emotion.h"
-
 #include <string>
+#include "RobotState.h"
 
 class Elbow : public Shape
 {
     public:
-        Elbow(BodyDimensions& dimensions, std::string side);
+        Elbow
+        (
+            BodyDimensions& dimensions,
+            std::string side,
+            RobotState& robotState
+        );
         
         void Initialise() override;
         
-        void Update(float dt, Emotion emotion);
+        void Update(float dt);
         void Draw() const;
 
         void SetTransform(MyTransform parentTransform);
 
+        void WaveArm();
+
     private:
         BodyDimensions& dimensions;
         Vector2 positionOffset;
+        RobotState& robotState;
 
         std::string side = "";
 
@@ -247,24 +250,45 @@ class Elbow : public Shape
 #include <string>
 #include "Shape.h"
 #include "Hand.h"
-#include "Emotion.h"
+#include "RobotState.h"
 
 class ForeArm : public Shape
 {
     public:
-        ForeArm(BodyDimensions& dimensions, std::string side);
+        enum class WaveState
+        {
+            None,
+            Raising,
+            Lowering
+        };
+
+        ForeArm(
+            BodyDimensions& dimensions, 
+            std::string side,
+            RobotState& robotState
+        );
         
         void Initialise();
         
-        void Update(float dt, Emotion emotion);
+        void Update(float dt);
         void Draw() const;
         
         void SetTransform(MyTransform parentTransform);
 
+        void WaveArm();
+        
     private:
+        void AdvanceWave(float dt);
+
         BodyDimensions& dimensions;
         Vector2 positionOffset;
+        MyTransform tempParentTransform;
         
+        RobotState& robotState;
+        
+        WaveState waveState = WaveState::None;
+        float waveTimer = 0;
+
         float localRotation = 0.0f;
         float homeRotation = 0.0f;
         
@@ -283,16 +307,21 @@ class ForeArm : public Shape
 #include "BodyDimensions.h"
 #include "Shape.h"
 #include <string>
-#include "Emotion.h"
+#include "RobotState.h"
 
 class Hand : public Shape
 {
     public:
-        Hand(BodyDimensions& dimensions, std::string side);
+        Hand
+        (
+            BodyDimensions& dimensions, 
+            std::string side,
+            RobotState& RobotState
+        );
         
         void Initialise() override;
         
-        void Update(float dt, Emotion emotion);
+        void Update(float dt);
         void Draw() const;
         
         void SetTransform(MyTransform parentTransform);
@@ -301,6 +330,8 @@ class Hand : public Shape
         BodyDimensions& dimensions;
         Vector2 positionOffset;
         
+        RobotState& robotState;
+
         std::string side = "";
 };
 
@@ -314,25 +345,31 @@ class Hand : public Shape
 #include "Shape.h"
 #include "UpperArm.h"
 #include "BodyDimensions.h"
-#include "Emotion.h"
+#include "RobotState.h"
 
 class Shoulder : public Shape
 {
     public:
-        Shoulder(BodyDimensions& dimensions, std::string side);
+        Shoulder
+        (
+            BodyDimensions& dimensions, 
+            std::string side, 
+            RobotState& robotState
+        );
 
         void Initialise() override;
 
-        void Update(float dt, Emotion emotion);
+        void Update(float dt);
         void Draw() const;
         
         void SetTransform(MyTransform parentTransform);
 
-        void SwingArm(float dt, float swingMinAngle, float swingMaxAngle);
-
+        void WaveArm();
+        
     private:
         BodyDimensions& dimensions;
         Vector2 positionOffset = {0, 0};
+        RobotState& robotState;
 
         std::string side = "";
         UpperArm upperArm;
@@ -350,33 +387,47 @@ class Shoulder : public Shape
 #include "Shape.h"
 #include "Body/Arms/Elbow.h"
 #include "BodyDimensions.h"
-#include "Emotion.h"
+#include "RobotState.h"
 
 class UpperArm : public Shape
 {
     public:
-        UpperArm(BodyDimensions& dimensions, std::string side);
+        enum class WaveState
+        {
+            None,
+            Raising,
+            Waving,
+            Lowering
+        };
+
+        UpperArm
+        (
+            BodyDimensions& dimensions, 
+            std::string side, 
+            RobotState& robotState
+        );
 
         void Initialise() override;
      
-        void Update(float dt, Emotion emotion);
+        void Update(float dt);
         void Draw() const;
         
         void SetTransform(MyTransform parentTransform);
 
-        void SwingArm(float dt, float swingMinAngle, float swingMaxAngle);
+        void WaveArm();
 
     private:
+        void AdvanceWave(float dt);
+
         BodyDimensions& dimensions;
         Vector2 positionOffset;
+        MyTransform tempParentTransform;
+        RobotState& robotState;
+
+        WaveState waveState = WaveState::None;
 
         float localRotation = 0.0f;
         std::string side = "";
-
-        const float SWING_MIN = 0.0f;
-        const float SWING_MAX = 180.0f;
-        const float SWING_SPEED = 1.0f;
-        float swingTime = 0;
 
         Elbow elbow;
 };
@@ -389,7 +440,6 @@ class UpperArm : public Shape
 #pragma once
 
 #include "raylib.h"
-#include "Emotion.h"
 #include "BodyBase.h"
 #include "Body/Arms/Arms.h"
 #include "Body/Pelvis.h"
@@ -397,27 +447,33 @@ class UpperArm : public Shape
 #include "Body/Neck.h"
 #include "BodyDimensions.h"
 #include "MyTransform.h"
+#include "RobotState.h"
 
 
 class Body
 {
 public:
-    Body(BodyDimensions& dimensions);
+    Body(BodyDimensions& dimensions, RobotState& robotState);
     void Initialise();
     void Shutdown();
     
-    void Update(float dt, Emotion emotion);
+    void Update(float dt);
     void Draw() const;
     
     void SetTransform(MyTransform transform);
 
+    void Crouch();
+
 private:
     BodyDimensions &dimensions;
     MyTransform transform;
+    RobotState& robotState;
+    
     BodyBase bodyBase;
     Neck neck;
     Pelvis pelvis;
     Arms arms;
+
 };
 
 
@@ -456,26 +512,25 @@ class BodyBase : public Sprite
 
 #include "Sprite.h"
 #include "BodyDimensions.h"
-#include "Emotion.h"
+#include "RobotState.h"
 
 class Antenna : public Sprite 
 {
     public:
-        Antenna(BodyDimensions& dimensions);
+        Antenna(BodyDimensions& dimensions, RobotState& robotState);
         
         void Initialise() override;
         
         using Sprite::Update;
-        void Update(float dt, Emotion emotion);
+        void Update(float dt);
         
         void SetTransform(MyTransform parentTransform);
 
     private:
         BodyDimensions& dimensions;
+        RobotState& robotState;
         Vector2 positionOffset;
         
-        float antennaAnimationTimer = 0.0f;
-        float nextAntennaAnimation = 3.0f;
         float topOfHeadOffset = 46.0f;
 };
 
@@ -488,26 +543,24 @@ class Antenna : public Sprite
 
 #include "Sprite.h"
 #include "BodyDimensions.h"
-#include "Emotion.h"
+#include "RobotState.h"
 
 class Ears : public Sprite
 {
      public:
-        Ears(BodyDimensions& dimensions);
+        Ears(BodyDimensions& dimensions, RobotState& robotState);
         
         void Initialise() override;
         
         using Sprite::Update;
-        void Update(float dt, Emotion emotion);
+        void Update(float dt);
         
         void SetTransform(MyTransform parentTransform);
 
     private:
         BodyDimensions& dimensions;
+        RobotState& robotState;
         Vector2 positionOffset;
-
-        float idleAnimationTimer = 0.0f;
-        float nextIdleAnimation = 0.0;
 };
 
 
@@ -518,34 +571,27 @@ class Ears : public Sprite
 #pragma once
 
 #include "Sprite.h"
-#include "Emotion.h"
 #include "BodyDimensions.h"
+#include "RobotState.h"
 
 class Eyebrows : public Sprite
 {
     public:
-        Eyebrows(BodyDimensions& dimensions);
+        Eyebrows(BodyDimensions& dimensions, RobotState& robotState);
         
         void Initialise() override;
 
         using Sprite::Update;
-        void Update(float dt, Emotion emotion);
+        void Update(float dt);
         
         void SetTransform(MyTransform transform);
 
     private:
         BodyDimensions& dimensions;
+        RobotState& robotState;
         Vector2 positionOffset;
 
         float foreheadOffset = 65; 
-
-        float happyAnimationTimer = 0.0f;
-        float nextHappyAnimation = 3.0f;
-
-        float idleAnimationTimer = 0.0f;
-        float nextIdleAnimation = 3.0f;
-        
-        bool wasHappy = false;
 };
 
 
@@ -558,18 +604,18 @@ class Eyebrows : public Sprite
 #include "Sprite.h"
 #include "BodyDimensions.h"
 #include "Pupils.h"
-#include "Emotion.h"
+#include "RobotState.h"
 
 class Eyes : public Sprite
 {
     public:
-        Eyes(BodyDimensions& dimensions);
+        Eyes(BodyDimensions& dimensions, RobotState& robotState);
         
         void Initialise() override;
         void Shutdown();
 
         using Sprite::Update;
-        void Update(float dt, Emotion emotion);
+        void Update(float dt);
         void Draw() const;
 
         void SetTransform(MyTransform parentTransform);
@@ -581,10 +627,11 @@ class Eyes : public Sprite
 
     private:
         BodyDimensions& dimensions;
+        RobotState& robotState;
         Vector2 positionOffset;
         
-        float idleAnimationTimer = 0.0f;
-        float nextIdleAnimation = 0.0f;
+        float blinkAnimationTimer = 0.0f;
+        float nextBlinkAnimation = 0.0f;
 
         Pupils pupils;
 }; 
@@ -605,9 +652,9 @@ class Eyes : public Sprite
 #include "Body/Head/Headbase.h"
 #include "Body/Head/Nose.h"
 #include "Body/Head/Pupils.h"
-#include "Emotion.h"
 #include "BodyDimensions.h"
 #include "MyTransform.h"
+#include "RobotState.h"
 
 //====================================================
 // Head
@@ -625,12 +672,20 @@ class Eyes : public Sprite
 class Head
 {
 public:
-    Head(BodyDimensions& dimensions);
+    enum class NodState
+        {
+            None,
+            Raising,
+            Lowering,
+            Returning
+        };
+
+    Head(BodyDimensions& dimensions, RobotState& robotState);
     
     void Initialise();
     void Shutdown();
     
-    void Update(float dt, Emotion emotion);
+    void Update(float dt);
     void Draw() const;
 
     void SetTransform(MyTransform parentTransform);
@@ -638,10 +693,21 @@ public:
     void LookAt(Vector2 point);
     void LookForward();
     
+    void Nod();
+
 private:
+    void AdvanceNod(float dt);
+
     BodyDimensions& dimensions;
+    
     MyTransform transform;
+    MyTransform tempParentTransform;
+
     Vector2 positionOffset;
+    
+    RobotState& robotState;
+    NodState nodState = NodState::None;
+    float nodOffsetY = 0.0f;
 
     Headbase headBase;
     Eyes eyes;
@@ -661,17 +727,19 @@ private:
 
 #include "Sprite.h"
 #include "BodyDimensions.h"
+#include "RobotState.h"
 
 class Headbase : public Sprite 
 {
     public:
-        Headbase(BodyDimensions& dimensions);
+        Headbase(BodyDimensions& dimensions, RobotState& robotState);
         void Initialise() override;
         
         void SetTransform(MyTransform parentTransform);
 
     private:
         BodyDimensions& dimensions;
+        RobotState& robotState;
         Vector2 positionOffset;
 
         std::string name = "headBase";
@@ -685,27 +753,24 @@ class Headbase : public Sprite
 #pragma once
 
 #include "Sprite.h"
-#include "Emotion.h"
 #include "BodyDimensions.h"
+#include "RobotState.h"
 
 class Mouth : public Sprite
 {
     public:
-        Mouth(BodyDimensions& dimensions);
+        Mouth(BodyDimensions& dimensions, RobotState& robotState);
         
         void Initialise() override;
-        void UpdateMouth(float dt, Emotion emotion);
+        void UpdateMouth(float dt);
         
         void SetTransform(MyTransform parentTransform);
 
     private:
         BodyDimensions& dimensions;
+        RobotState& robotState;
         Vector2 positionOffset;
-
-        int frame = 0;
-        float frameTimer = 0.0f;
-        const float FRAME_DURATION = 0.3f;
-
+        
         float mouthDisplayOffset = 28.0f;
 };
 
@@ -719,48 +784,27 @@ class Mouth : public Sprite
 #include "Sprite.h"
 #include "raylib.h"
 #include "BodyDimensions.h"
-#include "Emotion.h"
+#include "RobotState.h"
 
 class Nose : public Sprite
 {
     public:
-        Nose(BodyDimensions& dimensions);
+        Nose(BodyDimensions& dimensions, RobotState& robotState);
         
         void Initialise() override;
         
         using Sprite::Update;
-        void Update(float dt, Emotion emotion);
+        void Update(float dt);
         void Draw() const override;
         
         void SetTransform(MyTransform parentTransform);
 
     private:
         BodyDimensions& dimensions;
+        RobotState& robotState;
         Vector2 positionOffset;
-        float slightPositionOffset = 5.0f;
-
-        //Idle
-        float localRotation = 0.0f;
-        float idleTimer = 0.0f;
-        bool noseRotating = false;
-        float nextNoseRotation = 0;
-        float noseRotateTimer = 0;
         
-        //Wiggle
-        Vector2 homePosition = {0,0};
-        float wiggleTimer = 0.0f;
-        bool noseWiggling = false;
-        float nextNoseWiggle = 0;
-        float noseWiggleTimer = 0;
-        float wiggleOffSetX = 0;
-        float wiggleOffsetY = 0;
-
-        const float NEXT_ROTATION_TIME = 5.0f;
-        const float LOCAL_ROTATION_SPEED = 700.0f;
-
-        const float NEXT_WIGGLE_TIME = 3.0f;
-        const float WIGGLE_SPEED = 25.0f;
-        const float WIGGLE_AMOUNT = 5.0f;
+        float slightPositionOffset = 5.0f;
 }; 
 
 
@@ -776,17 +820,17 @@ class Nose : public Sprite
 #include <string>
 #include "BodyDimensions.h"
 #include "MyTransform.h"
-#include "Emotion.h"
+#include "RobotState.h"
 
 class Pupil : public Sprite
 {
     public:
-        Pupil(BodyDimensions& dimensions);
+        Pupil(BodyDimensions& dimensions, RobotState& robotState);
         
         void Initialise() override;
         
         using Sprite::Update;
-        void Update(float dt, Emotion emotion);
+        void Update(float dt);
         
         void SetSide(std::string side);
         float GetSideOffset();
@@ -799,6 +843,7 @@ class Pupil : public Sprite
 
     private:
         BodyDimensions& dimensions;
+        RobotState& robotState;
         Vector2 positionOffset;
 
         std::string side; // "left" or "right"
@@ -817,8 +862,7 @@ class Pupil : public Sprite
 #include "Constants.h"
 #include "BodyDimensions.h"
 #include "MyTransform.h"
-#include "Emotion.h"
-
+#include "RobotState.h"
 
 //====================================================
 // Pupils
@@ -833,12 +877,12 @@ class Pupil : public Sprite
 class Pupils
 {
 public:
-    Pupils(BodyDimensions& dimensions);
+    Pupils(BodyDimensions& dimensions, RobotState& robotState);
 
     void Initialise();
     void Shutdown();
 
-    void Update(float dt, Emotion emotion);
+    void Update(float dt);
     void Draw() const;
 
     void SetTransform(MyTransform parentTransform);
@@ -851,6 +895,7 @@ public:
     
 private:
     BodyDimensions& dimensions;
+    RobotState& robotState;
     MyTransform transform;
 
     Pupil leftPupil;
@@ -872,16 +917,16 @@ private:
 
 #include "BodyDimensions.h"
 #include "Shape.h"
+#include "RobotState.h"
 #include <string>
-#include "Emotion.h"
 
 class Foot : public Shape
 {
     public:
-        Foot(BodyDimensions& dimensions, std::string side);
+        Foot(BodyDimensions& dimensions, std::string side, RobotState& robotState);
         
         void Initialise() override;
-        void Update(float dt, Emotion emotion);
+        void Update(float dt);
         
         void Draw() const;
         
@@ -889,6 +934,7 @@ class Foot : public Shape
 
     private:
         BodyDimensions& dimensions;
+        RobotState& robotState;
         Vector2 positionOffset;
 
         std::string side;
@@ -904,23 +950,24 @@ class Foot : public Shape
 #include "BodyDimensions.h"
 #include "Shape.h"
 #include "Shin.h"
+#include "RobotState.h"
 #include <string>
-#include "Emotion.h"
 
 class Knee : public Shape
 {
     public:
-        Knee(BodyDimensions& dimensions, std::string side);
+        Knee(BodyDimensions& dimensions, std::string side, RobotState& robotState);
         
         void Initialise() override;
         
-        void Update(float dt, Emotion emotion);
+        void Update(float dt);
         void Draw() const;
 
         void SetTransform(MyTransform parentTransform);
         
     private:
         BodyDimensions& dimensions;
+        RobotState& robotState;
         Vector2 positionOffset;
 
         std::string side;
@@ -939,23 +986,24 @@ class Knee : public Shape
 #include "BodyDimensions.h"
 #include "Shape.h"
 #include "MyTransform.h"
-#include "Emotion.h"
 #include "Thigh.h"
+#include "RobotState.h"
 
 class Legs : Shape
 {
     public:
-        Legs(BodyDimensions& dimensions);
+        Legs(BodyDimensions& dimensions, RobotState& robotState);
         void Initialise();
         void Shutdown();
         
-        void Update(float dt, Emotion emotion);
+        void Update(float dt);
         void Draw() const;
 
         void SetTransform(MyTransform parentTransform);
 
     private:
         BodyDimensions& dimensions;
+        RobotState& robotState;
         Thigh rightThigh;
         Thigh leftThigh;
 };
@@ -969,24 +1017,25 @@ class Legs : Shape
 #include "BodyDimensions.h"
 #include "Shape.h"
 #include "Foot.h"
+#include "RobotState.h"
 #include <string>
-#include "Emotion.h"
 
 class Shin : public Shape
 {
     public:
         public:
-        Shin(BodyDimensions& dimensions, std::string side);
+        Shin(BodyDimensions& dimensions, std::string side, RobotState& robotState);
         
         void Initialise() override;
         
-        void Update(float dt, Emotion emotion);
+        void Update(float dt);
         void Draw() const;
         
         void SetTransform(MyTransform parentTrnsform);
 
     private:
         BodyDimensions& dimensions;
+        RobotState& robotState;
         Vector2 positionOffset;
 
         std::string side;
@@ -1005,23 +1054,24 @@ class Shin : public Shape
 #include "Knee.h"
 #include "BodyDimensions.h"
 #include "MyTransform.h"
-#include "Emotion.h"
+#include "RobotState.h"
 
 #include <string>
 
 class Thigh : public Shape
 {
     public:
-        Thigh(BodyDimensions& dimensions, std::string side);
+        Thigh(BodyDimensions& dimensions, std::string side, RobotState& robotState);
         void Initialise() override;
         
-        void Update(float dt, Emotion emotion);
+        void Update(float dt);
         void Draw() const;
 
         void SetTransform(MyTransform parentTransform);
         
     private:
         BodyDimensions& dimensions;
+        RobotState& robotState;
         Vector2 positionOffset;
         
         std::string side;
@@ -1038,28 +1088,27 @@ class Thigh : public Shape
 
 #include "Body/Head/Head.h"
 #include "Shape.h"
-#include "Emotion.h"
 #include "BodyDimensions.h"
 #include "MyTransform.h"
 #include <string>
+#include "RobotState.h"
 
 class Neck : public Shape
 {
     public:
-        Neck(BodyDimensions& dimensions);
+        Neck(BodyDimensions& dimensions, RobotState& robotState);
         void Initialise() override;
         void Shutdown();
         
-        void Update(float dt, Emotion emotion);
+        void Update(float dt);
         void Draw() const override;
         
         void SetTransform(MyTransform parentTransform);
         
-        Head& GetHead();
-        
     private:
         BodyDimensions& dimensions;
         Vector2 positionOffset;
+        RobotState& robotState;
 
         Head head;
 
@@ -1075,16 +1124,16 @@ class Neck : public Shape
 #include "Body/Legs/Legs.h"
 #include "Shape.h"
 #include "BodyDimensions.h"
-#include "Emotion.h"
+#include "RobotState.h"
 
 class Pelvis : Shape
 {
     public:
-        Pelvis(BodyDimensions& dimensions);
+        Pelvis(BodyDimensions& dimensions, RobotState& robotState);
         void Initialise() override;
         void Shutdown();
         
-        void Update(float dt, Emotion emotion);
+        void Update(float dt);
         void Draw() const;
         
         void SetTransform(MyTransform parentTransform);
@@ -1092,6 +1141,8 @@ class Pelvis : Shape
     private:
         BodyDimensions& dimensions;
         Vector2 positionOffset;
+
+        RobotState& robotState;
         
         Legs legs;
 };
@@ -1220,32 +1271,6 @@ struct DrawGeometry
     // Local pixel position of the transform pivot measured from the
     // drawable's top-left corner, using Raylib's screen-space origin rules.
     Vector2 origin = {0.0f, 0.0f};
-};
-
-
-=====================================
-.\include\Emotion.h
-=====================================
-
-#pragma once
-
-
-//====================================================
-// Emotion
-//
-// High-level emotional states used by RobotBrain
-// to control Tingo's facial expressions and behaviour.
-//====================================================
-
-enum class Emotion
-{
-    Neutral,
-    Happy,
-    Sad,
-    Angry,
-    Surprised,
-
-    Count
 };
 
 
@@ -1421,10 +1446,10 @@ class Object : public Shape
 #pragma once
 
 #include "RobotBrain.h"
-#include "Emotion.h"
 #include "Body/Body.h"
 #include "BodyDimensions.h"
 #include "MyTransform.h"
+#include "RobotState.h"
 
 class Robot
 {
@@ -1437,17 +1462,20 @@ public:
     void Draw() const;
     
     void SetTransform(MyTransform transform);
-    
-    void SetEmotion(Emotion emotion);
-    Emotion GetEmotion();
 
-    void NextState();
-    void NextEmotion();
+    void CycleState();
+    void CycleEmotion();
+    void ToggleSpeaking();
+    void ToggleGesture(std::string gesture);
+   
+    RobotState::Gestures& GetGestures();
     
 private:
     BodyDimensions dimensions;
     MyTransform transform;
    
+    RobotState robotState;
+
     Body body;
     RobotBrain robotBrain;
 };
@@ -1459,7 +1487,7 @@ private:
 
 #pragma once
 
-#include "Emotion.h"
+#include "RobotState.h"
 
 class Robot;
 
@@ -1467,36 +1495,61 @@ class RobotBrain
 {
     public:
 
-        enum class State
-        {
-            Idle,
-            Speaking,
-            Thinking,
-            Listening,
-            Reacting,
-
-            Count
-        };
-        static const char* RobotStateToString(State state);
-        static const char* EmotionToString(Emotion emotion);
-        void NextEmotion();
-        void NextState();
-
-        RobotBrain(Robot& robot);
+        RobotBrain(Robot& robot, RobotState& robotState);
 
         void Update(float dt);
-
-        void SetState(State newState);
-        
-        void SetEmotion(Emotion newEmotion);
-        Emotion GetEmotion();
-
         void Draw() const;
         
     private:
         Robot& robot;
-        State state;
-        Emotion emotion;
+        RobotState& robotState;
+};
+
+
+=====================================
+.\include\RobotState.h
+=====================================
+
+#pragma once
+
+class RobotState
+{
+    public:
+        struct Gestures
+        {
+            bool idle = false;
+            bool nod = false;
+            bool shakeHead = false;
+            bool waveLeft = false;
+            bool waveRight = false;
+            bool kickLeft = false;
+            bool kickRight = false;
+            bool jump = false;
+            bool shrug = false;
+            bool celebrate = false;
+            bool crouch = false;
+        };
+        Gestures gestures;
+
+        enum class State
+        {
+            Idle,
+            Thinking,
+            Listening,
+            Reacting
+        };
+        State state = State::Idle;
+        bool speaking = false;
+
+        enum class Emotions
+        {
+            Idle,
+            Happy,
+            Sad,
+            Angry,
+            Surprised
+        };
+        Emotions emotion = Emotions::Idle;
 };
 
 
@@ -1990,10 +2043,11 @@ void Animation::Stop()
 
 #include "Body/Arms/Arms.h"
 
-Arms::Arms(BodyDimensions& dimensions)
-    : dimensions(dimensions),
-      leftShoulder(dimensions, "left"),
-      rightShoulder(dimensions, "right")
+Arms::Arms(BodyDimensions& dimensions, RobotState& robotState) : 
+    dimensions(dimensions),
+    robotState(robotState),
+    leftShoulder(dimensions, "left", robotState),
+    rightShoulder(dimensions, "right", robotState)
 {
 }
 
@@ -2007,20 +2061,12 @@ void Arms::Shutdown()
 {
 }
 
-void Arms::Update(float dt, Emotion emotion)
+void Arms::Update(float dt)
 {
-    leftShoulder.Update(dt, emotion);
-    rightShoulder.Update(dt, emotion);
+    WaveArm();
 
-    if(swingLeftArm)
-    {
-        leftShoulder.SwingArm(dt, 0, 180);
-    }
-
-    if(swingRightArm)
-    {
-        rightShoulder.SwingArm(dt, 0, 180);
-    }
+    leftShoulder.Update(dt);
+    rightShoulder.Update(dt);
 }
 
 void Arms::Draw() const 
@@ -2035,24 +2081,15 @@ void Arms::SetTransform(MyTransform parentTransform)
     rightShoulder.SetTransform(parentTransform);
 }
 
-void Arms::SwingArm(std::string side, bool swing)
+void Arms::WaveArm()
 {
-    if(side == "left" && swing)
-    {
-        swingLeftArm = true;
-    }
-    else if(side == "left" && !swing)
-    {
-        swingLeftArm = false;
+    if(robotState.gestures.waveRight) {
+        rightShoulder.WaveArm();
     }
 
-    if(side == "right" && swing)
+    if(robotState.gestures.waveLeft)
     {
-        swingRightArm = true;
-    }
-    else if(side == "right" && !swing)
-    {
-        swingRightArm = false;
+        leftShoulder.WaveArm();
     }
 }
 
@@ -2065,11 +2102,17 @@ void Arms::SwingArm(std::string side, bool swing)
 #include <cmath>
 #include <iostream>
 
-Elbow::Elbow(BodyDimensions& dimensions, std::string side) :
+Elbow::Elbow
+(
+    BodyDimensions& dimensions, 
+    std::string side,
+    RobotState& robotState
+) :
     Shape(CARDBOARD_DARK),
     dimensions(dimensions),
+    robotState(robotState),
     side(side),
-    foreArm(dimensions, side)
+    foreArm(dimensions, side, robotState)
 {}
 
 void Elbow::Initialise()
@@ -2093,9 +2136,9 @@ void Elbow::Initialise()
     foreArm.Initialise();
 }
 
-void Elbow::Update(float dt, Emotion emotion)
+void Elbow::Update(float dt)
 {
-    foreArm.Update(dt, emotion);
+    foreArm.Update(dt);
 }
 
 void Elbow::Draw() const 
@@ -2113,6 +2156,11 @@ void Elbow::SetTransform(MyTransform parentTransform)
     foreArm.SetTransform(transform);
 }
 
+void Elbow::WaveArm()
+{
+    foreArm.WaveArm();
+}
+
 
 =====================================
 .\src\body\Arms\ForeArm.cpp
@@ -2120,11 +2168,17 @@ void Elbow::SetTransform(MyTransform parentTransform)
 
 #include "Body/Arms/ForeArm.h"
 
-ForeArm::ForeArm(BodyDimensions& dimensions, std::string side) :
+ForeArm::ForeArm
+(
+    BodyDimensions& dimensions, 
+    std::string side,
+    RobotState& robotState
+) :
 	Shape(CARDBOARD_LIGHT),
     dimensions(dimensions),
+    robotState(robotState),
 	side(side),
-	hand(dimensions, side)
+	hand(dimensions, side, robotState)
 {}
 
 void ForeArm::Initialise()
@@ -2150,9 +2204,14 @@ void ForeArm::Initialise()
 }
 
 
-void ForeArm::Update(float dt, Emotion emotion)
+void ForeArm::Update(float dt)
 {
-    hand.Update(dt, emotion);
+    if(waveState != WaveState::None)
+    {
+        AdvanceWave(dt);
+    }
+
+    hand.Update(dt);
 }
 
 void ForeArm::Draw() const 
@@ -2163,15 +2222,96 @@ void ForeArm::Draw() const
 
 void ForeArm::SetTransform(MyTransform parentTransform)
 {
+    tempParentTransform = parentTransform;
+
     Shape::transform = MakeChildTransform(parentTransform, positionOffset);
-
-    float angle = -20.0f;
-    if(side == "left") angle = 20.0f; 
-    Shape::transform.rotation += angle;
-
+    Shape::transform.rotation += localRotation;
     Shape::SetScreenCoords();
 
     hand.SetTransform(Shape::transform);
+}
+
+void ForeArm::WaveArm()
+{
+    if(waveState == WaveState::None)
+    {
+        waveState = WaveState::Raising;
+    }
+}
+
+void ForeArm::AdvanceWave(float dt)
+{
+    if(side == "left")
+    {
+        const float speed = 400.0f;
+        const float minRotation = 0.0f;
+        const float maxRotation = 90.0f;
+        
+        if(waveState == WaveState::Raising)
+        {
+            localRotation += speed * dt;
+            
+            if(localRotation >= maxRotation)
+            {
+                localRotation = maxRotation;
+                waveState = WaveState::Lowering;
+            }
+        }
+        else if(waveState == WaveState::Lowering)
+        {
+            localRotation -= speed * dt;
+
+            if(localRotation <= minRotation)
+            {
+                localRotation = minRotation;
+                
+                if(robotState.gestures.waveLeft)
+                {
+                    waveState = WaveState::Raising;
+                }
+                else {
+                    waveState = WaveState::None;
+                }
+            }
+        }
+    }
+
+    if(side == "right")
+    {
+        const float speed = 400.0f;
+        const float minRotation = 0.0f;
+        const float maxRotation = -90.0f;
+
+        if(waveState == WaveState::Raising)
+        {
+            localRotation -= speed * dt;
+            
+            if(localRotation <= maxRotation)
+            {
+                localRotation = maxRotation;
+                waveState = WaveState::Lowering;
+            }
+        }
+        else if(waveState == WaveState::Lowering)
+        {
+            localRotation += speed * dt;
+
+            if(localRotation >= minRotation)
+            {
+                localRotation = minRotation;
+                
+                if(robotState.gestures.waveRight)
+                {
+                    waveState = WaveState::Raising;
+                }
+                else {
+                    waveState = WaveState::None;
+                }
+            }
+        }
+    }
+
+    SetTransform(tempParentTransform);
 }
 
 
@@ -2181,9 +2321,15 @@ void ForeArm::SetTransform(MyTransform parentTransform)
 
 #include "Body/Arms/Hand.h"
 
-Hand::Hand(BodyDimensions& dimensions, std::string side) :
+Hand::Hand
+(
+    BodyDimensions& dimensions, 
+    std::string side,
+    RobotState& robotState
+) :
 	Shape(CARDBOARD_DARK),
     dimensions(dimensions),
+    robotState(robotState),
 	side(side)
 {}
 
@@ -2207,7 +2353,7 @@ void Hand::Initialise()
 }
 
 float r = 0.0f;
-void Hand::Update(float dt, Emotion emotion)
+void Hand::Update(float dt)
 {
     r += dt*50.0;
 }
@@ -2234,13 +2380,17 @@ void Hand::SetTransform(MyTransform parentTransform)
 #include <iostream>
 #include "raymath.h"
 
-// Construct a shoulder using the shared body dimensions
-// and the side of the body that the shoulder belongs to.
-Shoulder::Shoulder(BodyDimensions& dimensions, std::string side) :
+Shoulder::Shoulder
+(
+    BodyDimensions& dimensions, 
+    std::string side,
+    RobotState& robotState
+) :
     Shape(CARDBOARD_DARK),
     dimensions(dimensions),
+    robotState(robotState),
     side(side),
-    upperArm(dimensions, side)
+    upperArm(dimensions, side, robotState)
 {
 }
 
@@ -2268,8 +2418,6 @@ void Shoulder::Initialise()
             -dimensions.bodyWidth / 2.0f - dimensions.shoulderWidth / 2.0f,
             dimensions.bodyHeight / 2.0f - dimensions.shoulderHeight / 2.0f
         };
-
-        Shape::SetShapeName("rightShoulder");
     }
 
     drawGeometry.origin = {
@@ -2281,9 +2429,9 @@ void Shoulder::Initialise()
 }
 
 // Update the shoulder and its child upper arm.
-void Shoulder::Update(float dt, Emotion emotion)
+void Shoulder::Update(float dt)
 {
-    upperArm.Update(dt, emotion);
+    upperArm.Update(dt);
 }
 
 void Shoulder::Draw() const 
@@ -2301,13 +2449,9 @@ void Shoulder::SetTransform(MyTransform parentTransform)
     upperArm.SetTransform(transform);
 }
 
-void Shoulder::SwingArm(
-    float dt,
-    float swingMinAngle,
-    float swingMaxAngle
-)
+void Shoulder::WaveArm()
 {
-    upperArm.SwingArm(dt, swingMinAngle, swingMaxAngle);
+    upperArm.WaveArm();
 }
 
 
@@ -2317,16 +2461,24 @@ void Shoulder::SwingArm(
 
 #include "Body/Arms/UpperArm.h"
 #include "Constants.h"
+#include "raylib.h"
 #include <cmath>
 #include <iostream>
+#include <string>
 
 // Construct the upper arm using the shared body dimensions
 // and the side of the body that the arm belongs to.
-UpperArm::UpperArm(BodyDimensions& dimensions, std::string side) :
+UpperArm::UpperArm
+(
+    BodyDimensions& dimensions, 
+    std::string side, 
+    RobotState& robotState
+) :
     Shape(CARDBOARD_LIGHT),
     dimensions(dimensions),
+    robotState(robotState),
     side(side),
-    elbow(dimensions, side)
+    elbow(dimensions, side, robotState)
 {
 }
 
@@ -2350,86 +2502,119 @@ void UpperArm::Initialise()
     };
 
     elbow.Initialise();
-
-    if(side == "left") {Shape::SetShapeName("leftUpperArm");}
-    if(side == "right") {Shape::SetShapeName("rightUpperArm");}
 }
 
-// Update the upper arm and its child elbow.
-void UpperArm::Update(float dt, Emotion emotion)
+void UpperArm::Update(float dt)
 {
-    elbow.Update(dt, emotion);
+    if(waveState != WaveState::None)
+    {
+        AdvanceWave(dt);
+    }
+
+    elbow.Update(dt);
 }
 
-
-// Draw the upper arm.
 void UpperArm::Draw() const
 {
     Shape::Draw();
     elbow.Draw();
 }
 
-
-// Swing the upper arm between the supplied minimum
-// and maximum angles.
-void UpperArm::SwingArm(
-    float dt,
-    float swingMinAngle,
-    float swingMaxAngle
-)
-{
-    // Advance the animation timer.
-    swingTime += dt * SWING_SPEED;
-
-    // Keep the timer inside one complete sine-wave cycle.
-    if (swingTime >= 2.0f * PI)
-    {
-        swingTime -= 2.0f * PI;
-    }
-
-    // sinf() produces a value between -1 and +1.
-    //
-    // Convert that into a value between 0 and 1.
-    //
-    // This gives us a percentage that represents where we are
-    // between the minimum and maximum swing angles.
-    float unitAngle = 0;
-
-    // The left arm uses the normal direction of the sine wave.
-    if(side == "left")
-    {
-        unitAngle = (sinf(swingTime) + 1.0f) / 2.0f;
-    }
-
-    // The right arm swings in the opposite direction.
-    if(side == "right")
-    {
-        unitAngle = -(sinf(swingTime) + 1.0f) / 2.0f;
-    }
-
-    // Convert the 0-to-1 value into the requested angle range.
-    //
-    // For example:
-    //
-    //     unitAngle = 0   -> swingMinAngle
-    //     unitAngle = 0.5 -> halfway between the two
-    //     unitAngle = 1   -> swingMaxAngle
-    //
-    // The result becomes the arm's local rotation.
-    localRotation =
-        swingMinAngle +
-        unitAngle * (swingMaxAngle - swingMinAngle);
-}
-
-
 void UpperArm::SetTransform(MyTransform parentTransform)
-{
+{   
+    tempParentTransform = parentTransform;
+
     Shape::transform = MakeChildTransform(parentTransform, positionOffset);
     Shape::transform.rotation += localRotation;
 
     Shape::SetScreenCoords();
 
     elbow.SetTransform(Shape::transform);
+}
+
+void UpperArm::WaveArm()
+{
+    if(waveState == WaveState::None)
+    {
+        waveState = WaveState::Raising;
+    }
+}
+
+void UpperArm::AdvanceWave(float dt)
+{
+    if(side == "left")
+    {
+        const float speed = 250.0f;
+        const float minRotation = 0.0f;
+        const float maxRotation = 120.0f;
+
+        if(waveState == WaveState::Raising)
+        {
+            localRotation += speed * dt;
+            
+            if(localRotation >= maxRotation)
+            {
+                localRotation = maxRotation;
+                waveState = WaveState::Waving;
+                elbow.WaveArm();
+            }
+        }
+        else if(waveState == WaveState::Waving)
+        {
+            if(!robotState.gestures.waveLeft)
+            {
+                waveState = WaveState::Lowering;
+            }
+        }
+        else if(waveState == WaveState::Lowering)
+        {
+            localRotation -= speed * dt;
+
+            if(localRotation <= minRotation)
+            {
+                localRotation = minRotation;
+                waveState = WaveState::None;
+            }
+        }
+    }
+
+    if(side == "right")
+    {
+        const float speed = 250.0f;
+        const float minRotation = 0.0f;
+        const float maxRotation = -120.0f;
+
+        if(waveState == WaveState::Raising)
+        {
+            localRotation -= speed * dt;
+            
+            if(localRotation <= maxRotation)
+            {
+                localRotation = maxRotation;
+                waveState = WaveState::Waving;
+                elbow.WaveArm();
+            }
+        }
+        else if(waveState == WaveState::Waving)
+        {
+            if(!robotState.gestures.waveRight)
+            {
+                waveState = WaveState::Lowering;
+            }
+        }
+        else if(waveState == WaveState::Lowering)
+        {
+            localRotation += speed * dt;
+
+            if(localRotation >= minRotation)
+            {
+                localRotation = minRotation;
+                waveState = WaveState::None;
+            }
+        }
+    }
+
+    SetTransform(tempParentTransform);
 }
 
 
@@ -2439,14 +2624,14 @@ void UpperArm::SetTransform(MyTransform parentTransform)
 
 #include "Body/Body.h"
 #include <cmath>
-#include "Emotion.h"
 
-Body::Body(BodyDimensions& dimensions) :
+Body::Body(BodyDimensions& dimensions, RobotState& robotState) :
     dimensions(dimensions),
+    robotState(robotState),
     bodyBase(dimensions),
-    neck(dimensions),
-    pelvis(dimensions),
-    arms(dimensions)
+    neck(dimensions, robotState),
+    pelvis(dimensions, robotState),
+    arms(dimensions, robotState)
 {}
 
 void Body::Initialise()
@@ -2464,11 +2649,16 @@ void Body::Shutdown()
     pelvis.Shutdown();
 }
 
-void Body::Update(float dt, Emotion emotion)
+void Body::Update(float dt)
 {
-    neck.Update(dt, emotion);
-    arms.Update(dt, emotion);
-    pelvis.Update(dt, emotion);
+    if(robotState.gestures.crouch)
+    {
+        Crouch();
+    }
+
+    neck.Update(dt);
+    arms.Update(dt);
+    pelvis.Update(dt);
 }
 
 void Body::Draw() const
@@ -2479,14 +2669,29 @@ void Body::Draw() const
     pelvis.Draw();
 }
 
-void Body::SetTransform(MyTransform transform)
+void Body::SetTransform(MyTransform parentTransform)
 {
-    this->transform = transform;
+    transform = parentTransform;
+    tempParentTransform = parentTransform;
 
     bodyBase.SetTransform(this->transform);
     neck.SetTransform(this->transform);
     arms.SetTransform(this->transform);
     pelvis.SetTransform(this->transform);
+}
+
+void Body::Crouch()
+{
+    if(crouchState != CrouchState::None)
+    {
+        crouchState = CrouchState::Lowering;
+    }
+}
+
+void Body::AdvanceCrouch(float dt)
+{
+
+    SetTransform(tempParentTransform);
 }
 
 
@@ -2553,9 +2758,10 @@ void BodyBase::SetTransform(MyTransform parentTransform)
 
 #include "Body/Legs/Foot.h"
 
-Foot::Foot(BodyDimensions& dimensions, std::string side) :
+Foot::Foot(BodyDimensions& dimensions, std::string side, RobotState& robotState) :
 	Shape(CARDBOARD_DARK),
 	dimensions(dimensions),
+	robotState(robotState),
 	side(side)
 
 {}
@@ -2596,7 +2802,7 @@ void Foot::Initialise()
 }
 
 float kjhr = 0;
-void Foot::Update(float dt, Emotion emotion)
+void Foot::Update(float dt)
 {
 	kjhr *= dt;
 }
@@ -2620,11 +2826,12 @@ void Foot::SetTransform(MyTransform parentTransform)
 #include "Constants.h"
 
 // Load the head sprite and initialise its animation.
-Knee::Knee(BodyDimensions& dimensions, std::string side) :
+Knee::Knee(BodyDimensions& dimensions, std::string side, RobotState& robotState) :
     Shape(CARDBOARD_DARK),
     dimensions(dimensions),
+    robotState(robotState),
     side(side),
-    shin(dimensions, side)
+    shin(dimensions, side, robotState)
 {}
 
 void Knee::Initialise()
@@ -2659,9 +2866,9 @@ void Knee::Initialise()
     shin.Initialise();
 }
 
-void Knee::Update(float dt, Emotion emotion)
+void Knee::Update(float dt)
 {
-    shin.Update(dt, emotion);
+    shin.Update(dt);
 }
 
 void Knee::Draw() const
@@ -2686,10 +2893,11 @@ void Knee::SetTransform(MyTransform parentTransform)
 
 #include "Body/Legs/Legs.h"
 
-Legs::Legs(BodyDimensions& dimensions) :
+Legs::Legs(BodyDimensions& dimensions, RobotState& robotState) :
     dimensions(dimensions),
-    rightThigh(dimensions, "right"),
-    leftThigh(dimensions, "left")
+    robotState(robotState),
+    rightThigh(dimensions, "right", robotState),
+    leftThigh(dimensions, "left", robotState)
 {}
 
 void Legs::Initialise()
@@ -2703,10 +2911,10 @@ void Legs::Shutdown()
    
 }
 
-void Legs::Update(float dt, Emotion emotion)
+void Legs::Update(float dt)
 {
-    leftThigh.Update(dt, emotion);
-    rightThigh.Update(dt, emotion);
+    leftThigh.Update(dt);
+    rightThigh.Update(dt);
 }
 
 void Legs::Draw() const
@@ -2729,11 +2937,12 @@ void Legs::SetTransform(MyTransform parentTransform)
 
 #include "Body/Legs/Shin.h"
 
-Shin::Shin(BodyDimensions& dimensions, std::string side) :
+Shin::Shin(BodyDimensions& dimensions, std::string side, RobotState& robotState) :
 	Shape(CARDBOARD),
 	dimensions(dimensions),
+    robotState(robotState),
 	side(side),
-	foot(dimensions, side)
+    foot(dimensions, side, robotState)
 {}
 
 void Shin::Initialise()
@@ -2768,9 +2977,9 @@ void Shin::Initialise()
 	foot.Initialise();
 }
 
-void Shin::Update(float dt, Emotion emotion)
+void Shin::Update(float dt)
 {
-    foot.Update(dt, emotion);
+    foot.Update(dt);
 }
 
 void Shin::Draw() const
@@ -2782,12 +2991,6 @@ void Shin::Draw() const
 void Shin::SetTransform(MyTransform parentTransform)
 {
     Shape::transform = MakeChildTransform(parentTransform, positionOffset);
-
-	float angle = 20.0f;
-    if(side == "left") angle = -20.0f;
-
-    Shape::transform.rotation += angle;
-
     Shape::SetScreenCoords();
 
 	foot.SetTransform(Shape::transform);
@@ -2803,11 +3006,12 @@ void Shin::SetTransform(MyTransform parentTransform)
 #include <string>
 
 // Load the head sprite and initialise its animation.
-Thigh::Thigh(BodyDimensions& dimensions, std::string side) :
+Thigh::Thigh(BodyDimensions& dimensions, std::string side, RobotState& robotState) :
     Shape(CARDBOARD),
     dimensions(dimensions),
+    robotState(robotState),
     side(side),
-    knee(dimensions, side)
+    knee(dimensions, side, robotState)
 {}
 
 void Thigh::Initialise()
@@ -2845,9 +3049,9 @@ void Thigh::Initialise()
     knee.Initialise();
 }
 
-void Thigh::Update(float dt, Emotion emotion)
+void Thigh::Update(float dt)
 {
-    knee.Update(dt, emotion);
+    knee.Update(dt);
 }
 
 void Thigh::Draw() const
@@ -2859,11 +3063,6 @@ void Thigh::Draw() const
 void Thigh::SetTransform(MyTransform parentTransform)
 {
     Shape::transform = MakeChildTransform(parentTransform, positionOffset);
-    
-    float angle = -20.0f;
-    if(side == "left") angle = 20.0f; 
-    Shape::transform.rotation += angle;
-
     Shape::SetScreenCoords();
 
     knee.SetTransform(Shape::transform);
@@ -2877,11 +3076,12 @@ void Thigh::SetTransform(MyTransform parentTransform)
 #include "Body/Neck.h"
 #include "raylib.h"
 
-Neck::Neck(BodyDimensions& dimensions) :
+Neck::Neck(BodyDimensions& dimensions, RobotState& robotState) :
     Shape(CARDBOARD_DARK),
     dimensions(dimensions),
     positionOffset(),
-    head(dimensions)
+    robotState(robotState),
+    head(dimensions, robotState)
 {
 }
 
@@ -2908,8 +3108,8 @@ void Neck::Initialise()
     Shape::SetShapeName("neck");
 }
 
-void Neck::Update(float dt, Emotion emotion) {
-    head.Update(dt, emotion);
+void Neck::Update(float dt) {
+    head.Update(dt);
 }
 
 void Neck::Draw() const
@@ -2926,11 +3126,6 @@ void Neck::SetTransform(MyTransform parentTransform)
     head.SetTransform(transform);
 }
 
-Head& Neck::GetHead()
-{
-    return head;
-}
-
 void Neck::Shutdown()
 {
     head.Shutdown();
@@ -2944,9 +3139,10 @@ void Neck::Shutdown()
 #include "Body/Pelvis.h"
 #include "raymath.h"
 
-Pelvis::Pelvis(BodyDimensions& dimensions) :
+Pelvis::Pelvis(BodyDimensions& dimensions, RobotState& robotState) :
     dimensions(dimensions),
-    legs(dimensions)
+    robotState(robotState),
+    legs(dimensions, robotState)
 {}
 void Pelvis::Initialise()
 {
@@ -2969,9 +3165,9 @@ void Pelvis::Initialise()
     };
 }
 
-void Pelvis::Update(float dt, Emotion emotion)
+void Pelvis::Update(float dt)
 {
-    legs.Update(dt, emotion);
+    legs.Update(dt);
 }
 
 void Pelvis::Draw() const 
@@ -3031,7 +3227,6 @@ void Pelvis::Shutdown()
 
 #include "Game.h"
 #include "Constants.h"
-#include "Emotion.h"
 #include "MyTransform.h"
 
 
@@ -3062,32 +3257,28 @@ void Game::Initialise()
 
 void Game::HandleInput()
 {
+	if (input.S_Pressed()) robot.CycleState();
+	if (input.E_Pressed()) robot.CycleEmotion();
+	if (input.G_Pressed()) robot.ToggleSpeaking();
 
-	/*Neutral,
-    Happy,
-    Sad,
-    Angry,
-    Surprised*/
-	//Emotion remote control
-	
-	if(input.S_Pressed())
-	{
-		robot.NextState();
-	}
-
-	if(input.E_Pressed()) 
-	{
-		robot.NextEmotion();
-	}
+	if (IsKeyPressed(KEY_ONE)) robot.ToggleGesture("idle");
+	if (IsKeyPressed(KEY_TWO)) robot.ToggleGesture("nod");
+	if (IsKeyPressed(KEY_THREE)) robot.ToggleGesture("shakeHead");
+	if (IsKeyPressed(KEY_FOUR)) robot.ToggleGesture("waveLeft");
+	if (IsKeyPressed(KEY_FIVE)) robot.ToggleGesture("waveRight");
+	if (IsKeyPressed(KEY_SIX)) robot.ToggleGesture("kickLeft");
+	if (IsKeyPressed(KEY_SEVEN)) robot.ToggleGesture("kickRight");
+	if (IsKeyPressed(KEY_EIGHT)) robot.ToggleGesture("jump");
+	if (IsKeyPressed(KEY_NINE)) robot.ToggleGesture("shrug");
+	if (IsKeyPressed(KEY_ZERO)) robot.ToggleGesture("celebrate");
+	if (IsKeyPressed(KEY_C)) robot.ToggleGesture("crouch");
 }
 
-// Update the game state.
 void Game::Update(const float dt)
 {	
 	robot.Update(dt);
 }
 
-// Draw the current frame.
 void Game::Draw()
 {
 	ClearBackground(BLACK);
@@ -3148,7 +3339,9 @@ void Game::Run()
 #include "Body/Head/Antenna.h"
 #include "Constants.h"
 
-Antenna::Antenna(BodyDimensions& dimensions) : dimensions(dimensions)
+Antenna::Antenna(BodyDimensions& dimensions, RobotState& robotState) :
+    dimensions(dimensions),
+    robotState(robotState)
 {}
 
 void Antenna::Initialise()
@@ -3186,22 +3379,9 @@ void Antenna::Initialise()
     };
 }
 
-void Antenna::Update(float dt, Emotion emotion)
+void Antenna::Update(float dt)
 {
     Sprite::Update(dt);
-
-    /*
-    //Idle behavior
-    //Wiggle the antenna at random intervals
-    antennaAnimationTimer += dt;
-
-    if (antennaAnimationTimer > nextAntennaAnimation)
-    {
-        animation.Play(0, 7, AnimationPriority::Idle);
-        antennaAnimationTimer = 0.0f;
-        nextAntennaAnimation = GetRandomValue(1000, 5000) / 1000.0f;
-    }
-    */
 }
 
 void Antenna::SetTransform(MyTransform parentTransform)
@@ -3215,19 +3395,12 @@ void Antenna::SetTransform(MyTransform parentTransform)
 .\src\head\Ears.cpp
 =====================================
 
-//====================================================
-// Ears.cpp
-//
-// Handles the robot's ear sprites and animation.
-// The ears can play a short wiggle animation when
-// triggered.
-//====================================================
-
 #include "Body/Head/Ears.h"
 #include "Constants.h"
 
-Ears::Ears(BodyDimensions& dimensions) : 
-    dimensions(dimensions)
+Ears::Ears(BodyDimensions& dimensions, RobotState& robotState) :
+    dimensions(dimensions),
+    robotState(robotState)
 {}
 
 void Ears::Initialise()
@@ -3262,19 +3435,9 @@ void Ears::Initialise()
     };
 }
 
-void Ears::Update(float dt, Emotion emotion)
+void Ears::Update(float dt)
 {
     Sprite::Update(dt);
-
-    /*
-    idleAnimationTimer += dt;
-
-    if(idleAnimationTimer > nextIdleAnimation)
-    { 
-        animation.Play(0, 4, AnimationPriority::Idle);
-        idleAnimationTimer = 0.0f;
-        nextIdleAnimation = GetRandomValue(1000, 5000) / 1000.0f;
-    }*/
 }
 
 void Ears::SetTransform(MyTransform parentTransform)
@@ -3288,19 +3451,12 @@ void Ears::SetTransform(MyTransform parentTransform)
 .\src\head\Eyebrows.cpp
 =====================================
 
-//====================================================
-// Eyebrows.cpp
-//
-// Handles the robot's eyebrow sprites and animation.
-// The eyebrows can play idle and emotional animations.
-//====================================================
-
 #include "Body/Head/Eyebrows.h"
 #include "Constants.h"
-#include "Emotion.h"
 
-Eyebrows::Eyebrows(BodyDimensions& dimensions) : 
-    dimensions(dimensions)
+Eyebrows::Eyebrows(BodyDimensions& dimensions, RobotState& robotState) :
+    dimensions(dimensions),
+    robotState(robotState)
 {}
 
 void Eyebrows::Initialise()
@@ -3338,74 +3494,9 @@ void Eyebrows::Initialise()
     };
 }
 
-void Eyebrows::Update(float dt, Emotion emotion)
+void Eyebrows::Update(float dt)
 {
     Sprite::Update(dt);
-
-    /*
-    // Speaking and happiness both use the expressive eyebrow animation.
-    bool happy = speaking || emotion == Emotion::Happy;
-
-    // Start the happy animation immediately when entering the happy state.
-    if (happy && !wasHappy)
-    {
-        animation.Play(2, 3, AnimationPriority::Emotion);
-
-        // Reset the timer and choose a random delay before the next wiggle.
-        happyAnimationTimer = 0.0f;
-        nextHappyAnimation = GetRandomValue(1000, 5000) / 1000.0f;
-
-        wasHappy = true;
-        return;
-    }
-
-    // While happy, occasionally repeat the eyebrow wiggle.
-    if (happy)
-    {
-        animation.Play(2, 3, AnimationPriority::Emotion);
-
-        happyAnimationTimer += dt;
-
-        if (happyAnimationTimer > nextHappyAnimation)
-        {
-    
-            // Reset the timer and choose a new random interval.
-            happyAnimationTimer = 0.0f;
-            nextHappyAnimation =
-                GetRandomValue(1000, 5000) / 1000.0f;
-        }
-
-        return;
-    }
-
-    // Restore the idle animation when the happy state ends.
-    if (wasHappy)
-    {
-        animation.Stop();
-        animation.Play(0, 1, AnimationPriority::Idle);
-
-        // Reset the idle timer so the next idle animation is delayed.
-        idleAnimationTimer = 0.0f;
-        nextIdleAnimation =
-            GetRandomValue(1000, 5000) / 1000.0f;
-
-        wasHappy = false;
-        return;
-    }
-
-    // In the neutral state, occasionally play a small idle movement.
-    idleAnimationTimer += dt;
-
-    if (idleAnimationTimer > nextIdleAnimation)
-    {
-        animation.Stop();
-        animation.Play(0, 1, AnimationPriority::Idle);
-
-        // Reset the timer and randomise the next idle movement.
-        idleAnimationTimer = 0.0f;
-        nextIdleAnimation =
-            GetRandomValue(1000, 5000) / 1000.0f;
-    }*/
 }
 
 void Eyebrows::SetTransform(MyTransform parentTransform) 
@@ -3432,9 +3523,10 @@ void Eyebrows::SetTransform(MyTransform parentTransform)
 #include "Constants.h"
 #include <cmath>
 
-Eyes::Eyes(BodyDimensions& dimensions) : 
+Eyes::Eyes(BodyDimensions& dimensions, RobotState& robotState) :
     dimensions(dimensions),
-    pupils(dimensions)
+    robotState(robotState),
+    pupils(dimensions, robotState)
 {
 }
 
@@ -3476,20 +3568,20 @@ void Eyes::Initialise()
     pupils.Initialise();
 }
 
-void Eyes::Update(float dt, Emotion emotion)
+void Eyes::Update(float dt)
 {
     Sprite::Update(dt);
 
-    idleAnimationTimer += dt;
+    blinkAnimationTimer += dt;
     
-    if(idleAnimationTimer > nextIdleAnimation)
+    if(blinkAnimationTimer > nextBlinkAnimation)
     {
         animation.Play(0, 4, AnimationPriority::Idle);
-        idleAnimationTimer = 0.0f;
-        nextIdleAnimation = GetRandomValue(1000, 5000) / 1000.0f;
+        blinkAnimationTimer = 0.0f;
+        nextBlinkAnimation = GetRandomValue(1000, 5000) / 1000.0f;
     }
 
-    pupils.Update(dt, emotion);
+    pupils.Update(dt);
 }
 
 void Eyes::Draw() const
@@ -3548,19 +3640,19 @@ void Eyes::Shutdown()
 //====================================================
 
 #include "Body/Head/Head.h"
-#include "Emotion.h"
 #include <cmath>
 
 // Initialise the head's transform and idle animation state.
-Head::Head(BodyDimensions& dimensions) :
+Head::Head(BodyDimensions& dimensions, RobotState& robotState) :
     dimensions(dimensions),
-    headBase(dimensions),
-    eyes(dimensions),
-    antenna(dimensions),
-    ears(dimensions),
-    eyebrows(dimensions),
-    mouth(dimensions),
-    nose(dimensions)
+    robotState(robotState),
+    headBase(dimensions, robotState),
+    eyes(dimensions, robotState),
+    antenna(dimensions, robotState),
+    ears(dimensions, robotState),
+    eyebrows(dimensions, robotState),
+    mouth(dimensions, robotState),
+    nose(dimensions, robotState)
 {
 }
 
@@ -3595,14 +3687,24 @@ void Head::Shutdown()
 }
 
 // Update every animated head component.
-void Head::Update(float dt, Emotion emotion)
+void Head::Update(float dt)
 {
-    antenna.Update(dt, emotion);
-    ears.Update(dt, emotion);
-    eyebrows.Update(dt, emotion);
-    eyes.Update(dt, emotion);
-    mouth.UpdateMouth(dt, emotion);
-    nose.Update(dt, emotion);
+    if(robotState.gestures.nod)
+    {
+        Nod();
+    }
+
+    if(nodState != NodState::None)
+    {
+        AdvanceNod(dt);
+    }
+
+    antenna.Update(dt);
+    ears.Update(dt);
+    eyebrows.Update(dt);
+    eyes.Update(dt);
+    mouth.UpdateMouth(dt);
+    nose.Update(dt);
 }
 
 void Head::Draw() const
@@ -3618,7 +3720,11 @@ void Head::Draw() const
 
 void Head::SetTransform(MyTransform parentTransform)
 {
+    tempParentTransform = parentTransform;
+
     transform = MakeChildTransform(parentTransform, positionOffset);
+
+    transform.position.y += nodOffsetY;
 
     headBase.SetTransform(transform);
     eyes.SetTransform(transform);
@@ -3637,6 +3743,79 @@ void Head::LookAt(Vector2 point)
 void Head::LookForward()
 {
     eyes.GetPupils().LookForward();
+}
+
+void Head::Nod()
+{
+    if(nodState == NodState::None)
+    {
+        nodState = NodState::Raising;
+    }
+}
+
+void Head::AdvanceNod(float dt)
+{
+    const float speed = 250.0f;
+    const float minOffset = -30.0f;
+    const float maxOffset = 5.0f;
+
+    if(nodState == NodState::Raising)
+    {
+        nodOffsetY += speed * dt;
+
+        if(nodOffsetY >= maxOffset)
+        {
+            nodOffsetY = maxOffset;
+            nodState = NodState::Lowering;
+        }
+    }
+    else if(nodState == NodState::Lowering)
+    {
+        nodOffsetY -= speed * dt;
+
+        if(nodOffsetY <= minOffset)
+        {
+            nodOffsetY = minOffset;
+
+            if(robotState.gestures.nod)
+            {
+                nodState = NodState::Raising;
+            }
+            else
+            {
+                nodState = NodState::Returning;
+            }
+        }
+    }
+    else if(nodState == NodState::Returning)
+    {
+        if(nodOffsetY > 0.0f)
+        {
+            nodOffsetY -= speed * dt;
+
+            if(nodOffsetY <= 0.0f)
+            {
+                nodOffsetY = 0.0f;
+                nodState = NodState::None;
+            }
+        }
+        else if(nodOffsetY < 0.0f)
+        {
+            nodOffsetY += speed * dt;
+
+            if(nodOffsetY >= 0.0f)
+            {
+                nodOffsetY = 0.0f;
+                nodState = NodState::None;
+            }
+        }
+        else
+        {
+            nodState = NodState::None;
+        }
+    }
+
+    SetTransform(tempParentTransform);
 }
 
 
@@ -3658,8 +3837,9 @@ void Head::LookForward()
 #include "Constants.h"
 #include "raylib.h"
 
-Headbase::Headbase(BodyDimensions& dimensions) : 
-    dimensions(dimensions)
+Headbase::Headbase(BodyDimensions& dimensions, RobotState& robotState) :
+    dimensions(dimensions),
+    robotState(robotState)
 {}
 
 // Load the head sprite and initialise its animation.
@@ -3719,10 +3899,10 @@ void Headbase::SetTransform(MyTransform parentTransform)
 
 #include "Body/Head/Mouth.h"
 #include "Constants.h"
-#include "Emotion.h"
 
-Mouth::Mouth(BodyDimensions& dimensions) : 
-    dimensions(dimensions)
+Mouth::Mouth(BodyDimensions& dimensions, RobotState& robotState) :
+    dimensions(dimensions),
+    robotState(robotState)
 {}
 
 // Load the mouth sprite sheet and initialise its animation.
@@ -3733,6 +3913,7 @@ void Mouth::Initialise()
     const int COLUMNS = 3;
     const int ROWS = 1;
     const int TOTAL_FRAMES = COLUMNS * ROWS;
+    const float FRAME_DURATION = 0.5;
 
     dimensions.mouthWidth = texture.width / COLUMNS;
     dimensions.mouthHeight = texture.height / ROWS;
@@ -3761,36 +3942,9 @@ void Mouth::Initialise()
 }
 
 // Advance the mouth animation.
-void Mouth::UpdateMouth(float dt, Emotion emotion)
+void Mouth::UpdateMouth(float dt)
 {
     Update(dt);
-
-    /*
-    if (emotion == Emotion::Happy && !speaking)
-    {
-        frame = 0;
-        frameTimer = 0.0f;
-        animation.SetFrame(frame);
-        return;
-    }
-
-    if (!speaking)
-    {
-        frame = 1;
-        frameTimer = 0.0f;
-        animation.SetFrame(frame);
-        return;
-    }
-
-    //Animate mouth while speaking
-    frameTimer += dt;
-
-    if (frameTimer >= FRAME_DURATION)
-    {
-        frameTimer -= FRAME_DURATION;
-        frame = (frame == 1) ? 2 : 1;
-        animation.SetFrame(frame);
-    }*/
 }
 
 void Mouth::SetTransform(MyTransform parentTransform)
@@ -3804,52 +3958,15 @@ void Mouth::SetTransform(MyTransform parentTransform)
 .\src\head\Nose.cpp
 =====================================
 
-//====================================================
-// Nose.cpp
-//
-// Handles the robot's nose sprite and idle animations.
-//
-// The nose uses two levels of rotation:
-//
-// 1. Parent rotation:
-//    The nose position rotates around the body/head
-//    reference point, allowing it to follow the head
-//    when the head rotates.
-//
-// 2. Local rotation:
-//    The nose itself rotates around its own centre.
-//
-// The nose also has an independent horizontal wiggle
-// animation. The wiggle modifies the nose's local
-// local position offset while preserving its original position.
-//
-//====================================================
-
 #include "Body/Head/Nose.h"
 #include "Constants.h"
 #include <iostream>
 #include <cmath>
 
-Nose::Nose(BodyDimensions& dimensions) : dimensions(dimensions)
+Nose::Nose(BodyDimensions& dimensions, RobotState& robotState) :
+    dimensions(dimensions),
+    robotState(robotState)
 {}
-
-//====================================================
-// Initialise
-//====================================================
-//
-// Loads the nose texture and sets up its animation.
-//
-// The nose uses the anchor point supplied by the Head
-// as its parent rotation reference.
-//
-// localPositionOffset stores the nose's position relative to
-// that parent anchor point.
-//
-// homeAnchorPoint stores the original local offset.
-// This gives the wiggle animation a fixed position to
-// return to after the animation finishes.
-//
-//====================================================
 
 void Nose::Initialise()
 {
@@ -3883,136 +4000,12 @@ void Nose::Initialise()
         drawGeometry.width / 2.0f,
         drawGeometry.height / 2.0f
     };
-
-    homePosition = positionOffset;
 }
 
-//====================================================
-// Update
-//====================================================
-//
-// Updates the base Sprite animation and the nose's
-// independent idle animations.
-//
-// The nose has two independent idle behaviours:
-//
-// 1. Rotation:
-//    Occasionally rotates the nose through 360 degrees.
-//
-// 2. Wiggle:
-//    Occasionally moves the nose horizontally around
-//    its original local anchor position.
-//
-// localRotation is independent of the parent's rotation.
-//
-// rotation:
-//     Rotation inherited from the Head.
-//
-// localRotation:
-//     Additional rotation belonging only to the nose.
-//
-//====================================================
 
-void Nose::Update(float dt, Emotion emotion)
+void Nose::Update(float dt)
 {
     Sprite::Update(dt);
-    
-    /*
-    //================================================
-    // Nose Rotation Idle Animation
-    //================================================
-
-    // Count down until the next nose rotation.
-    nextNoseRotation -= dt;
-
-    if (nextNoseRotation <= 0.0f && !noseRotating)
-    {
-        // Start a new nose rotation.
-        noseRotating = true;
-
-        // Reset the rotation timer.
-        noseRotateTimer = 0.0f;
-
-        // Randomise the delay before the following rotation.
-        nextNoseRotation = (float)GetRandomValue(7, 12);
-    }
-
-    if (noseRotating)
-    {
-        // Track how long the rotation has been active.
-        noseRotateTimer += dt;
-
-        // Rotate the nose using a frame-rate independent
-        // speed defined by LOCAL_ROTATION_SPEED.
-        localRotation += LOCAL_ROTATION_SPEED * dt;
-
-        // Once a complete 360-degree rotation is reached,
-        // stop the idle animation and return to zero local
-        // rotation.
-        if (localRotation >= 360.0f)
-        {
-            noseRotating = false;
-            localRotation = 0;
-        }
-    }
-
-    //================================================
-    // Nose Wiggle Idle Animation
-    //================================================
-
-    // Count down until the next nose wiggle.
-    nextNoseWiggle -= dt;
-
-    if (nextNoseWiggle <= 0.0f && !noseWiggling)
-    {
-        // Start a new wiggle.
-        noseWiggling = true;
-
-        // Reset the wiggle timer.
-        noseWiggleTimer = 0.0f;
-
-        // Randomise the delay before the following wiggle.
-        nextNoseWiggle = (float)GetRandomValue(5, 7);
-
-        // The original local parent position is already
-        // stored in home position.
-    }
-
-    if (noseWiggling)
-    {
-        // Track how long the wiggle has been active.
-        noseWiggleTimer += dt;
-
-        // Calculate the horizontal wiggle using a sine wave.
-        //
-        // WIGGLE_SPEED controls how quickly the nose moves.
-        // WIGGLE_AMOUNT controls how far it moves from
-        // its original position.
-        wiggleOffSetX =
-            sinf(noseWiggleTimer * WIGGLE_SPEED) * WIGGLE_AMOUNT;
-
-        // Apply the wiggle to the original LOCAL position.
-        //
-        // Using homeAnchorPoint as the starting position
-        // prevents the wiggle from accumulating movement
-        // from one frame to the next.
-        positionOffset.x =
-            homePosition.x + wiggleOffSetX;
-
-        // The wiggle lasts for one second.
-        if (noseWiggleTimer >= 1.0f)
-        {
-            // Stop the wiggle.
-            noseWiggling = false;
-
-            // Reset the wiggle state.
-            noseWiggleTimer = 0.0f;
-            wiggleOffSetX = 0.0f;
-
-            // Restore the original LOCAL anchor position.
-            positionOffset.x = homePosition.x;
-        }
-    }*/
 }
 
 void Nose::Draw() const
@@ -4023,8 +4016,6 @@ void Nose::Draw() const
 void Nose::SetTransform(MyTransform parentTransform)
 {
     Sprite::transform = MakeChildTransform(parentTransform, positionOffset);
-    Sprite::transform.rotation = parentTransform.rotation + localRotation;
-
     Sprite::SetScreenCoords();
 }
 
@@ -4033,22 +4024,14 @@ void Nose::SetTransform(MyTransform parentTransform)
 .\src\head\Pupil.cpp
 =====================================
 
-//====================================================
-// Pupil.cpp
-//
-// Handles the robot's pupil sprite.
-//
-// The pupil is drawn separately from the eyes so it
-// can move independently when the robot looks around.
-//====================================================
-
 #include "Body/Head/Pupil.h"
 #include "Constants.h"
 #include <cmath>
 #include <string>
 
-Pupil::Pupil(BodyDimensions& dimensions) :
-    dimensions(dimensions)
+Pupil::Pupil(BodyDimensions& dimensions, RobotState& robotState) :
+    dimensions(dimensions),
+    robotState(robotState)
 {}
 
 // Load the pupil sprite and initialise its animation.
@@ -4092,7 +4075,7 @@ void Pupil::Initialise()
 }
 
 // Advance the pupil animation.
-void Pupil::Update(float dt, Emotion emotion)
+void Pupil::Update(float dt)
 {
     Sprite::Update(dt);
 }
@@ -4135,29 +4118,19 @@ void Pupil::SetTransform(MyTransform parentTransform)
 .\src\head\Pupils.cpp
 =====================================
 
-//====================================================
-// Pupils.cpp
-//
-// Controls both of the robot's pupils.
-//
-// This class keeps the pupils positioned inside the
-// eyes and moves them towards a target point to give
-// the illusion that the robot is looking around.
-//====================================================
-
 #include "Body/Head/Pupils.h"
 #include "raylib.h"
 #include "cmath"
 #include "raymath.h"
 
-Pupils::Pupils(BodyDimensions& dimensions) : 
+Pupils::Pupils(BodyDimensions& dimensions, RobotState& robotState) :
     dimensions(dimensions),
+    robotState(robotState),
     transform(),
-    leftPupil(dimensions),
-    rightPupil(dimensions)
+    leftPupil(dimensions, robotState),
+    rightPupil(dimensions, robotState)
 {}
 
-// Initialise both pupil sprites.
 void Pupils::Initialise()
 {
     leftPupil.SetSide("left");
@@ -4167,28 +4140,24 @@ void Pupils::Initialise()
     rightPupil.Initialise();
 }
 
-// Release resources used by both pupils.
 void Pupils::Shutdown()
 {
     leftPupil.Shutdown();
     rightPupil.Shutdown();
 }
 
-// Update both pupil animations.
-void Pupils::Update(float dt, Emotion emotion)
+void Pupils::Update(float dt)
 {
-    leftPupil.Update(dt, emotion);
-    rightPupil.Update(dt, emotion);
+    leftPupil.Update(dt);
+    rightPupil.Update(dt);
 }
 
-// Draw both pupils.
 void Pupils::Draw() const
 {
     leftPupil.Draw();
     rightPupil.Draw();
 }
 
-// Set both pupil anchor points relative to the head.
 void Pupils::SetTransform(MyTransform parentTransform)
 {
     transform = parentTransform;
@@ -4210,7 +4179,6 @@ Vector2 Pupils::RotateVector(Vector2 v, float rotation)
     };
 }
 
-// Rotate the pupils so they remain aligned with the head.
 void Pupils::SetRotation(float rotation)
 {
     Vector2 rotatedLeft =
@@ -4233,11 +4201,8 @@ void Pupils::SetRotation(float rotation)
         transform.position.x + rotatedRight.x,
         transform.position.y + rotatedRight.y
     });
-
 }
 
-// Move the pupils towards a target point while limiting
-// how far they can travel within the eye.
 void Pupils::LookAt(Vector2 point)
 {
     float scale = transform.scale;
@@ -4263,7 +4228,6 @@ void Pupils::LookAt(Vector2 point)
         + dimensions.eyesYoffset) * scale
     };
 
-    // Calculate the direction from each eye to the target.
     Vector2 leftDirection =
     {
         point.x - leftEyeCentre.x,
@@ -4279,7 +4243,6 @@ void Pupils::LookAt(Vector2 point)
     leftDirection = Vector2Normalize(leftDirection);
     rightDirection = Vector2Normalize(rightDirection);
 
-    // Convert the direction into a small movement offset.
     leftLookOffset =
     {
         leftDirection.x * LOOK_DISTANCE,
@@ -4374,7 +4337,7 @@ bool Input::LeftMouseButtonPressed() const
 
 bool Input::G_Pressed() const
 {
-    return IsKeyDown(KEY_G);
+    return IsKeyPressed(KEY_G);
 }
 
 bool Input::E_Pressed()
@@ -4611,11 +4574,10 @@ std::string Object::GetName()
 
 #include "Robot.h"
 #include "RobotBrain.h"
-#include "Emotion.h"
 
 Robot::Robot() :
-    body(dimensions),
-    robotBrain(*this)
+    body(dimensions, robotState),
+    robotBrain(*this, robotState)
 {}
 
 void Robot::Initialise()
@@ -4625,20 +4587,246 @@ void Robot::Initialise()
 
 void Robot::Update(float dt)
 {
-    body.Update(dt, robotBrain.GetEmotion());
-
+    body.Update(dt);
+    robotBrain.Update(dt);
 }
 
-void Robot::SetTransform(MyTransform transform)
+void Robot::SetTransform(MyTransform initialTransform)
 {
-    this->transform = transform;
-    body.SetTransform(this->transform);
+    transform = initialTransform;
+    body.SetTransform(transform);
 }
 
 void Robot::Draw() const
 {
     body.Draw();
-    robotBrain.Draw();
+
+    const char* stateName = "Unknown";
+    switch (robotState.state)
+    {
+        case RobotState::State::Idle: stateName = "Idle"; break;
+        case RobotState::State::Thinking: stateName = "Thinking"; break;
+        case RobotState::State::Listening: stateName = "Listening"; break;
+        case RobotState::State::Reacting: stateName = "Reacting"; break;
+    }
+
+    const char* emotionName = "Unknown";
+    switch (robotState.emotion)
+    {
+        case RobotState::Emotions::Idle: emotionName = "Idle"; break;
+        case RobotState::Emotions::Happy: emotionName = "Happy"; break;
+        case RobotState::Emotions::Sad: emotionName = "Sad"; break;
+        case RobotState::Emotions::Angry: emotionName = "Angry"; break;
+        case RobotState::Emotions::Surprised: emotionName = "Surprised"; break;
+    }
+
+    const auto flag = [](bool value) { return value ? "ON" : "off"; };
+    const auto& gestures = robotState.gestures;
+    const int x = 12;
+    int y = 12;
+    const int fontSize = 20;
+    const int lineHeight = fontSize + 4;
+    
+    DrawText("ROBOT STATE", x, y, 16, YELLOW); 
+    
+    y += lineHeight;
+    
+    DrawText(
+        TextFormat
+        (
+            "State: %s", stateName
+        ), 
+        x, 
+        y, 
+        fontSize, 
+        RAYWHITE
+    ); 
+    
+    y += lineHeight;
+    
+    DrawText(
+        TextFormat
+        (
+            "Emotion: %s  Speaking: %s",
+            emotionName, flag(robotState.speaking)
+        ), 
+        x, 
+        y, 
+        fontSize, 
+        RAYWHITE
+    ); 
+    
+    y += lineHeight;
+    
+    DrawText
+    (
+        TextFormat
+        (
+            "idle %s | nod %s | shake %s", 
+            flag(gestures.idle), 
+            flag(gestures.nod), 
+            flag(gestures.shakeHead)
+        ), 
+        x, 
+        y, 
+        fontSize, 
+        RAYWHITE
+    ); 
+        
+    y += lineHeight;
+    
+    DrawText
+    (
+        TextFormat
+        (
+            "waveL %s | waveR %s", 
+            flag(gestures.waveLeft), 
+            flag(gestures.waveRight)
+        ),  
+        x, 
+        y, 
+        fontSize, 
+        RAYWHITE
+    );
+          
+    y += lineHeight;
+
+    DrawText
+    (
+        TextFormat
+        (
+            "kickL %s | kickR %s", 
+            flag(gestures.kickLeft), 
+            flag(gestures.kickRight)
+        ),  
+        x, 
+        y, 
+        fontSize, 
+        RAYWHITE
+    );
+    
+    y += lineHeight;
+
+    DrawText
+    (
+        TextFormat
+        (
+            "jump %s | shrug %s | celebrate %s", 
+            flag(gestures.jump), 
+            flag(gestures.shrug),
+            flag(gestures.celebrate)
+        ),  
+        x, 
+        y, 
+        fontSize, 
+        RAYWHITE
+    );
+
+    y += lineHeight;
+
+    DrawText
+    (
+        TextFormat
+        (
+            "crouch %s |", 
+            flag(gestures.crouch)
+        ),  
+        x, 
+        y, 
+        fontSize, 
+        RAYWHITE
+    );
+}
+
+void Robot::CycleState()
+{
+    switch (robotState.state)
+    {
+        case RobotState::State::Idle: robotState.state = RobotState::State::Thinking; break;
+        case RobotState::State::Thinking: robotState.state = RobotState::State::Listening; break;
+        case RobotState::State::Listening: robotState.state = RobotState::State::Reacting; break;
+        case RobotState::State::Reacting: robotState.state = RobotState::State::Idle; break;
+    }
+}
+
+void Robot::CycleEmotion()
+{
+    switch (robotState.emotion)
+    {
+        case RobotState::Emotions::Idle: robotState.emotion = RobotState::Emotions::Happy; break;
+        case RobotState::Emotions::Happy: robotState.emotion = RobotState::Emotions::Sad; break;
+        case RobotState::Emotions::Sad: robotState.emotion = RobotState::Emotions::Angry; break;
+        case RobotState::Emotions::Angry: robotState.emotion = RobotState::Emotions::Surprised; break;
+        case RobotState::Emotions::Surprised: robotState.emotion = RobotState::Emotions::Idle; break;
+    }
+}
+
+void Robot::ToggleSpeaking()
+{
+    robotState.speaking = !robotState.speaking;
+}
+
+RobotState::Gestures& Robot::GetGestures()
+{
+    return robotState.gestures;
+}
+
+void Robot::ToggleGesture(std::string gesture)
+{
+    if(gesture == "idle") 
+    {
+        robotState.gestures.idle = !robotState.gestures.idle;
+    }
+    
+    if(gesture == "nod") 
+    {
+        robotState.gestures.nod = !robotState.gestures.nod;
+    }
+    
+    if(gesture == "shakeHead") 
+    {
+        robotState.gestures.shakeHead = !robotState.gestures.shakeHead;
+    }
+
+    if(gesture == "waveLeft") 
+    {
+        robotState.gestures.waveLeft = !robotState.gestures.waveLeft;
+    }
+    
+    if(gesture == "waveRight") 
+    {
+        robotState.gestures.waveRight = !robotState.gestures.waveRight;
+    }
+    
+    if(gesture == "kickLeft") 
+    {
+        robotState.gestures.kickLeft = !robotState.gestures.kickLeft;
+    }
+
+    if(gesture == "kickRight") 
+    {
+        robotState.gestures.kickRight = !robotState.gestures.kickRight;
+    }
+
+    if(gesture == "jump") 
+    {
+        robotState.gestures.jump = !robotState.gestures.jump;
+    }
+
+    if(gesture == "shrug") 
+    {
+        robotState.gestures.shrug = !robotState.gestures.shrug;
+    }
+
+    if(gesture == "celebrate") 
+    {
+        robotState.gestures.celebrate = !robotState.gestures.celebrate;
+    }
+
+    if(gesture == "crouch")
+    {
+        robotState.gestures.crouch = !robotState.gestures.crouch;
+    }
 }
 
 void Robot::Shutdown()
@@ -4646,128 +4834,32 @@ void Robot::Shutdown()
     body.Shutdown();
 }
 
-void Robot::SetEmotion(Emotion emotion)
-{
-    robotBrain.SetEmotion(emotion);
-}
-
-Emotion Robot::GetEmotion()
-{
-    return robotBrain.GetEmotion();
-}
-
-void Robot::NextState()
-{
-    robotBrain.NextState();
-}
-
-void Robot::NextEmotion()
-{
-    robotBrain.NextEmotion();
-}
-
 
 =====================================
 .\src\RobotBrain.cpp
 =====================================
 
-
 #include "RobotBrain.h"
 #include "Robot.h"
-#include "Emotion.h"
 #include "BodyDimensions.h"
 #include "raylib.h"
 
-
-RobotBrain::RobotBrain(Robot& robot)
-    : robot(robot),
-      state(State::Idle),
-      emotion(Emotion::Neutral)
+RobotBrain::RobotBrain(Robot& robot, RobotState& robotState) : 
+    robot(robot),
+    robotState(robotState)
 {}
 
-inline int rrrr = 0;
 void RobotBrain::Update(float dt)
 {
-    rrrr = dt;
-}
-
-void RobotBrain::SetState(State state)
-{
-    this->state = state;
-}
-
-void RobotBrain::SetEmotion(Emotion newEmotion)
-{
-    emotion = newEmotion;
-}
-
-Emotion RobotBrain::GetEmotion()
-{
-    return emotion;
-}
-
-const char* RobotBrain::RobotStateToString(State state)
-{
-    switch (state)
-    {
-        case State::Idle:      return "Idle";
-        case State::Speaking:  return "Speaking";
-        case State::Thinking:  return "Thinking";
-        case State::Listening: return "Listening";
-        case State::Reacting:  return "Reacting";
-        default:               return "Unknown";
-    }
-}
-
-const char* RobotBrain::EmotionToString(Emotion emotion)
-{
-    switch (emotion)
-    {
-        case Emotion::Neutral:   return "Neutral";
-        case Emotion::Happy:     return "Happy";
-        case Emotion::Sad:       return "Sad";
-        case Emotion::Angry:     return "Angry";
-        case Emotion::Surprised: return "Surprised";
-        default:                 return "Unknown";
-    }
-}
-
-void RobotBrain::NextEmotion()
-{
-    int next = static_cast<int>(emotion) + 1;
-
-    if (next >= static_cast<int>(Emotion::Count))
-    {
-        next = 0;
-    }
-
-    emotion = static_cast<Emotion>(next);
-}
-
-void RobotBrain::NextState()
-{
-    int next = static_cast<int>(state) + 1;
-
-    if (next >= static_cast<int>(State::Count))
-    {
-        next = 0;
-    }
-
-    state = static_cast<State>(next);
+    
 }
 
 void RobotBrain::Draw() const
 {
-    DrawText(
-        TextFormat("RobotBrain State: %s", RobotStateToString(state)),
-        10, 10, 20, WHITE
-    );
 
-    DrawText(
-        TextFormat("RobotBrain Emotion: %s", EmotionToString(emotion)),
-        10, 30, 20, WHITE
-    );
 }
+
+
 
 
 =====================================

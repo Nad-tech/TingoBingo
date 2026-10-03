@@ -36,3 +36,9 @@ void Legs::SetTransform(MyTransform parentTransform)
     rightThigh.SetTransform(parentTransform);
 }
 
+void Legs::Crouch()
+{
+    leftThigh.Crouch();
+    rightThigh.Crouch();
+}
+

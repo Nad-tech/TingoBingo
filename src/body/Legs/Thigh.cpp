@@ -2,7 +2,6 @@
 #include "Constants.h"
 #include <string>
 
-// Load the head sprite and initialise its animation.
 Thigh::Thigh(BodyDimensions& dimensions, std::string side, RobotState& robotState) :
     Shape(CARDBOARD),
     dimensions(dimensions),
@@ -13,12 +12,11 @@ Thigh::Thigh(BodyDimensions& dimensions, std::string side, RobotState& robotStat
 
 void Thigh::Initialise()
 {
-    // Calculate the size of a single animation frame.
     dimensions.thighWidth = 80.0f; 
     dimensions.thighHeight = 150.0f;
 
-    Shape::drawGeometry.width = dimensions.thighWidth;
-    Shape::drawGeometry.height = dimensions.thighHeight;
+    drawGeometry.width = dimensions.thighWidth;
+    drawGeometry.height = dimensions.thighHeight;
 
     if(side == "left")
     {
@@ -38,8 +36,8 @@ void Thigh::Initialise()
         };
     }
 
-    Shape::drawGeometry.origin = {
-        Shape::drawGeometry.width / 2.0f,
+    drawGeometry.origin = {
+        drawGeometry.width / 2.0f,
         0
     };
 
@@ -48,6 +46,13 @@ void Thigh::Initialise()
 
 void Thigh::Update(float dt)
 {
+    Crouch();
+
+    if(crouchState != CrouchState::None)
+    {
+        AdvanceCrouch(dt);
+    }
+
     knee.Update(dt);
 }
 
@@ -59,8 +64,97 @@ void Thigh::Draw() const
 
 void Thigh::SetTransform(MyTransform parentTransform)
 {
-    Shape::transform = MakeChildTransform(parentTransform, positionOffset);
-    Shape::SetScreenCoords();
+    tempParentTransform = parentTransform;
 
-    knee.SetTransform(Shape::transform);
+    transform = MakeChildTransform(parentTransform, positionOffset);
+    transform.rotation += localRotation;
+    
+    SetScreenCoords();
+
+    knee.SetTransform(transform);
+}
+
+void Thigh::Crouch()
+{
+    if(robotState.gestures.crouch && crouchState == CrouchState::None)
+    {
+        crouchState = CrouchState::Raising;
+    }
+}
+
+void Thigh::AdvanceCrouch(float dt)
+{
+    if(side == "left")
+    {
+        const float speed = 250.0f;
+        const float minRotation = 0.0f;
+        const float maxRotation = 30.0f;
+
+        if(crouchState == CrouchState::Raising)
+        {
+            localRotation += speed * dt;
+            
+            if(localRotation >= maxRotation)
+            {
+                localRotation = maxRotation;
+                crouchState = CrouchState::Crouching;
+                //knee.Crouch();
+            }
+        }
+        else if(crouchState == CrouchState::Crouching)
+        {
+            if(!robotState.gestures.crouch)
+            {
+                crouchState = CrouchState::Returning;
+            }
+        }
+        else if(crouchState == CrouchState::Returning)
+        {
+            localRotation -= speed * dt;
+
+            if(localRotation <= minRotation)
+            {
+                localRotation = minRotation;
+                crouchState = CrouchState::None;
+            }
+        }
+    }
+
+    if(side == "right")
+    {
+        const float speed = 250.0f;
+        const float minRotation = 0.0f;
+        const float maxRotation = -30.0f;
+
+        if(crouchState == CrouchState::Raising)
+        {
+            localRotation -= speed * dt;
+            
+            if(localRotation <= maxRotation)
+            {
+                localRotation = maxRotation;
+                crouchState = CrouchState::Crouching;
+                //knee.Crouch();
+            }
+        }
+        else if(crouchState == CrouchState::Crouching)
+        {
+            if(!robotState.gestures.crouch)
+            {
+                crouchState = CrouchState::Returning;
+            }
+        }
+        else if(crouchState == CrouchState::Returning)
+        {
+            localRotation += speed * dt;
+
+            if(localRotation >= minRotation)
+            {
+                localRotation = minRotation;
+                crouchState = CrouchState::None;
+            }
+        }
+    }
+
+    SetTransform(tempParentTransform);
 }

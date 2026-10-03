@@ -16,6 +16,8 @@ class Pelvis : Shape
         
         void SetTransform(MyTransform parentTransform);
 
+        void Crouch();
+
     private:
         BodyDimensions& dimensions;
         Vector2 positionOffset;

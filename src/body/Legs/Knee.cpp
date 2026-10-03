@@ -61,3 +61,8 @@ void Knee::SetTransform(MyTransform parentTransform)
 
     shin.SetTransform(Shape::transform);
 }
+
+void Knee::Crouch()
+{
+    shin.Crouch();
+}

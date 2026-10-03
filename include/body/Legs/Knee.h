@@ -17,6 +17,8 @@ class Knee : public Shape
         void Draw() const;
 
         void SetTransform(MyTransform parentTransform);
+
+        void Crouch();
         
     private:
         BodyDimensions& dimensions;
