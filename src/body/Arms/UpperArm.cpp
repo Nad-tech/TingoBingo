@@ -79,6 +79,7 @@ void UpperArm::WaveArm()
     }
 }
 
+/*
 void UpperArm::AdvanceWave(float dt)
 {
     const float speed = 250.0f;
@@ -124,6 +125,83 @@ void UpperArm::AdvanceWave(float dt)
         {
             localRotation = minRotation;
             waveState = WaveState::None;
+        }
+    }
+
+    SetTransform(tempParentTransform);
+}*/
+
+void UpperArm::AdvanceWave(float dt)
+{
+    if(side == "left")
+    {
+        const float speed = 250.0f;
+        const float minRotation = 0.0f;
+        const float maxRotation = 120.0f;
+
+        if(waveState == WaveState::Raising)
+        {
+            localRotation += speed * dt;
+            
+            if(localRotation >= maxRotation)
+            {
+                localRotation = maxRotation;
+                waveState = WaveState::Waving;
+                elbow.WaveArm();
+            }
+        }
+        else if(waveState == WaveState::Waving)
+        {
+            if(!robotState.gestures.waveLeft)
+            {
+                waveState = WaveState::Lowering;
+            }
+        }
+        else if(waveState == WaveState::Lowering)
+        {
+            localRotation -= speed * dt;
+
+            if(localRotation <= minRotation)
+            {
+                localRotation = minRotation;
+                waveState = WaveState::None;
+            }
+        }
+    }
+
+    if(side == "right")
+    {
+        const float speed = 250.0f;
+        const float minRotation = 0.0f;
+        const float maxRotation = -120.0f;
+
+        if(waveState == WaveState::Raising)
+        {
+            localRotation -= speed * dt;
+            
+            if(localRotation <= maxRotation)
+            {
+                localRotation = maxRotation;
+                waveState = WaveState::Waving;
+                elbow.WaveArm();
+            }
+        }
+        else if(waveState == WaveState::Waving)
+        {
+            if(!robotState.gestures.waveRight)
+            {
+                waveState = WaveState::Lowering;
+            }
+        }
+        else if(waveState == WaveState::Lowering)
+        {
+            localRotation += speed * dt;
+
+            if(localRotation >= minRotation)
+            {
+                localRotation = minRotation;
+                waveState = WaveState::None;
+            }
         }
     }
 

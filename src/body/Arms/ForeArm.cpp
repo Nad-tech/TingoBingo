@@ -78,53 +78,86 @@ void ForeArm::WaveArm()
 
 void ForeArm::AdvanceWave(float dt)
 {
-    const float speed = 400.0f;
-    float minRotation = 0.0f;
-    float maxRotation = 0.0f;
+    if(side == "left")
+    {
+        const float speed = 400.0f;
+        const float minRotation = 0.0f;
+        const float maxRotation = 90.0f;
+        
+        if(waveState == WaveState::Raising)
+        {
+            localRotation += speed * dt;
+            
+            if(localRotation >= maxRotation)
+            {
+                localRotation = maxRotation;
+                waveState = WaveState::Lowering;
+            }
+        }
+        else if(waveState == WaveState::Waving)
+        {
+            if(!robotState.gestures.waveLeft)
+            {
+                waveState = WaveState::Lowering;
+            }
+        }
+        else if(waveState == WaveState::Lowering)
+        {
+            localRotation -= speed * dt;
+
+            if(localRotation <= minRotation)
+            {
+                localRotation = minRotation;
+                
+                if(robotState.gestures.waveLeft)
+                {
+                    waveState = WaveState::Raising;
+                }
+                else {
+                    waveState = WaveState::None;
+                }
+            }
+        }
+    }
 
     if(side == "right")
     {
-        minRotation = 0.0f;
-        maxRotation = -90.0f;
-    }
+        const float speed = 400.0f;
+        const float minRotation = 0.0f;
+        const float maxRotation = -90.0f;
 
-    if(side == "left")
-    {
-        minRotation = 0.0f;
-        maxRotation = 90.0f;
-    }
-        
-    if(waveState == WaveState::Raising)
-    {
-        localRotation -= speed * dt;
-        
-        if(localRotation <= maxRotation)
+        if(waveState == WaveState::Raising)
         {
-            localRotation = maxRotation;
-            waveState = WaveState::Lowering;
-        }
-    }
-    else if(waveState == WaveState::Waving)
-    {
-        if(!robotState.gestures.waveRight)
-        {
-            waveState = WaveState::Lowering;
-        }
-    }
-    else if(waveState == WaveState::Lowering)
-    {
-        localRotation += speed * dt;
-
-        if(localRotation >= minRotation)
-        {
-            localRotation = minRotation;
+            localRotation -= speed * dt;
             
-            if(robotState.gestures.waveRight)
+            if(localRotation <= maxRotation)
             {
-                waveState = WaveState::Raising;
+                localRotation = maxRotation;
+                waveState = WaveState::Lowering;
             }
-            else {
-                waveState = WaveState::None;
+        }
+        else if(waveState == WaveState::Waving)
+        {
+            if(!robotState.gestures.waveRight)
+            {
+                waveState = WaveState::Lowering;
+            }
+        }
+        else if(waveState == WaveState::Lowering)
+        {
+            localRotation += speed * dt;
+
+            if(localRotation >= minRotation)
+            {
+                localRotation = minRotation;
+                
+                if(robotState.gestures.waveRight)
+                {
+                    waveState = WaveState::Raising;
+                }
+                else {
+                    waveState = WaveState::None;
+                }
             }
         }
     }
