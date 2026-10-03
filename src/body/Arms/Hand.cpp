@@ -4,7 +4,7 @@ Hand::Hand
 (
     BodyDimensions& dimensions, 
     std::string side,
-    RobotState& RobotState
+    RobotState& robotState
 ) :
 	Shape(CARDBOARD_DARK),
     dimensions(dimensions),

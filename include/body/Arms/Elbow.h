@@ -30,8 +30,6 @@ class Elbow : public Shape
         Vector2 positionOffset;
         RobotState& robotState;
 
-        WaveState waveState = WaveState::None;
-
         std::string side = "";
 
         ForeArm foreArm;

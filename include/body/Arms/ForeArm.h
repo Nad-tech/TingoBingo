@@ -5,11 +5,17 @@
 #include "Shape.h"
 #include "Hand.h"
 #include "RobotState.h"
-#include "WaveState.h"
 
 class ForeArm : public Shape
 {
     public:
+        enum class WaveState
+        {
+            None,
+            Raising,
+            Lowering
+        };
+
         ForeArm(
             BodyDimensions& dimensions, 
             std::string side,
@@ -22,8 +28,6 @@ class ForeArm : public Shape
         void Draw() const;
         
         void SetTransform(MyTransform parentTransform);
-
-        void SetWaveState(WaveState waveState);
 
         void WaveArm();
         

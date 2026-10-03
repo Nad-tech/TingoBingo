@@ -4,11 +4,18 @@
 #include "Body/Arms/Elbow.h"
 #include "BodyDimensions.h"
 #include "RobotState.h"
-#include "WaveState.h"
 
 class UpperArm : public Shape
 {
     public:
+        enum class WaveState
+        {
+            None,
+            Raising,
+            Waving,
+            Lowering
+        };
+
         UpperArm
         (
             BodyDimensions& dimensions, 

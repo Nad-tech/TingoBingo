@@ -11,7 +11,6 @@ class RobotState
             bool waveLeft = false;
             bool waveRight = false;
             bool shrug = false;
-            bool point = false;
             bool celebrate = false;
         };
         Gestures gestures;
@@ -24,7 +23,6 @@ class RobotState
             WaveLeft,
             WaveRight,
             Shrug,
-            Point,
             Celebrate
         };
 
@@ -40,11 +38,11 @@ class RobotState
 
         enum class Emotions
         {
-            Neutral,
+            Idle,
             Happy,
             Sad,
             Angry,
             Surprised
         };
-        Emotions emotion = Emotions::Neutral;
+        Emotions emotion = Emotions::Idle;
 };

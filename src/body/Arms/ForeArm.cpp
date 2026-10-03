@@ -63,11 +63,6 @@ void ForeArm::SetTransform(MyTransform parentTransform)
     hand.SetTransform(Shape::transform);
 }
 
-void ForeArm::SetWaveState(WaveState waveState)
-{
-    this->waveState = waveState;
-}
-
 void ForeArm::WaveArm()
 {
     if(waveState == WaveState::None)
@@ -91,13 +86,6 @@ void ForeArm::AdvanceWave(float dt)
             if(localRotation >= maxRotation)
             {
                 localRotation = maxRotation;
-                waveState = WaveState::Lowering;
-            }
-        }
-        else if(waveState == WaveState::Waving)
-        {
-            if(!robotState.gestures.waveLeft)
-            {
                 waveState = WaveState::Lowering;
             }
         }
@@ -133,13 +121,6 @@ void ForeArm::AdvanceWave(float dt)
             if(localRotation <= maxRotation)
             {
                 localRotation = maxRotation;
-                waveState = WaveState::Lowering;
-            }
-        }
-        else if(waveState == WaveState::Waving)
-        {
-            if(!robotState.gestures.waveRight)
-            {
                 waveState = WaveState::Lowering;
             }
         }

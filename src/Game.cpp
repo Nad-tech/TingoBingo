@@ -71,7 +71,6 @@ void Game::HandleInput()
 	if (IsKeyPressed(KEY_FOUR)) robot.ToggleGesture(RobotState::Gesture::WaveLeft);
 	if (IsKeyPressed(KEY_FIVE)) robot.ToggleGesture(RobotState::Gesture::WaveRight);
 	if (IsKeyPressed(KEY_SIX)) robot.ToggleGesture(RobotState::Gesture::Shrug);
-	if (IsKeyPressed(KEY_SEVEN)) robot.ToggleGesture(RobotState::Gesture::Point);
 	if (IsKeyPressed(KEY_EIGHT)) robot.ToggleGesture(RobotState::Gesture::Celebrate);
 }
 

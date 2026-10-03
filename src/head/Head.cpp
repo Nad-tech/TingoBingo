@@ -63,6 +63,16 @@ void Head::Shutdown()
 // Update every animated head component.
 void Head::Update(float dt)
 {
+    if(robotState.gestures.nod)
+    {
+        Nod();
+    }
+
+    if(nodState != NodState::None)
+    {
+        AdvanceNod(dt);
+    }
+
     antenna.Update(dt);
     ears.Update(dt);
     eyebrows.Update(dt);
@@ -84,7 +94,11 @@ void Head::Draw() const
 
 void Head::SetTransform(MyTransform parentTransform)
 {
+    tempParentTransform = parentTransform;
+
     transform = MakeChildTransform(parentTransform, positionOffset);
+
+    transform.position.y += nodOffsetY;
 
     headBase.SetTransform(transform);
     eyes.SetTransform(transform);
@@ -103,4 +117,77 @@ void Head::LookAt(Vector2 point)
 void Head::LookForward()
 {
     eyes.GetPupils().LookForward();
+}
+
+void Head::Nod()
+{
+    if(nodState == NodState::None)
+    {
+        nodState = NodState::Raising;
+    }
+}
+
+void Head::AdvanceNod(float dt)
+{
+    const float speed = 250.0f;
+    const float minOffset = -30.0f;
+    const float maxOffset = 5.0f;
+
+    if(nodState == NodState::Raising)
+    {
+        nodOffsetY += speed * dt;
+
+        if(nodOffsetY >= maxOffset)
+        {
+            nodOffsetY = maxOffset;
+            nodState = NodState::Lowering;
+        }
+    }
+    else if(nodState == NodState::Lowering)
+    {
+        nodOffsetY -= speed * dt;
+
+        if(nodOffsetY <= minOffset)
+        {
+            nodOffsetY = minOffset;
+
+            if(robotState.gestures.nod)
+            {
+                nodState = NodState::Raising;
+            }
+            else
+            {
+                nodState = NodState::Returning;
+            }
+        }
+    }
+    else if(nodState == NodState::Returning)
+    {
+        if(nodOffsetY > 0.0f)
+        {
+            nodOffsetY -= speed * dt;
+
+            if(nodOffsetY <= 0.0f)
+            {
+                nodOffsetY = 0.0f;
+                nodState = NodState::None;
+            }
+        }
+        else if(nodOffsetY < 0.0f)
+        {
+            nodOffsetY += speed * dt;
+
+            if(nodOffsetY >= 0.0f)
+            {
+                nodOffsetY = 0.0f;
+                nodState = NodState::None;
+            }
+        }
+        else
+        {
+            nodState = NodState::None;
+        }
+    }
+
+    SetTransform(tempParentTransform);
 }

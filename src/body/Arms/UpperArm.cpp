@@ -79,58 +79,6 @@ void UpperArm::WaveArm()
     }
 }
 
-/*
-void UpperArm::AdvanceWave(float dt)
-{
-    const float speed = 250.0f;
-
-    float minRotation = 0.0f;
-    float maxRotation = 0.0f;
-
-    if(side == "right")
-    {
-        minRotation = 0.0f;
-        maxRotation = -120.0f;
-    }
-
-    if(side == "left")
-    {
-        minRotation = 0.0f;
-        maxRotation = 120.0f;
-    }
-
-    if(waveState == WaveState::Raising)
-    {
-        localRotation -= speed * dt;
-        
-        if(localRotation <= maxRotation)
-        {
-            localRotation = maxRotation;
-            waveState = WaveState::Waving;
-            elbow.WaveArm();
-        }
-    }
-    else if(waveState == WaveState::Waving)
-    {
-        if(!robotState.gestures.waveRight)
-        {
-            waveState = WaveState::Lowering;
-        }
-    }
-    else if(waveState == WaveState::Lowering)
-    {
-        localRotation += speed * dt;
-
-        if(localRotation >= minRotation)
-        {
-            localRotation = minRotation;
-            waveState = WaveState::None;
-        }
-    }
-
-    SetTransform(tempParentTransform);
-}*/
-
 void UpperArm::AdvanceWave(float dt)
 {
     if(side == "left")

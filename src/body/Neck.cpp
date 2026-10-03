@@ -4,8 +4,8 @@
 Neck::Neck(BodyDimensions& dimensions, RobotState& robotState) :
     Shape(CARDBOARD_DARK),
     dimensions(dimensions),
-    robotState(robotState),
     positionOffset(),
+    robotState(robotState),
     head(dimensions, robotState)
 {
 }

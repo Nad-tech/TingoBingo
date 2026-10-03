@@ -29,6 +29,14 @@
 class Head
 {
 public:
+    enum class NodState
+        {
+            None,
+            Raising,
+            Lowering,
+            Returning
+        };
+
     Head(BodyDimensions& dimensions, RobotState& robotState);
     
     void Initialise();
@@ -42,12 +50,21 @@ public:
     void LookAt(Vector2 point);
     void LookForward();
     
+    void Nod();
+
 private:
+    void AdvanceNod(float dt);
+
     BodyDimensions& dimensions;
+    
     MyTransform transform;
+    MyTransform tempParentTransform;
+
     Vector2 positionOffset;
     
     RobotState& robotState;
+    NodState nodState = NodState::None;
+    float nodOffsetY = 0.0f;
 
     Headbase headBase;
     Eyes eyes;

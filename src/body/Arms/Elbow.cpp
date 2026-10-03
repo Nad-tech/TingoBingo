@@ -38,11 +38,6 @@ void Elbow::Initialise()
 
 void Elbow::Update(float dt)
 {
-    if(waveState == WaveState::Waving)
-    {
-        foreArm.SetWaveState(WaveState::Raising);
-    }
-
     foreArm.Update(dt);
 }
 

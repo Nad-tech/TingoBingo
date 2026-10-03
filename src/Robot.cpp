@@ -39,7 +39,7 @@ void Robot::Draw() const
     const char* emotionName = "Unknown";
     switch (robotState.emotion)
     {
-        case RobotState::Emotions::Neutral: emotionName = "Neutral"; break;
+        case RobotState::Emotions::Idle: emotionName = "Idle"; break;
         case RobotState::Emotions::Happy: emotionName = "Happy"; break;
         case RobotState::Emotions::Sad: emotionName = "Sad"; break;
         case RobotState::Emotions::Angry: emotionName = "Angry"; break;
@@ -56,7 +56,6 @@ void Robot::Draw() const
     DrawText(TextFormat("Emotion: %s  Speaking: %s", emotionName, flag(robotState.speaking)), x, y, 14, RAYWHITE); y += lineHeight;
     DrawText(TextFormat("Gestures: idle %s | nod %s | shake %s", flag(gestures.idle), flag(gestures.nod), flag(gestures.shakeHead)), x, y, 14, RAYWHITE); y += lineHeight;
     DrawText(TextFormat("           waveL %s | waveR %s | shrug %s", flag(gestures.waveLeft), flag(gestures.waveRight), flag(gestures.shrug)), x, y, 14, RAYWHITE); y += lineHeight;
-    DrawText(TextFormat("           point %s | celebrate %s", flag(gestures.point), flag(gestures.celebrate)), x, y, 14, RAYWHITE);
 }
 
 void Robot::CycleState()
@@ -74,11 +73,11 @@ void Robot::CycleEmotion()
 {
     switch (robotState.emotion)
     {
-        case RobotState::Emotions::Neutral: robotState.emotion = RobotState::Emotions::Happy; break;
+        case RobotState::Emotions::Idle: robotState.emotion = RobotState::Emotions::Happy; break;
         case RobotState::Emotions::Happy: robotState.emotion = RobotState::Emotions::Sad; break;
         case RobotState::Emotions::Sad: robotState.emotion = RobotState::Emotions::Angry; break;
         case RobotState::Emotions::Angry: robotState.emotion = RobotState::Emotions::Surprised; break;
-        case RobotState::Emotions::Surprised: robotState.emotion = RobotState::Emotions::Neutral; break;
+        case RobotState::Emotions::Surprised: robotState.emotion = RobotState::Emotions::Idle; break;
     }
 }
 
@@ -97,7 +96,6 @@ void Robot::ToggleGesture(RobotState::Gesture gesture)
         case RobotState::Gesture::WaveLeft: robotState.gestures.waveLeft = !robotState.gestures.waveLeft; break;
         case RobotState::Gesture::WaveRight: robotState.gestures.waveRight = !robotState.gestures.waveRight; break;
         case RobotState::Gesture::Shrug: robotState.gestures.shrug = !robotState.gestures.shrug; break;
-        case RobotState::Gesture::Point: robotState.gestures.point = !robotState.gestures.point; break;
         case RobotState::Gesture::Celebrate: robotState.gestures.celebrate = !robotState.gestures.celebrate; break;
     }
 }
