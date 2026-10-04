@@ -33,14 +33,14 @@ void Pupil::Initialise()
         FRAME_DURATION
     );
 
-    if(side == "left") {
+    /*if(side == "left") {
         positionOffset = {sideOffset, 0};
     }
 
     if(side == "right")
     {
         positionOffset = {-sideOffset, 0};
-    }
+    }*/
     
     Sprite::drawGeometry.origin = {
         dimensions.pupilWidth / 2.0f,
@@ -56,12 +56,12 @@ void Pupil::Update(float dt)
 
 void Pupil::SetSide(std::string side)
 {
-    this->side = side;
+    //this->side = side;
 }
 
 float Pupil::GetSideOffset()
 {
-    return sideOffset;
+    //return sideOffset;
 }
 
 void Pupil::SetPosition(Vector2 position)

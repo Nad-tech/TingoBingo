@@ -1,17 +1,18 @@
 #pragma once
 
+#include "Sprite.h"
 #include "BodyDimensions.h"
 #include "RobotState.h"
-#include "Eye.h"
 
-class Eyes
+class EyeBrow : public Sprite
 {
     public:
-        Eyes(BodyDimensions& dimensions, RobotState& robotState);
+        EyeBrow(BodyDimensions& dimensions, std::string side, RobotState& robotState);
         
-        void Initialise();
+        void Initialise() override;
         void Shutdown();
 
+        using Sprite::Update;
         void Update(float dt);
         void Draw() const;
 
@@ -20,7 +21,5 @@ class Eyes
     private:
         BodyDimensions& dimensions;
         RobotState& robotState;
-
-        Eye leftEye;
-        Eye rightEye;
+        Vector2 positionOffset;
 }; 

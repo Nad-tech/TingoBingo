@@ -41,7 +41,7 @@ void Head::Shutdown()
     mouth.Shutdown();
     ears.Shutdown();
     antenna.Shutdown();
-    eyebrows.Shutdown();
+    eyebrows.ShutDown();
     nose.Shutdown();
 }
 
@@ -100,12 +100,12 @@ void Head::SetTransform(MyTransform parentTransform)
 
 void Head::LookAt(Vector2 point)
 {
-    eyes.GetPupils().LookAt(point);
+    //eyes.GetPupils().LookAt(point);
 }
 
 void Head::LookForward()
 {
-    eyes.GetPupils().LookForward();
+    //eyes.GetPupils().LookForward();
 }
 
 void Head::Nod()

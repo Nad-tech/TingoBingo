@@ -8,7 +8,6 @@
 #include "Body/Head/Eyes.h"
 #include "Body/Head/Headbase.h"
 #include "Body/Head/Nose.h"
-#include "Body/Head/Pupils.h"
 #include "BodyDimensions.h"
 #include "MyTransform.h"
 #include "RobotState.h"
@@ -80,7 +79,7 @@ private:
     Eyes eyes;
     Antenna antenna;
     Ears ears;
-    Eyebrows eyebrows;
+    EyeBrows eyebrows;
     Mouth mouth;
     Nose nose;
 };

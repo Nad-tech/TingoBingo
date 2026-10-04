@@ -1,20 +1,22 @@
 #pragma once
 
-#include "Sprite.h"
 #include "BodyDimensions.h"
 #include "RobotState.h"
+#include "EyeBrow.h"
+#include "MyTransform.h"
 
-class Eyebrows : public Sprite
+class EyeBrows
 {
     public:
-        Eyebrows(BodyDimensions& dimensions, RobotState& robotState);
+        EyeBrows(BodyDimensions& dimensions, RobotState& robotState);
         
-        void Initialise() override;
+        void Initialise();
+        void ShutDown();
 
-        using Sprite::Update;
         void Update(float dt);
+        void Draw() const;
         
-        void SetTransform(MyTransform transform);
+        void SetTransform(MyTransform parentTransform);
 
     private:
         BodyDimensions& dimensions;
@@ -22,4 +24,7 @@ class Eyebrows : public Sprite
         Vector2 positionOffset;
 
         float foreheadOffset = 65; 
+
+        EyeBrow leftEyeBrow;
+        EyeBrow rightEyeBrow;
 };
