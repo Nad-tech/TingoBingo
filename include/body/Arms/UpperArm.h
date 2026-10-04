@@ -14,7 +14,6 @@ class UpperArm : public Shape
             Raising,
             Lowering,
             Waving
-            
         };
 
         enum class ShrugState

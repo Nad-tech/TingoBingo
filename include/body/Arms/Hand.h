@@ -4,6 +4,7 @@
 #include "Shape.h"
 #include <string>
 #include "RobotState.h"
+#include "Clamps.h"
 
 class Hand : public Shape
 {
@@ -12,7 +13,7 @@ class Hand : public Shape
         (
             BodyDimensions& dimensions, 
             std::string side,
-            RobotState& RobotState
+            RobotState& robotState
         );
         
         void Initialise() override;
@@ -29,4 +30,6 @@ class Hand : public Shape
         RobotState& robotState;
 
         std::string side = "";
+
+        Clamps clamps;
 };

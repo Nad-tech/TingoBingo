@@ -9,7 +9,8 @@ Hand::Hand
 	Shape(CARDBOARD_DARK),
     dimensions(dimensions),
     robotState(robotState),
-	side(side)
+	side(side),
+    clamps(dimensions, robotState)
 {}
 
 void Hand::Initialise()
