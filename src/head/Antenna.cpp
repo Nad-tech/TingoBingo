@@ -1,11 +1,3 @@
-//====================================================
-// Antenna.cpp
-//
-// Handles the robot's antenna sprite and animation.
-// The antenna can play a short wiggle animation when
-// triggered.
-//====================================================
-
 #include "Body/Head/Antenna.h"
 #include "Constants.h"
 

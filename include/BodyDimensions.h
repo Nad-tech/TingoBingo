@@ -20,8 +20,8 @@ public:
     float antennaWidth;
     float antennaHeight;
 
-    float earsWidth;
-    float earsHeight;
+    float earWidth;
+    float earHeight;
 
     float eyeBrowsWidth;
     float eyeBrowsHeight;

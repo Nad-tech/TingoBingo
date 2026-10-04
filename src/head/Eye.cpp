@@ -44,7 +44,7 @@ void Eye::Initialise()
 
 void Eye::ShutDown()
 {
-    Sprite::Shutdown();
+    Sprite::ShutDown();
 }
 
 void Eye::Update(float dt)

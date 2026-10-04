@@ -1,23 +1,26 @@
 #pragma once
 
-#include "Sprite.h"
 #include "BodyDimensions.h"
 #include "RobotState.h"
+#include "Ear.h"
 
-class Ears : public Sprite
+class Ears
 {
-     public:
+    public:
         Ears(BodyDimensions& dimensions, RobotState& robotState);
         
-        void Initialise() override;
-        
-        using Sprite::Update;
+        void Initialise();
+        void ShutDown();
+
         void Update(float dt);
-        
+        void Draw() const;
+
         void SetTransform(MyTransform parentTransform);
 
     private:
         BodyDimensions& dimensions;
         RobotState& robotState;
-        Vector2 positionOffset;
-};
+
+        Ear leftEar;
+        Ear rightEar;
+}; 

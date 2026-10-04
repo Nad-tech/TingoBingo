@@ -48,7 +48,7 @@ void Sprite::SetShapeName(std::string name)
     this->name = name;
 }
 
-void Sprite::Shutdown()
+void Sprite::ShutDown()
 {
     UnloadTexture(texture);
 }

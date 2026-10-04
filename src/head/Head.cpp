@@ -36,13 +36,13 @@ void Head::Initialise()
 // Release resources used by each head component.
 void Head::Shutdown()
 {
-    headBase.Shutdown();
+    headBase.ShutDown();
     eyes.ShutDown();
-    mouth.Shutdown();
-    ears.Shutdown();
-    antenna.Shutdown();
+    mouth.ShutDown();
+    ears.ShutDown();
+    antenna.ShutDown();
     eyebrows.ShutDown();
-    nose.Shutdown();
+    nose.ShutDown();
 }
 
 // Update every animated head component.

@@ -33,6 +33,6 @@ public:
     void SetScreenCoords();
     void SetShapeName(std::string name);
     
-    void Shutdown();
+    void ShutDown();
     virtual ~Sprite() = default;
 };

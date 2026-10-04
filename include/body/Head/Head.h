@@ -12,19 +12,6 @@
 #include "MyTransform.h"
 #include "RobotState.h"
 
-//====================================================
-// Head
-//
-// Controls the complete robot head.
-//
-// Head owns all of the individual head components and
-// keeps them synchronised so they behave as one unit.
-//
-// Facial features such as the eyes, mouth, eyebrows
-// and pupils can animate independently while the
-// Headbase handles the main head orientation.
-//====================================================
-
 class Head
 {
 public:
