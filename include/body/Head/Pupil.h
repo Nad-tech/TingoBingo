@@ -13,15 +13,10 @@ class Pupil : public Sprite
         
         void Initialise() override;
         
-        using Sprite::Update;
         void Update(float dt);
-        
-        void SetSide(std::string side);
-        float GetSideOffset();
+        void Draw() const;
         
         void SetPosition(Vector2 position);
-        
-        void SetRotation(float rotation);
         
         void SetTransform(MyTransform parentTransform);
 

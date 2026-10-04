@@ -8,7 +8,6 @@ Pupil::Pupil(BodyDimensions& dimensions, RobotState& robotState) :
     robotState(robotState)
 {}
 
-// Load the pupil sprite and initialise its animation.
 void Pupil::Initialise()
 {
     Sprite::texture = LoadTexture("assets/images/TingoBingo/head/pupil.png");
@@ -32,36 +31,23 @@ void Pupil::Initialise()
         COLUMNS,
         FRAME_DURATION
     );
-
-    /*if(side == "left") {
-        positionOffset = {sideOffset, 0};
-    }
-
-    if(side == "right")
-    {
-        positionOffset = {-sideOffset, 0};
-    }*/
     
+    positionOffset = {0.0f, 0.0f};
+
     Sprite::drawGeometry.origin = {
         dimensions.pupilWidth / 2.0f,
         dimensions.pupilHeight / 2.0f
     };
 }
 
-// Advance the pupil animation.
 void Pupil::Update(float dt)
 {
     Sprite::Update(dt);
 }
 
-void Pupil::SetSide(std::string side)
+void Pupil::Draw() const
 {
-    //this->side = side;
-}
-
-float Pupil::GetSideOffset()
-{
-    //return sideOffset;
+    Sprite::Draw();
 }
 
 void Pupil::SetPosition(Vector2 position)
@@ -74,11 +60,6 @@ void Pupil::SetPosition(Vector2 position)
             position.x + X * cosf(radians) - Y * sinf(radians),
             position.y + X * sinf(radians) + Y * cosf(radians)
     };
-}
-
-void Pupil::SetRotation(float rotation)
-{
-    transform.rotation = rotation;
 }
 
 void Pupil::SetTransform(MyTransform parentTransform) 

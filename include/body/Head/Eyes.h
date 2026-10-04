@@ -10,12 +10,14 @@ class Eyes
         Eyes(BodyDimensions& dimensions, RobotState& robotState);
         
         void Initialise();
-        void Shutdown();
+        void ShutDown();
 
         void Update(float dt);
         void Draw() const;
 
         void SetTransform(MyTransform parentTransform);
+
+        void Blink(float dt);
 
     private:
         BodyDimensions& dimensions;
@@ -23,4 +25,7 @@ class Eyes
 
         Eye leftEye;
         Eye rightEye;
+
+        float blinkTimer = 0.0f;
+        float nextBlink = 0.0f;
 }; 

@@ -11,7 +11,7 @@ class Eye : public Sprite
         Eye(BodyDimensions& dimensions, std::string side, RobotState& robotState);
         
         void Initialise() override;
-        void Shutdown();
+        void ShutDown();
 
         using Sprite::Update;
         void Update(float dt);
@@ -19,13 +19,13 @@ class Eye : public Sprite
 
         void SetTransform(MyTransform parentTransform);
 
+        void Blink();
+
     private:
         BodyDimensions& dimensions;
         RobotState& robotState;
         Vector2 positionOffset;
+        std::string side;
         
-        float blinkAnimationTimer = 0.0f;
-        float nextBlinkAnimation = 0.0f;
-
         Pupil pupil;
 }; 

@@ -9,8 +9,8 @@ public:
     float headWidth;
     float headHeight;
 
-    float eyesWidth;
-    float eyesHeight;
+    float eyeWidth;
+    float eyeHeight;
 
     float eyesYoffset;
 

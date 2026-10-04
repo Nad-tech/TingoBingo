@@ -37,7 +37,7 @@ void Head::Initialise()
 void Head::Shutdown()
 {
     headBase.Shutdown();
-    eyes.Shutdown();
+    eyes.ShutDown();
     mouth.Shutdown();
     ears.Shutdown();
     antenna.Shutdown();
