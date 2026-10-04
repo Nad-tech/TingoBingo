@@ -19,7 +19,7 @@ void Mouth::Initialise()
 {
     texture = LoadTexture("assets/images/TingoBingo/head/mouth.png");
 
-    const int COLUMNS = 3;
+    const int COLUMNS = 4;
     const int ROWS = 1;
     const int TOTAL_FRAMES = COLUMNS * ROWS;
     const float FRAME_DURATION = 0.5;
@@ -41,7 +41,7 @@ void Mouth::Initialise()
 
     positionOffset = {
         0,
-        0
+        -55.0f
     };
 
     drawGeometry.origin = {
