@@ -23,8 +23,8 @@ public:
     float earWidth;
     float earHeight;
 
-    float eyeBrowsWidth;
-    float eyeBrowsHeight;
+    float eyeBrowWidth;
+    float eyeBrowHeight;
 
     float mouthWidth;
     float mouthHeight;

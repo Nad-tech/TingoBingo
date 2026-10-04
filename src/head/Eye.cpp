@@ -32,7 +32,7 @@ void Eye::Initialise()
         FRAME_DURATION
     );
 
-    positionOffset = { side == "left" ? 40.0f : -40.0f , 40.0f };
+    positionOffset = { side == "left" ? 40.0f : -40.0f , 30.0f };
 
     drawGeometry.origin = {
         drawGeometry.width / 2.0f,

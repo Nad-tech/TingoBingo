@@ -10,11 +10,9 @@ class EyeBrow : public Sprite
         EyeBrow(BodyDimensions& dimensions, std::string side, RobotState& robotState);
         
         void Initialise() override;
-        void Shutdown();
 
         using Sprite::Update;
         void Update(float dt);
-        void Draw() const;
 
         void SetTransform(MyTransform parentTransform);
 
@@ -22,4 +20,6 @@ class EyeBrow : public Sprite
         BodyDimensions& dimensions;
         RobotState& robotState;
         Vector2 positionOffset;
+
+        std::string side;
 }; 

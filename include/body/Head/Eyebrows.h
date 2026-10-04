@@ -21,9 +21,6 @@ class EyeBrows
     private:
         BodyDimensions& dimensions;
         RobotState& robotState;
-        Vector2 positionOffset;
-
-        float foreheadOffset = 65; 
 
         EyeBrow leftEyeBrow;
         EyeBrow rightEyeBrow;
