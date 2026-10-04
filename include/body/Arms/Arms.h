@@ -18,7 +18,8 @@ class Arms
         
         void SetTransform(MyTransform parentTransform);
 
-        void WaveArm();
+        void Wave();
+        void Shrug();
         
     private:
         BodyDimensions& dimensions;

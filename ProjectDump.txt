@@ -187,7 +187,7 @@ class Arms
         
         void SetTransform(MyTransform parentTransform);
 
-        void WaveArm();
+        void Wave();
         
     private:
         BodyDimensions& dimensions;
@@ -227,7 +227,7 @@ class Elbow : public Shape
 
         void SetTransform(MyTransform parentTransform);
 
-        void WaveArm();
+        void Wave();
 
     private:
         BodyDimensions& dimensions;
@@ -275,7 +275,7 @@ class ForeArm : public Shape
         
         void SetTransform(MyTransform parentTransform);
 
-        void WaveArm();
+        void Wave();
         
     private:
         void AdvanceWave(float dt);
@@ -364,7 +364,7 @@ class Shoulder : public Shape
         
         void SetTransform(MyTransform parentTransform);
 
-        void WaveArm();
+        void Wave();
         
     private:
         BodyDimensions& dimensions;
@@ -414,7 +414,7 @@ class UpperArm : public Shape
         
         void SetTransform(MyTransform parentTransform);
 
-        void WaveArm();
+        void Wave();
 
     private:
         void AdvanceWave(float dt);
@@ -2063,7 +2063,7 @@ void Arms::Shutdown()
 
 void Arms::Update(float dt)
 {
-    WaveArm();
+    Wave();
 
     leftShoulder.Update(dt);
     rightShoulder.Update(dt);
@@ -2081,15 +2081,15 @@ void Arms::SetTransform(MyTransform parentTransform)
     rightShoulder.SetTransform(parentTransform);
 }
 
-void Arms::WaveArm()
+void Arms::Wave()
 {
     if(robotState.gestures.waveRight) {
-        rightShoulder.WaveArm();
+        rightShoulder.Wave();
     }
 
     if(robotState.gestures.waveLeft)
     {
-        leftShoulder.WaveArm();
+        leftShoulder.Wave();
     }
 }
 
@@ -2156,9 +2156,9 @@ void Elbow::SetTransform(MyTransform parentTransform)
     foreArm.SetTransform(transform);
 }
 
-void Elbow::WaveArm()
+void Elbow::Wave()
 {
-    foreArm.WaveArm();
+    foreArm.Wave();
 }
 
 
@@ -2231,7 +2231,7 @@ void ForeArm::SetTransform(MyTransform parentTransform)
     hand.SetTransform(Shape::transform);
 }
 
-void ForeArm::WaveArm()
+void ForeArm::Wave()
 {
     if(waveState == WaveState::None)
     {
@@ -2449,9 +2449,9 @@ void Shoulder::SetTransform(MyTransform parentTransform)
     upperArm.SetTransform(transform);
 }
 
-void Shoulder::WaveArm()
+void Shoulder::Wave()
 {
-    upperArm.WaveArm();
+    upperArm.Wave();
 }
 
 
@@ -2532,7 +2532,7 @@ void UpperArm::SetTransform(MyTransform parentTransform)
     elbow.SetTransform(Shape::transform);
 }
 
-void UpperArm::WaveArm()
+void UpperArm::Wave()
 {
     if(waveState == WaveState::None)
     {
@@ -2556,7 +2556,7 @@ void UpperArm::AdvanceWave(float dt)
             {
                 localRotation = maxRotation;
                 waveState = WaveState::Waving;
-                elbow.WaveArm();
+                elbow.Wave();
             }
         }
         else if(waveState == WaveState::Waving)
@@ -2592,7 +2592,7 @@ void UpperArm::AdvanceWave(float dt)
             {
                 localRotation = maxRotation;
                 waveState = WaveState::Waving;
-                elbow.WaveArm();
+                elbow.Wave();
             }
         }
         else if(waveState == WaveState::Waving)

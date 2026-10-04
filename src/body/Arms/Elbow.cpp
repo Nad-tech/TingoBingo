@@ -56,7 +56,12 @@ void Elbow::SetTransform(MyTransform parentTransform)
     foreArm.SetTransform(transform);
 }
 
-void Elbow::WaveArm()
+void Elbow::Wave()
 {
-    foreArm.WaveArm();
+    foreArm.Wave();
+}
+
+void Elbow::Shrug()
+{
+    foreArm.Shrug();
 }

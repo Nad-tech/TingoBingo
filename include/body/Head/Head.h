@@ -30,13 +30,20 @@ class Head
 {
 public:
     enum class NodState
-        {
-            None,
-            Raising,
-            Lowering,
-            Returning
-        };
+    {
+        None,
+        Raising,
+        Lowering,
+        Returning
+    };
 
+    enum class ShrugState
+    {
+        None,
+        Lowering,
+        Returning
+    };
+        
     Head(BodyDimensions& dimensions, RobotState& robotState);
     
     void Initialise();
@@ -51,9 +58,11 @@ public:
     void LookForward();
     
     void Nod();
+    void Shrug();
 
 private:
     void AdvanceNod(float dt);
+    void AdvanceShrug(float dt);
 
     BodyDimensions& dimensions;
     
@@ -64,7 +73,8 @@ private:
     
     RobotState& robotState;
     NodState nodState = NodState::None;
-    float nodOffsetY = 0.0f;
+    ShrugState shrugState = ShrugState::None;
+    float YOffset = 0.0f;
 
     Headbase headBase;
     Eyes eyes;

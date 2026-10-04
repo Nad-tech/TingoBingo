@@ -16,6 +16,7 @@ class RobotState
             bool shrug = false;
             bool celebrate = false;
             bool crouch = false;
+            bool spin = false;
         };
         Gestures gestures;
 

@@ -50,6 +50,11 @@ void UpperArm::Update(float dt)
         AdvanceWave(dt);
     }
 
+    if(shrugState != ShrugState::None)
+    {
+        AdvanceShrug(dt);
+    }
+
     elbow.Update(dt);
 }
 
@@ -71,7 +76,7 @@ void UpperArm::SetTransform(MyTransform parentTransform)
     elbow.SetTransform(Shape::transform);
 }
 
-void UpperArm::WaveArm()
+void UpperArm::Wave()
 {
     if(waveState == WaveState::None)
     {
@@ -85,7 +90,7 @@ void UpperArm::AdvanceWave(float dt)
     {
         const float speed = 250.0f;
         const float minRotation = 0.0f;
-        const float maxRotation = 120.0f;
+        const float maxRotation = 60.0f;
 
         if(waveState == WaveState::Raising)
         {
@@ -95,7 +100,7 @@ void UpperArm::AdvanceWave(float dt)
             {
                 localRotation = maxRotation;
                 waveState = WaveState::Waving;
-                elbow.WaveArm();
+                elbow.Wave();
             }
         }
         else if(waveState == WaveState::Waving)
@@ -121,7 +126,7 @@ void UpperArm::AdvanceWave(float dt)
     {
         const float speed = 250.0f;
         const float minRotation = 0.0f;
-        const float maxRotation = -120.0f;
+        const float maxRotation = -60.0f;
 
         if(waveState == WaveState::Raising)
         {
@@ -131,7 +136,7 @@ void UpperArm::AdvanceWave(float dt)
             {
                 localRotation = maxRotation;
                 waveState = WaveState::Waving;
-                elbow.WaveArm();
+                elbow.Wave();
             }
         }
         else if(waveState == WaveState::Waving)
@@ -154,4 +159,91 @@ void UpperArm::AdvanceWave(float dt)
     }
 
     SetTransform(tempParentTransform);
+}
+
+void UpperArm::Shrug()
+{
+    if(shrugState == ShrugState::None)
+    {
+        shrugState = ShrugState::Raising;
+    }
+}
+
+void UpperArm::AdvanceShrug(float dt)
+{
+    float shrugMax = 60.0f;
+
+    if(side == "left")
+    {
+        const float speed = 250.0f;
+        const float minRotation = 0.0f;
+        const float maxRotation = shrugMax;
+
+        if(shrugState == ShrugState::Raising)
+        {
+            localRotation += speed * dt;
+            
+            if(localRotation >= maxRotation)
+            {
+                localRotation = maxRotation;
+                shrugState = ShrugState::Shrugging;
+                elbow.Shrug();
+            }
+        }
+        else if(shrugState == ShrugState::Shrugging)
+        {
+            if(!robotState.gestures.shrug)
+            {
+                shrugState = ShrugState::Lowering;
+            }
+        }
+        else if(shrugState == ShrugState::Lowering)
+        {
+            localRotation -= speed * dt;
+
+            if(localRotation <= minRotation)
+            {
+                localRotation = minRotation;
+                shrugState = ShrugState::None;
+            }
+        }
+    }
+
+    if(side == "right")
+    {
+        const float speed = 250.0f;
+        const float minRotation = 0.0f;
+        const float maxRotation = -shrugMax;
+
+        if(shrugState == ShrugState::Raising)
+        {
+            localRotation -= speed * dt;
+            
+            if(localRotation <= maxRotation)
+            {
+                localRotation = maxRotation;
+                shrugState = ShrugState::Shrugging;
+                elbow.Shrug();
+            }
+        }
+        else if(shrugState == ShrugState::Shrugging)
+        {
+            if(!robotState.gestures.shrug)
+            {
+                shrugState = ShrugState::Lowering;
+            }
+        }
+        else if(shrugState == ShrugState::Lowering)
+        {
+            localRotation += speed * dt;
+
+            if(localRotation >= minRotation)
+            {
+                localRotation = minRotation;
+                shrugState = ShrugState::None;
+            }
+        }
+    }
+
+    SetTransform(tempParentTransform);    
 }

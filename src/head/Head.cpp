@@ -55,6 +55,13 @@ void Head::Update(float dt)
         AdvanceNod(dt);
     }
 
+    Shrug();
+
+    if(shrugState != ShrugState::None)
+    {
+        AdvanceShrug(dt);
+    }
+
     antenna.Update(dt);
     ears.Update(dt);
     eyebrows.Update(dt);
@@ -80,7 +87,7 @@ void Head::SetTransform(MyTransform parentTransform)
 
     transform = MakeChildTransform(parentTransform, positionOffset);
 
-    transform.position.y += nodOffsetY;
+    transform.position.y += YOffset;
 
     headBase.SetTransform(transform);
     eyes.SetTransform(transform);
@@ -117,21 +124,21 @@ void Head::AdvanceNod(float dt)
 
     if(nodState == NodState::Raising)
     {
-        nodOffsetY += speed * dt;
+        YOffset += speed * dt;
 
-        if(nodOffsetY >= maxOffset)
+        if(YOffset >= maxOffset)
         {
-            nodOffsetY = maxOffset;
+            YOffset = maxOffset;
             nodState = NodState::Lowering;
         }
     }
     else if(nodState == NodState::Lowering)
     {
-        nodOffsetY -= speed * dt;
+        YOffset -= speed * dt;
 
-        if(nodOffsetY <= minOffset)
+        if(YOffset <= minOffset)
         {
-            nodOffsetY = minOffset;
+            YOffset = minOffset;
         
             if(robotState.gestures.nod)
             {
@@ -145,24 +152,72 @@ void Head::AdvanceNod(float dt)
     }
     else if(nodState == NodState::Returning)
     {
-        if(nodOffsetY > 0.0f)
+        if(YOffset > 0.0f)
         {
-            nodOffsetY -= speed * dt;
+            YOffset -= speed * dt;
 
-            if(nodOffsetY <= 0.0f)
+            if(YOffset <= 0.0f)
             {
-                nodOffsetY = 0.0f;
+                YOffset = 0.0f;
                 nodState = NodState::None;
             }
         }
-        else if(nodOffsetY < 0.0f)
+        else if(YOffset < 0.0f)
         {
-            nodOffsetY += speed * dt;
+            YOffset += speed * dt;
 
-            if(nodOffsetY >= 0.0f)
+            if(YOffset >= 0.0f)
             {
-                nodOffsetY = 0.0f;
+                YOffset = 0.0f;
                 nodState = NodState::None;
+            }
+        }
+        else
+        {
+            nodState = NodState::None;
+        }
+    }
+
+    SetTransform(tempParentTransform);
+}
+
+void Head::Shrug()
+{
+    if(robotState.gestures.shrug && shrugState == ShrugState::None)
+    {
+        shrugState = ShrugState::Lowering;
+    }
+}
+
+void Head::AdvanceShrug(float dt)
+{
+    const float speed = 250.0f;
+    const float minOffset = -30.0f;
+
+    if(shrugState == ShrugState::Lowering)
+    {
+        YOffset -= speed * dt;
+
+        if(YOffset <= minOffset)
+        {
+            YOffset = minOffset;
+        
+            if(!robotState.gestures.shrug)
+            {
+                shrugState = ShrugState::Returning;
+            }
+        }
+    }
+    else if(shrugState == ShrugState::Returning)
+    {
+        if(YOffset < 0.0f)
+        {
+            YOffset += speed * dt;
+
+            if(YOffset >= 0.0f)
+            {
+                YOffset = 0.0f;
+                shrugState = ShrugState::None;
             }
         }
         else

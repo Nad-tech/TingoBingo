@@ -94,7 +94,6 @@ void Shin::AdvanceCrouch(float dt)
             {
                 localRotation = maxRotation;
                 crouchState = CrouchState::Crouching;
-                //foot.Crouch();
             }
         }
         else if(crouchState == CrouchState::Crouching)
@@ -130,7 +129,6 @@ void Shin::AdvanceCrouch(float dt)
             {
                 localRotation = maxRotation;
                 crouchState = CrouchState::Crouching;
-                //knee.Crouch();
             }
         }
         else if(crouchState == CrouchState::Crouching)

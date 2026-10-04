@@ -43,6 +43,11 @@ void ForeArm::Update(float dt)
         AdvanceWave(dt);
     }
 
+    if(shrugState != ShrugState::None)
+    {
+        AdvanceShrug(dt);
+    }
+
     hand.Update(dt);
 }
 
@@ -63,7 +68,7 @@ void ForeArm::SetTransform(MyTransform parentTransform)
     hand.SetTransform(Shape::transform);
 }
 
-void ForeArm::WaveArm()
+void ForeArm::Wave()
 {
     if(waveState == WaveState::None)
     {
@@ -144,4 +149,89 @@ void ForeArm::AdvanceWave(float dt)
     }
 
     SetTransform(tempParentTransform);
+}
+
+void ForeArm::Shrug()
+{
+    if(shrugState == ShrugState::None)
+    {
+        shrugState = ShrugState::Raising;
+    }
+}
+
+void ForeArm::AdvanceShrug(float dt)
+{
+    float shrugMax = 60.0f;
+
+    if(side == "left")
+    {
+        const float speed = 250.0f;
+        const float minRotation = 0.0f;
+        const float maxRotation = shrugMax;
+
+        if(shrugState == ShrugState::Raising)
+        {
+            localRotation += speed * dt;
+            
+            if(localRotation >= maxRotation)
+            {
+                localRotation = maxRotation;
+                shrugState = ShrugState::Shrugging;
+            }
+        }
+        else if(shrugState == ShrugState::Shrugging)
+        {
+            if(!robotState.gestures.shrug)
+            {
+                shrugState = ShrugState::Lowering;
+            }
+        }
+        else if(shrugState == ShrugState::Lowering)
+        {
+            localRotation -= speed * dt;
+
+            if(localRotation <= minRotation)
+            {
+                localRotation = minRotation;
+                shrugState = ShrugState::None;
+            }
+        }
+    }
+
+    if(side == "right")
+    {
+        const float speed = 250.0f;
+        const float minRotation = 0.0f;
+        const float maxRotation = -shrugMax;
+
+        if(shrugState == ShrugState::Raising)
+        {
+            localRotation -= speed * dt;
+            
+            if(localRotation <= maxRotation)
+            {
+                localRotation = maxRotation;
+                shrugState = ShrugState::Shrugging;
+            }
+        }
+        else if(shrugState == ShrugState::Shrugging)
+        {
+            if(!robotState.gestures.shrug)
+            {
+                shrugState = ShrugState::Lowering;
+            }
+        }
+        else if(shrugState == ShrugState::Lowering)
+        {
+            localRotation += speed * dt;
+
+            if(localRotation >= minRotation)
+            {
+                localRotation = minRotation;
+                shrugState = ShrugState::None;
+            }
+        }
+    }
+
+    SetTransform(tempParentTransform);    
 }

@@ -12,8 +12,17 @@ class UpperArm : public Shape
         {
             None,
             Raising,
-            Waving,
-            Lowering
+            Lowering,
+            Waving
+            
+        };
+
+        enum class ShrugState
+        {
+            None,
+            Raising,
+            Lowering,
+            Shrugging
         };
 
         UpperArm
@@ -30,10 +39,12 @@ class UpperArm : public Shape
         
         void SetTransform(MyTransform parentTransform);
 
-        void WaveArm();
+        void Wave();
+        void Shrug();
 
     private:
         void AdvanceWave(float dt);
+        void AdvanceShrug(float dt);
 
         BodyDimensions& dimensions;
         Vector2 positionOffset;
@@ -41,8 +52,10 @@ class UpperArm : public Shape
         RobotState& robotState;
 
         WaveState waveState = WaveState::None;
+        ShrugState shrugState = ShrugState::None;
 
         float localRotation = 0.0f;
+        
         std::string side = "";
 
         Elbow elbow;

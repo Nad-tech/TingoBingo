@@ -55,6 +55,11 @@ void Shoulder::Initialise()
 // Update the shoulder and its child upper arm.
 void Shoulder::Update(float dt)
 {
+    if(shrugState != ShrugState::None)
+    {
+        AdvanceShrug(dt);
+    }
+
     upperArm.Update(dt);
 }
 
@@ -66,14 +71,64 @@ void Shoulder::Draw() const
 
 void Shoulder::SetTransform(MyTransform parentTransform)
 {
+    tempParentTransform = parentTransform;
+    
     transform = MakeChildTransform(parentTransform, positionOffset);
+    transform.position.y += shrugOffsetY;
 
     Shape::SetScreenCoords();
 
     upperArm.SetTransform(transform);
 }
 
-void Shoulder::WaveArm()
+void Shoulder::Wave()
 {
-    upperArm.WaveArm();
+    upperArm.Wave();
+}
+
+void Shoulder::Shrug()
+{
+    if(shrugState == ShrugState::None)
+    {
+        shrugState = ShrugState::Raising;
+    }
+}
+
+void Shoulder::AdvanceShrug(float dt)
+{
+    const float speed = 250.0f;
+    const float minOffset = 0.0f;
+    const float maxOffset = 30.0f;
+
+    if(shrugState == ShrugState::Raising)
+    {
+        shrugOffsetY += speed * dt;
+        
+        if(shrugOffsetY >= maxOffset)
+        {
+            shrugOffsetY = maxOffset;
+            shrugState = ShrugState::Shrugging;
+            upperArm.Shrug();
+        }
+    }
+    else if(shrugState == ShrugState::Shrugging)
+    {
+        if(!robotState.gestures.shrug)
+        {
+            shrugState = ShrugState::Lowering;
+        }
+    }
+    else if(shrugState == ShrugState::Lowering)
+    {
+        shrugOffsetY -= speed * dt;
+
+        if(shrugOffsetY <= minOffset)
+        {
+            shrugOffsetY = minOffset;
+            shrugState = ShrugState::None;
+        }
+    }
+    
+
+    SetTransform(tempParentTransform);
 }

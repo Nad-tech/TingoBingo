@@ -154,8 +154,9 @@ void Robot::Draw() const
     (
         TextFormat
         (
-            "crouch %s |", 
-            flag(gestures.crouch)
+            "crouch %s |  spin %s", 
+            flag(gestures.crouch),
+            flag(gestures.spin)
         ),  
         x, 
         y, 
@@ -252,6 +253,11 @@ void Robot::ToggleGesture(std::string gesture)
     if(gesture == "crouch")
     {
         robotState.gestures.crouch = !robotState.gestures.crouch;
+    }
+
+    if(gesture == "spin")
+    {
+        robotState.gestures.spin = !robotState.gestures.spin;
     }
 }
 

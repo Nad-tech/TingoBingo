@@ -8,6 +8,14 @@
 class Shoulder : public Shape
 {
     public:
+        enum class ShrugState
+        {
+            None,
+            Raising,
+            Lowering,
+            Shrugging
+        };
+
         Shoulder
         (
             BodyDimensions& dimensions, 
@@ -22,9 +30,12 @@ class Shoulder : public Shape
         
         void SetTransform(MyTransform parentTransform);
 
-        void WaveArm();
+        void Wave();
+        void Shrug();
         
     private:
+        void AdvanceShrug(float dt);    
+
         BodyDimensions& dimensions;
         Vector2 positionOffset = {0, 0};
         RobotState& robotState;
@@ -33,4 +44,8 @@ class Shoulder : public Shape
         UpperArm upperArm;
 
         std::string name;
+
+        ShrugState shrugState = ShrugState::None;
+        float shrugOffsetY = 0.0f;
+        MyTransform tempParentTransform;
 };
