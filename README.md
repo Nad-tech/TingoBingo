@@ -1,152 +1,110 @@
-# TingoBingo
+﻿# TingoBingo
 
-TingoBingo is an interactive cardboard robot built with C++ and Raylib. Tingo can look around, respond to objects, express emotions, animate his face, and generate speech.
+TingoBingo is a Windows desktop prototype for building and animating Tingo, a cardboard robot. It is written in C++23 and uses raylib for the window, drawing, input, and audio playback.
 
-> **Status:** Active development. The project is currently a Windows desktop prototype.
+The project is currently a hands-on animation and architecture prototype. The robot is assembled from separate body parts, and keyboard controls expose its state and several gesture animations for development.
 
-## Features
+## Run the Prototype
 
-- Modular robot made from independently controlled head and facial components
-- Facial animation for eyes, pupils, eyebrows, mouth, ears, nose, and antenna
-- Idle behaviours including blinking, head movement, and expressive feature animation
-- Emotional states: neutral, happy, sad, angry, and surprised
-- Autonomous searching after a period of inactivity
-- Ray-based object detection using the same direction as Tingo's gaze
-- Mouse interaction with draggable toys
-- Current toys: ball and banana
-- Speech generation and playback through Piper, FFmpeg, and Raylib audio
-- Reusable sprite-sheet animation with frame ranges and animation priorities
-
-## Controls
-
-| Input | Action |
-| --- | --- |
-| Left Arrow | Turn Tingo left |
-| Right Arrow | Turn Tingo right |
-| Space | Trigger the current space-key interaction |
-| H | Trigger the current H-key interaction |
-| Left Mouse Button | Pick up and move an object |
-
-The exact behaviour of keyboard interactions may change while the prototype is being developed.
-
-## How It Works
-
-The main loop is managed by `Game`:
-
-```text
-Initialise -> HandleInput -> Update -> Draw -> Shutdown
-```
-
-`RobotBrain` coordinates high-level behaviour. It manages idle, searching, and reacting states, then requests emotion, object, and speech actions from the relevant systems.
-
-During a search, Tingo rotates his gaze and projects a 300-pixel ray into the scene. The ray is tested against registered object rectangles. When an object is found, Tingo focuses on it and can deliver an object-specific reaction.
-
-Speech generation runs away from the game loop so Piper and FFmpeg processing does not block rendering. Raylib audio playback is kept on the main thread.
-
-## Requirements
-
-- Windows 10 or later
-- [MSYS2](https://www.msys2.org/) with the MinGW 64-bit environment
-- MinGW-w64 GCC/G++ and `mingw32-make`
-- [Raylib](https://www.raylib.com/)
-- Piper and FFmpeg for speech generation
-- Git, if cloning the repository
-
-The project is configured for the MSYS2 MinGW64 toolchain. Make sure the compiler, linker, Raylib libraries, and runtime DLLs are available in that environment.
-
-## Build and Run
-
-Open an MSYS2 MinGW64 terminal at the project root and run:
+Build and launch from an MSYS2 MinGW64 terminal at the repository root:
 
 ```bash
 ./scripts/build.sh
 ```
 
-This compiles the source files with `mingw32-make` and launches `build/TingoBingo.exe`.
-
-To build without launching the game:
+To build without launching:
 
 ```bash
 mingw32-make
 ```
 
-To remove compiled objects, dependency files, and the executable:
+The executable is created at `build/TingoBingo.exe`. Run it with the repository root as the working directory, because images and audio are loaded using paths relative to that directory.
+
+### Build Requirements
+
+- Windows
+- [MSYS2](https://www.msys2.org/) with the MinGW64 environment
+- GCC/G++, `mingw32-make`, and raylib development libraries available in that environment
+
+Other Makefile targets:
 
 ```bash
-mingw32-make clean
+mingw32-make clean      # Remove generated object, dependency, and executable files
+mingw32-make rebuild    # Clean and build again
 ```
 
-To rebuild from scratch:
+## Keyboard Reference
 
-```bash
-mingw32-make rebuild
-```
+| Key | Effect |
+| --- | --- |
+| `S` | Cycle the displayed robot state: Idle, Thinking, Listening, Reacting |
+| `E` | Cycle the displayed emotion: Idle, Happy, Sad, Angry, Surprised |
+| `G` | Toggle the speaking status indicator |
+| `1` | Toggle the idle gesture flag |
+| `2` | Nod |
+| `3` | Toggle the head-shake gesture flag |
+| `4` / `5` | Wave the left / right arm |
+| `6` / `7` | Toggle the left / right kick gesture flags |
+| `8` | Toggle the jump gesture flag |
+| `9` | Shrug |
+| `0` | Toggle the celebrate gesture flag |
+| `C` | Crouch |
+| `Z` | Toggle the spin gesture flag |
 
-### Visual Studio Code
+The current state, emotion, speaking value, and gesture flags are shown in the on-screen debug readout. State, emotion, and speaking inputs currently update that readout; they do not yet drive a behaviour system. Nod, crouch, arm wave, and shrug have animation code. Several other gesture flags are present as controls and state, but do not yet have a completed animation.
 
-The repository includes workspace settings, a build task, and a GDB launch configuration. With the C/C++ extension installed:
+## What Is in the Code
 
-1. Press `Ctrl+Shift+B` to run the default build task.
-2. Open **Run and Debug** and start the configured debug profile.
-
-## Project Structure
+The application is organised around a frame loop in `Game`:
 
 ```text
-TingoBingo/
-├── assets/       Images, audio, fonts, and speech resources
-├── include/      Header files
-├── src/          Application and gameplay implementation
-│   ├── head/     Facial component implementations
-│   └── body/     Body component implementations
-├── scripts/      Build and project utility scripts
-├── tools/        Local Piper and FFmpeg tools
-├── Makefile      MinGW build configuration
-└── build/        Generated build output
+Initialise → HandleInput → Update → Draw → Shutdown
 ```
 
-The `build/` directory and generated executables are ignored by Git. Source assets used by the application live under `assets/`; working files and render exports are excluded where appropriate.
+`Game` creates the raylib window and audio device, loads the background, handles keyboard input, and updates and draws the robot. `Robot` owns the robot's state and composes the body. `Body`, `Head`, `Arms`, and `Legs` delegate transforms, animation updates, and drawing to their component classes.
 
-## Architecture
+The head is made from a head base, eyes and pupils, eyebrows, mouth, nose, ears, and antenna. The arms include shoulders, upper arms, elbows, forearms, hands, fingers, and clamps. The legs are split into thighs, knees, shins, and feet. Shared transform and shape types support component placement and rendering.
+
+`RobotBrain` is the intended home for higher-level behaviour, but its update method is currently empty. The state and emotion values can be cycled for inspection; autonomous reactions and transitions have not yet been implemented.
+
+## Speech Experiment
+
+Speech support is present in `SpeechGenerator` and `SpeechController`. The intended pipeline generates a WAV with Piper on a worker thread, processes it with FFmpeg, then loads and plays the result through raylib on the main thread.
+
+Speech generation expects these paths relative to the repository root:
 
 ```text
-Game
-├── Robot
-│   ├── RobotBrain
-│   │   ├── Behaviour and state management
-│   │   ├── Emotion handling
-│   │   ├── Searching and object detection
-│   │   └── SpeechController
-│   └── Head
-│   |    ├── HeadBase
-│   |    ├── Eyes and Pupils
-│       ├── Eyebrows and Mouth
-│       ├── Nose and Ears
-│
-|-------
-
-
-
-       └── Antenna
-└── Objects
-    ├── Ball
-    └── Banana
+tools/piper/piper.exe
+tools/piper/en_GB-alan-medium.onnx
+tools/ffmpeg/bin/ffmpeg.exe
 ```
 
-The code is intentionally split into small systems so animation, behaviour, rendering, input, objects, and speech can evolve independently.
+The voice model and supporting speech resources are in the repository, but the expected Piper and FFmpeg executables must also be available at those paths. Speech is not currently triggered by the game loop.
 
-## Roadmap
+## Repository Map
 
-- More object-specific reactions and activities
-- More expressive and coordinated facial animations
-- Expanded emotional transitions and emotion-driven behaviour
-- Speech recognition and two-way voice interaction
-- Memory, context-aware reactions, and a more distinct personality
-- Mini-games, music interaction, dancing, and additional toys
+```text
+assets/                 Robot and background images, audio files
+include/                Public headers for game and robot components
+  Body/Head/            Head and facial component headers
+  Body/Arms/            Arm, hand, finger, and clamp headers
+  Body/Legs/            Leg component headers
+src/                    C++ implementations and application entry point
+  head/                 Head and facial components
+  body/                 Body, head, arms, and legs
+scripts/                Build and project utility scripts
+tools/                  Piper and FFmpeg resources
+utilities/              Project tree and source dump utilities
+Makefile                MinGW build rules
+build/                  Generated compiler output
+```
 
-## Contributing
+## Development
 
-This is an evolving personal project. Bug reports, ideas, and focused pull requests are welcome. Before making a larger change, describe the intended behaviour and keep new systems consistent with the existing modular architecture.
+Add component headers under `include/` and implementations under the matching `src/` subsystem. The Makefile discovers application, head, body, arm, and leg `.cpp` files and places generated output in `build/`.
+
+There is no automated test suite at present. A successful `mingw32-make` build checks compilation; run the executable to inspect visual and animation changes.
 
 ## License
 
-No license has been declared for this repository yet. Please contact the author before redistributing the code or bundled assets.
+No license is declared. Contact the author before redistributing this project or its bundled assets.
