@@ -20,6 +20,8 @@ class Eye : public Sprite
         void SetTransform(MyTransform parentTransform);
 
         void Blink();
+        void Close();
+        void Open();
 
     private:
         BodyDimensions& dimensions;

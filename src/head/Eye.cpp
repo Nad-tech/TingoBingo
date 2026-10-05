@@ -70,3 +70,14 @@ void Eye::Blink()
 {
     animation.Play(0, 4, AnimationPriority::Idle);
 }
+
+void Eye::Close()
+{
+    animation.SetFrame(2);   
+}
+
+void Eye::Open()
+{
+    animation.Stop();
+    animation.SetFrame(0);
+}

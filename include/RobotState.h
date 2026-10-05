@@ -17,6 +17,8 @@ class RobotState
             bool celebrate = false;
             bool crouch = false;
             bool spin = false;
+            bool closeLeftEye = false;
+            bool closeRightEye = false;
         };
         Gestures gestures;
 

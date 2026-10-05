@@ -21,7 +21,15 @@ void Eyes::ShutDown()
 
 void Eyes::Update(float dt)
 {
-    Blink(dt);
+    if(wasLeftEyeClosed && !robotState.gestures.closeLeftEye) leftEye.Open();
+    if(wasRightEyeClosed && !robotState.gestures.closeRightEye) rightEye.Open();
+
+    CloseLeft(dt);
+    CloseRight(dt);
+
+    wasLeftEyeClosed = robotState.gestures.closeLeftEye;
+    wasRightEyeClosed = robotState.gestures.closeRightEye;
+
     leftEye.Update(dt);
     rightEye.Update(dt);
 }
@@ -44,10 +52,22 @@ void Eyes::Blink(float dt)
 
     if (blinkTimer > nextBlink)
     {
-        leftEye.Blink();
-        rightEye.Blink();
+        if(!robotState.gestures.closeLeftEye) leftEye.Blink();
+        if(!robotState.gestures.closeRightEye) rightEye.Blink();
 
         blinkTimer = 0.0f;
         nextBlink = GetRandomValue(1000, 5000) / 1000.0f;
     }
+}
+
+void Eyes::CloseLeft(float dt)
+{
+    if(robotState.gestures.closeLeftEye) leftEye.Close();
+    else Blink(dt);
+}
+
+void Eyes::CloseRight(float dt)
+{
+    if(robotState.gestures.closeRightEye) rightEye.Close();
+    else Blink(dt);
 }

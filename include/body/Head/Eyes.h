@@ -18,6 +18,8 @@ class Eyes
         void SetTransform(MyTransform parentTransform);
 
         void Blink(float dt);
+        void CloseLeft(float dt);
+        void CloseRight(float dt);
 
     private:
         BodyDimensions& dimensions;
@@ -28,4 +30,6 @@ class Eyes
 
         float blinkTimer = 0.0f;
         float nextBlink = 0.0f;
+        bool wasLeftEyeClosed = false;
+        bool wasRightEyeClosed = false;
 }; 

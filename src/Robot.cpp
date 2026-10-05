@@ -163,6 +163,22 @@ void Robot::Draw() const
         fontSize, 
         RAYWHITE
     );
+
+    y += lineHeight;
+
+    DrawText
+    (
+        TextFormat
+        (
+            "closeLeye %s |  closeReye %s", 
+            flag(gestures.closeLeftEye),
+            flag(gestures.closeRightEye)
+        ),  
+        x, 
+        y, 
+        fontSize, 
+        RAYWHITE
+    );
 }
 
 void Robot::CycleState()
@@ -258,6 +274,16 @@ void Robot::ToggleGesture(std::string gesture)
     if(gesture == "spin")
     {
         robotState.gestures.spin = !robotState.gestures.spin;
+    }
+
+    if(gesture == "closeLeftEye")
+    {
+        robotState.gestures.closeLeftEye = !robotState.gestures.closeLeftEye;
+    }
+
+    if(gesture == "closeRightEye")
+    {
+        robotState.gestures.closeRightEye = !robotState.gestures.closeRightEye;
     }
 }
 

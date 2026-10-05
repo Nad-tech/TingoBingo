@@ -12,8 +12,6 @@ public:
     float eyeWidth;
     float eyeHeight;
 
-    float eyesYoffset;
-
     float pupilWidth;
     float pupilHeight;
 

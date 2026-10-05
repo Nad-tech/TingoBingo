@@ -77,6 +77,8 @@ void Game::HandleInput()
 	if (IsKeyPressed(KEY_ZERO)) robot.ToggleGesture("celebrate");
 	if (IsKeyPressed(KEY_C)) robot.ToggleGesture("crouch");
 	if (IsKeyPressed(KEY_Z)) robot.ToggleGesture("spin");
+	if (IsKeyPressed(KEY_Q)) robot.ToggleGesture("closeLeftEye");
+	if (IsKeyPressed(KEY_W)) robot.ToggleGesture("closeRightEye");
 }
 
 void Game::Update(const float dt)
