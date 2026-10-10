@@ -41,6 +41,9 @@ class UpperArm : public Shape
         void Wave();
         void Shrug();
 
+        void OpenClamp();
+        void CloseClamp();
+
     private:
         void AdvanceWave(float dt);
         void AdvanceShrug(float dt);

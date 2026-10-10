@@ -26,6 +26,9 @@ class Elbow : public Shape
         void Wave();
         void Shrug();
 
+        void OpenClamp();
+        void CloseClamp();
+
     private:
         BodyDimensions& dimensions;
         Vector2 positionOffset;

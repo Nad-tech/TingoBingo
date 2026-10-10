@@ -179,6 +179,22 @@ void Robot::Draw() const
         fontSize, 
         RAYWHITE
     );
+
+    y += lineHeight;
+
+    DrawText
+    (
+        TextFormat
+        (
+            "clampL %s | clampR %s",
+            flag(gestures.closeLeftClamp),
+            flag(gestures.closeRightClamp)
+        ),
+        x,
+        y,
+        fontSize,
+        RAYWHITE
+    );
 }
 
 void Robot::CycleState()
@@ -284,6 +300,16 @@ void Robot::ToggleGesture(std::string gesture)
     if(gesture == "closeRightEye")
     {
         robotState.gestures.closeRightEye = !robotState.gestures.closeRightEye;
+    }
+
+    if(gesture == "closeLeftClamp")
+    {
+        robotState.gestures.closeLeftClamp = !robotState.gestures.closeLeftClamp;
+    }
+
+    if(gesture == "closeRightClamp")
+    {
+        robotState.gestures.closeRightClamp = !robotState.gestures.closeRightClamp;
     }
 }
 

@@ -20,6 +20,8 @@ class Arms
 
         void Wave();
         void Shrug();
+
+        void OpenOrCloseClamp();
         
     private:
         BodyDimensions& dimensions;

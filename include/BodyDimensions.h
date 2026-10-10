@@ -48,6 +48,9 @@ public:
     float handWidth;
     float handHeight;
 
+    float fingerWidth;
+    float fingerHeight;
+
     float pelvisWidth;
     float pelvisHeight;
 

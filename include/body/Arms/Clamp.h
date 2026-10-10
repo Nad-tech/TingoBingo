@@ -3,10 +3,10 @@
 #include "Finger.h"
 #include "RobotState.h"
 
-class Clamps
+class Clamp
 {
     public:
-        Clamps(BodyDimensions& dimensions, RobotState& robotState);
+        Clamp(BodyDimensions& dimensions, RobotState& robotState);
 
         void Initialise();
         void Shutdown();
@@ -16,10 +16,13 @@ class Clamps
         
         void SetTransform(MyTransform parentTransform);
         
+        void CloseClamp();
+        void OpenClamp();
+
     private:
         BodyDimensions& dimensions;
         RobotState& robotState;
 
-        Finger upperFinger;
-        Finger lowerFinger; 
+        Finger leftFinger;
+        Finger rightFinger; 
 };

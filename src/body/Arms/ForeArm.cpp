@@ -235,3 +235,13 @@ void ForeArm::AdvanceShrug(float dt)
 
     SetTransform(tempParentTransform);    
 }
+
+void ForeArm::OpenClamp()
+{
+    hand.OpenClamp();
+}
+
+void ForeArm::CloseClamp()
+{
+    hand.CloseClamp();
+}

@@ -79,6 +79,8 @@ void Game::HandleInput()
 	if (IsKeyPressed(KEY_Z)) robot.ToggleGesture("spin");
 	if (IsKeyPressed(KEY_Q)) robot.ToggleGesture("closeLeftEye");
 	if (IsKeyPressed(KEY_W)) robot.ToggleGesture("closeRightEye");
+    if (IsKeyPressed(KEY_A)) robot.ToggleGesture("closeLeftClamp");
+    if (IsKeyPressed(KEY_D)) robot.ToggleGesture("closeRightClamp");
 }
 
 void Game::Update(const float dt)
@@ -93,6 +95,57 @@ void Game::Draw()
 	DrawTexture(background, 0, 0, WHITE);
 
 	robot.Draw();
+
+	const int legendX = SCREEN_WIDTH - 292;
+	const int legendY = 12;
+	const int legendWidth = 280;
+	const int lineHeight = 20;
+	const int textX = legendX + 10;
+	const int rightColumnX = legendX + 148;
+	int textY = legendY + 10;
+
+	DrawRectangle(
+		legendX,
+		legendY,
+		legendWidth,
+		250,
+		Fade(BLACK, 0.75f)
+	);
+	DrawRectangleLines(legendX, legendY, legendWidth, 250, Fade(RAYWHITE, 0.5f));
+
+	DrawText("KEY BINDINGS", textX, textY, 18, YELLOW);
+	textY += lineHeight + 2;
+	DrawText("S  Cycle state", textX, textY, 14, RAYWHITE);
+	DrawText("E  Cycle emotion", rightColumnX, textY, 14, RAYWHITE);
+	textY += lineHeight;
+	DrawText("G  Toggle speaking", textX, textY, 14, RAYWHITE);
+	textY += lineHeight;
+	DrawText("GESTURES", textX, textY, 14, YELLOW);
+	textY += lineHeight;
+
+	DrawText("1  Idle", textX, textY, 14, RAYWHITE);
+	DrawText("2  Nod", rightColumnX, textY, 14, RAYWHITE);
+	textY += lineHeight;
+	DrawText("3  Shake head", textX, textY, 14, RAYWHITE);
+	DrawText("4  Wave left", rightColumnX, textY, 14, RAYWHITE);
+	textY += lineHeight;
+	DrawText("5  Wave right", textX, textY, 14, RAYWHITE);
+	DrawText("6  Kick left", rightColumnX, textY, 14, RAYWHITE);
+	textY += lineHeight;
+	DrawText("7  Kick right", textX, textY, 14, RAYWHITE);
+	DrawText("8  Jump", rightColumnX, textY, 14, RAYWHITE);
+	textY += lineHeight;
+	DrawText("9  Shrug", textX, textY, 14, RAYWHITE);
+	DrawText("0  Celebrate", rightColumnX, textY, 14, RAYWHITE);
+	textY += lineHeight;
+	DrawText("C  Crouch", textX, textY, 14, RAYWHITE);
+	DrawText("Z  Spin", rightColumnX, textY, 14, RAYWHITE);
+	textY += lineHeight;
+	DrawText("Q  Close left eye", textX, textY, 14, RAYWHITE);
+	DrawText("W  Close right eye", rightColumnX, textY, 14, RAYWHITE);
+	textY += lineHeight;
+	DrawText("A  Close left clamp", textX, textY, 14, RAYWHITE);
+	DrawText("D  Close right clamp", rightColumnX, textY, 14, RAYWHITE);
 }
 
 void Game::Shutdown()

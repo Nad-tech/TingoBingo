@@ -20,7 +20,7 @@ Shoulder::Shoulder
 
 void Shoulder::Initialise()
 {
-    dimensions.shoulderWidth = 65.0f;
+    dimensions.shoulderWidth = 80.0f;
     dimensions.shoulderHeight = 65.0f;
 
     drawGeometry.width = dimensions.shoulderWidth;
@@ -131,4 +131,14 @@ void Shoulder::AdvanceShrug(float dt)
     
 
     SetTransform(tempParentTransform);
+}
+
+void Shoulder::OpenClamp()
+{
+    upperArm.OpenClamp();
+}
+
+void Shoulder::CloseClamp()
+{
+    upperArm.CloseClamp();
 }

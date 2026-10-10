@@ -247,3 +247,13 @@ void UpperArm::AdvanceShrug(float dt)
 
     SetTransform(tempParentTransform);    
 }
+
+void UpperArm::OpenClamp()
+{
+    elbow.OpenClamp();
+}
+
+void UpperArm::CloseClamp()
+{
+    elbow.CloseClamp();
+}

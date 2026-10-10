@@ -6,6 +6,12 @@
 class Finger : public Shape
 {
     public:
+        enum class FingerState
+        {
+            Open,
+            Close,
+        };
+
         Finger
         (
             BodyDimensions& dimensions, 
@@ -19,8 +25,13 @@ class Finger : public Shape
         void Draw() const;
         
         void SetTransform(MyTransform parentTransform);
+
+        void Open();
+        void Close();
         
     private:
+        void AdvanceOpenClose(float dt);
+
         BodyDimensions& dimensions;
         Vector2 positionOffset;
         
@@ -28,4 +39,9 @@ class Finger : public Shape
 
         std::string side = "";
 
+        MyTransform tempParentTransform;
+
+        float localRotation = 0.0f;
+
+        FingerState state = FingerState::Open;
 };

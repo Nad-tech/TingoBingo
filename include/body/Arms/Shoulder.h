@@ -32,6 +32,9 @@ class Shoulder : public Shape
 
         void Wave();
         void Shrug();
+
+        void CloseClamp();
+        void OpenClamp();
         
     private:
         void AdvanceShrug(float dt);    

@@ -4,7 +4,7 @@
 #include "Shape.h"
 #include <string>
 #include "RobotState.h"
-#include "Clamps.h"
+#include "Clamp.h"
 
 class Hand : public Shape
 {
@@ -22,6 +22,9 @@ class Hand : public Shape
         void Draw() const;
         
         void SetTransform(MyTransform parentTransform);
+
+        void CloseClamp();
+        void OpenClamp();
         
     private:
         BodyDimensions& dimensions;
@@ -31,5 +34,5 @@ class Hand : public Shape
 
         std::string side = "";
 
-        Clamps clamps;
+        Clamp clamp;
 };

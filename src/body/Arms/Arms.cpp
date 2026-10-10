@@ -22,6 +22,7 @@ void Arms::Update(float dt)
 {
     Wave();
     Shrug();
+    OpenOrCloseClamp();
 
     leftShoulder.Update(dt);
     rightShoulder.Update(dt);
@@ -57,5 +58,27 @@ void Arms::Shrug()
     {
         leftShoulder.Shrug();
         rightShoulder.Shrug();
+    }
+}
+
+void Arms::OpenOrCloseClamp()
+{
+    if(robotState.gestures.closeLeftClamp)
+    {
+        leftShoulder.CloseClamp();
+    }
+    else
+    {
+        leftShoulder.OpenClamp();
+    }
+
+
+    if(robotState.gestures.closeRightClamp)
+    {
+        rightShoulder.CloseClamp();
+    }
+    else
+    {
+        rightShoulder.OpenClamp();
     }
 }

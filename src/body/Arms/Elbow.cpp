@@ -65,3 +65,13 @@ void Elbow::Shrug()
 {
     foreArm.Shrug();
 }
+
+void Elbow::OpenClamp()
+{
+    foreArm.OpenClamp();
+}
+
+void Elbow::CloseClamp()
+{
+    foreArm.CloseClamp();
+}

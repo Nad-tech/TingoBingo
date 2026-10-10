@@ -10,7 +10,7 @@ Hand::Hand
     dimensions(dimensions),
     robotState(robotState),
 	side(side),
-    clamps(dimensions, robotState)
+    clamp(dimensions, robotState)
 {}
 
 void Hand::Initialise()
@@ -18,33 +18,46 @@ void Hand::Initialise()
     dimensions.handWidth = 55.0f;
     dimensions.handHeight = 50.0f;
 
-    Shape::drawGeometry.width = dimensions.handWidth;
-    Shape::drawGeometry.height = dimensions.handHeight;
+    drawGeometry.width = dimensions.handWidth;
+    drawGeometry.height = dimensions.handHeight;
 
     positionOffset = {
         0,
         -dimensions.forearmHeight
     };
 
-    Shape::drawGeometry.origin = {
-        Shape::drawGeometry.width / 2.0f,
-        Shape::drawGeometry.height / 2.0f
+    drawGeometry.origin = {
+        drawGeometry.width / 2.0f,
+        drawGeometry.height / 2.0f
     };
+
+    clamp.Initialise();
 }
 
-float r = 0.0f;
 void Hand::Update(float dt)
 {
-    r += dt*50.0;
+    clamp.Update(dt);
 }
 
 void Hand::Draw() const 
 {
     Shape::Draw();
+    clamp.Draw();
 }
 
 void Hand::SetTransform(MyTransform parentTransform)
 {
-    Shape::transform = MakeChildTransform(parentTransform, positionOffset);
-    Shape::SetScreenCoords();
+    transform = MakeChildTransform(parentTransform, positionOffset);
+    SetScreenCoords();
+    clamp.SetTransform(transform);
+}
+
+void Hand::CloseClamp()
+{
+    clamp.CloseClamp();
+}
+
+void Hand::OpenClamp()
+{
+    clamp.OpenClamp();
 }
