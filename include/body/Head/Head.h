@@ -29,6 +29,13 @@ public:
         Lowering,
         Returning
     };
+
+    enum class ShakeState
+    {
+        None,
+        Shake,
+        Returning
+    };
         
     Head(BodyDimensions& dimensions, RobotState& robotState);
     
@@ -45,10 +52,12 @@ public:
     
     void Nod();
     void Shrug();
+    void Shake();
 
 private:
     void AdvanceNod(float dt);
     void AdvanceShrug(float dt);
+    void AdvanceShake(float dt);
 
     BodyDimensions& dimensions;
     
@@ -60,6 +69,11 @@ private:
     RobotState& robotState;
     NodState nodState = NodState::None;
     ShrugState shrugState = ShrugState::None;
+    ShakeState shakeState = ShakeState::None;
+    float shakeTime = 0.0f;
+
+    float localRotation = 0.0f;
+    
     float YOffset = 0.0f;
 
     Headbase headBase;

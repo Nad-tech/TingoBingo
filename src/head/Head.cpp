@@ -20,9 +20,10 @@ void Head::Initialise()
 {
     headBase.Initialise();
     
+    //Neck joint
     positionOffset = {
         0,
-        dimensions.neckHeight / 2.0f + dimensions.headHeight / 2.0f  
+        dimensions.neckHeight / 2.0f  
     };
     
     antenna.Initialise();
@@ -62,6 +63,13 @@ void Head::Update(float dt)
         AdvanceShrug(dt);
     }
 
+    Shake();
+
+    if(shakeState != ShakeState::None)
+    {
+        AdvanceShake(dt);
+    }
+
     antenna.Update(dt);
     ears.Update(dt);
     eyebrows.Update(dt);
@@ -86,8 +94,8 @@ void Head::SetTransform(MyTransform parentTransform)
     tempParentTransform = parentTransform;
 
     transform = MakeChildTransform(parentTransform, positionOffset);
-
     transform.position.y += YOffset;
+    transform.rotation += localRotation;
 
     headBase.SetTransform(transform);
     eyes.SetTransform(transform);
@@ -228,3 +236,66 @@ void Head::AdvanceShrug(float dt)
 
     SetTransform(tempParentTransform);
 }
+
+void Head::Shake()
+{
+    if(shakeState == ShakeState::None && robotState.gestures.shakeHead)
+    {
+        shakeState = ShakeState::Shake;
+        shakeTime = 0.0f;
+    }
+}
+
+void Head::AdvanceShake(float dt)
+{
+    float speed = 10.0f;
+    float min = -30.0f;
+    float max = 30.0f;
+    float midPoint = (min + max) / 2.0f;
+    float amplitude = (max - min) / 2.0f;
+
+    if(shakeState == ShakeState::Shake)
+    {
+        shakeTime += dt;
+
+        localRotation = midPoint + amplitude*sinf(shakeTime * speed);
+
+        if(!robotState.gestures.shakeHead)
+        {
+            shakeState = ShakeState::Returning;
+        }
+    }
+    else if(shakeState == ShakeState::Returning)
+    {
+        const float returnSpeed = 100.0f;
+
+        if(localRotation < 0.0f)
+        {
+            localRotation += returnSpeed * dt;
+
+            if(localRotation >= 0.0f)
+            {
+                localRotation = 0.0f;
+            }
+        }
+        else if(localRotation > 0.0f)
+        {
+            localRotation -= returnSpeed * dt;
+
+            if(localRotation <= 0.0f)
+            {
+                localRotation = 0.0f;
+            }
+        }
+
+        if(localRotation == 0.0f)
+        {
+            shakeState = ShakeState::None;
+            shakeTime = 0.0f;
+        }
+    }
+
+    SetTransform(tempParentTransform);
+}
+
+

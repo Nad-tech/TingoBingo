@@ -33,7 +33,7 @@ void Nose::Initialise()
 
     positionOffset = {
         0.0f,
-        -slightPositionOffset
+        -slightPositionOffset + dimensions.headHeight / 2.0f
     };
 
     drawGeometry.origin = {

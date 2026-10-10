@@ -46,7 +46,10 @@ void Finger::Initialise()
         
 void Finger::Update(float dt)
 {
-    AdvanceOpenClose(dt);
+    if(state != FingerState::None)
+    {
+        AdvanceOpenClose(dt);
+    }
 }
 
 void Finger::Draw() const
@@ -85,6 +88,7 @@ void Finger::AdvanceOpenClose(float dt)
         if(localRotation <= min)
         {
             localRotation = min;
+            state = FingerState::None;
             return;
         }
     }
@@ -96,6 +100,7 @@ void Finger::AdvanceOpenClose(float dt)
         if(localRotation >= max)
         {
             localRotation = max;
+            state = FingerState::None;
             return;
         }
     }

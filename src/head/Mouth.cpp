@@ -41,7 +41,7 @@ void Mouth::Initialise()
 
     positionOffset = {
         0,
-        -55.0f
+        -55.0f + dimensions.headHeight / 2.0f
     };
 
     drawGeometry.origin = {

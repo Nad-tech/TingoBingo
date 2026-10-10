@@ -31,7 +31,10 @@ void EyeBrow::Initialise()
         FRAME_DURATION
     );
 
-    positionOffset = { side == "left" ? 40.0f : -40.0f , 70.0f };
+    positionOffset = { 
+        side == "left" ? 40.0f : -40.0f , 
+        70.0f + dimensions.headHeight / 2.0f 
+    };
 
     drawGeometry.origin = {
         drawGeometry.width / 2.0f,

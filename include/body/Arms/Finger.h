@@ -8,8 +8,9 @@ class Finger : public Shape
     public:
         enum class FingerState
         {
+            None,
             Open,
-            Close,
+            Close
         };
 
         Finger

@@ -32,7 +32,7 @@ void Antenna::Initialise()
 
     positionOffset = {
         0,
-        topOfHeadOffset
+        topOfHeadOffset + dimensions.headHeight / 2.0f
     };
 
     drawGeometry.origin = {

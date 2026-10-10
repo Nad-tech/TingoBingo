@@ -46,7 +46,7 @@ void Headbase::Initialise()
 
     drawGeometry.origin = {
         drawGeometry.width / 2.0f,
-        drawGeometry.height / 2.0f
+        drawGeometry.height
     };
 
     Sprite::SetShapeName("headBase");

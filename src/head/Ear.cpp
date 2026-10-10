@@ -32,7 +32,10 @@ void Ear::Initialise()
         FRAME_DURATION
     );
 
-    positionOffset = {side == "left" ? 110.0f : -110.0f, 0};
+    positionOffset = {
+        side == "left" ? 110.0f : -110.0f, 
+        dimensions.headHeight / 2.0f
+    };
 
     drawGeometry.origin = {
         drawGeometry.width / 2.0f,
