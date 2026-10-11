@@ -1,4 +1,6 @@
 #pragma once
+#include <vector>
+#include <string>
 
 class RobotState
 {
@@ -21,9 +23,41 @@ class RobotState
             bool closeRightEye = false;
             bool closeRightClamp = false;
             bool closeLeftClamp = false;
+
+            std::vector<std::string> gestureNames = {
+                "idle",
+                "nod",
+                "shakeHead",
+                "waveLeft",
+                "waveRight",
+                "kickLeft",
+                "kickRight",
+                "jump",
+                "shrug",
+                "celebrate",
+                "crouch",
+                "spin",
+                "closeLeftEye",
+                "closeRightEye",
+                "closeRightClamp",
+                "closeLeftClamp"
+            };
+
+            std::vector<std::string> idleGestureNames = {
+                "nod",
+                "shakeHead",
+                "waveLeft",
+                "waveRight",
+                "shrug",
+                "crouch",
+                "closeLeftEye",
+                "closeRightEye",
+                "closeRightClamp",
+                "closeLeftClamp"
+            };
         };
         Gestures gestures;
-
+    
         enum class State
         {
             Idle,

@@ -42,9 +42,9 @@ void Body::Update(float dt)
 void Body::Draw() const
 {
     bodyBase.Draw();
-    arms.Draw();
     neck.Draw();
     pelvis.Draw();
+    arms.Draw();
 }
 
 void Body::SetTransform(MyTransform parentTransform)

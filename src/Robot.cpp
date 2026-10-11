@@ -9,6 +9,7 @@ Robot::Robot() :
 void Robot::Initialise()
 {
     body.Initialise();
+    robotBrain.Initialise();
 }
 
 void Robot::Update(float dt)
