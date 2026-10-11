@@ -14,13 +14,16 @@ void RobotBrain::Initialise()
 
 void RobotBrain::Update(float dt)
 {
+    Vector2 p = {0,0};
+    robot.LookAt(p);
+
     float idleTimeOut = 5.0f;
     idleTimer += dt;
 
     //Idle behavior
     if 
     (
-        robotState.state == RobotState::State::Idle && 
+        robotState.brainState == RobotState::BrainState::Idle && 
         idleTimer >= idleTimeOut && 
         !robotState.speaking
     )

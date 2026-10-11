@@ -58,7 +58,11 @@ void Eye::Update(float dt)
 void Eye::Draw() const
 {
     Sprite::Draw();
-    pupil.Draw();
+    
+    if(animation.GetFrame() != 2) 
+    { 
+        pupil.Draw();
+    }
 }
 
 void Eye::SetTransform(MyTransform parentTransform)
@@ -83,4 +87,9 @@ void Eye::Open()
 {
     animation.Stop();
     animation.SetFrame(0);
+}
+
+void Eye::LookAt(Vector2 point)
+{
+    pupil.LookAt(point);
 }

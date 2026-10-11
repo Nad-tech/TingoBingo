@@ -36,8 +36,8 @@ void Eyes::Update(float dt)
 
 void Eyes::Draw() const
 {
-    leftEye.Draw();
-    rightEye.Draw();
+        leftEye.Draw();
+        rightEye.Draw();
 }
 
 void Eyes::SetTransform(MyTransform parentTransform)
@@ -70,4 +70,10 @@ void Eyes::CloseRight(float dt)
 {
     if(robotState.gestures.closeRightEye) rightEye.Close();
     else Blink(dt);
+}
+
+void Eyes::LookAt(Vector2 point)
+{
+    leftEye.LookAt(point);
+    rightEye.LookAt(point);
 }

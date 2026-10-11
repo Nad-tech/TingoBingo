@@ -5,6 +5,7 @@
 struct Phrases
 {
     std::string greeting = "Hello. My name is Tingo Bingo, what is your name";
+    
     std::vector<std::string> idlePhrases = {
         "beep beep i am a robot",
         "lets play",

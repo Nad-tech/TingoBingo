@@ -16,12 +16,16 @@ class Pupil : public Sprite
         void Update(float dt);
         void Draw() const;
         
-        void SetPosition(Vector2 position);
-        
         void SetTransform(MyTransform parentTransform);
+
+        void LookAt(Vector2 point);
 
     private:
         BodyDimensions& dimensions;
         RobotState& robotState;
-        Vector2 positionOffset;
+        Vector2 positionOffset = {0.0f, 0.0f};
+
+        Vector2 lookOffset = {0.0f, 0.0f};
+
+        MyTransform tempParentTransform;
 };

@@ -23,6 +23,7 @@ class RobotState
             bool closeRightEye = false;
             bool closeRightClamp = false;
             bool closeLeftClamp = false;
+            bool listening = false;
 
             std::vector<std::string> gestureNames = {
                 "idle",
@@ -40,7 +41,8 @@ class RobotState
                 "closeLeftEye",
                 "closeRightEye",
                 "closeRightClamp",
-                "closeLeftClamp"
+                "closeLeftClamp",
+                "listening"
             };
 
             std::vector<std::string> idleGestureNames = {
@@ -58,24 +60,25 @@ class RobotState
         };
         Gestures gestures;
     
-        enum class State
+        enum class BrainState
         {
             Idle,
             Thinking,
             Listening,
+            Searching,
             Reacting
         };
-        State state = State::Idle;
+        BrainState brainState = BrainState::Idle;
         
         bool speaking = false;
 
         enum class Emotions
         {
-            Idle,
+            None,
             Happy,
             Sad,
             Angry,
             Surprised
         };
-        Emotions emotion = Emotions::Idle;
+        Emotions emotion = Emotions::None;
 };

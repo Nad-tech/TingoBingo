@@ -33,6 +33,8 @@ public:
 
     void Crouch();
 
+    void LookAt(Vector2 point);
+
 private:
     void AdvanceCrouch(float dt);
 

@@ -14,8 +14,8 @@ void Robot::Initialise()
 
 void Robot::Update(float dt)
 {
-    body.Update(dt);
     robotBrain.Update(dt);
+    body.Update(dt);
 }
 
 void Robot::SetTransform(MyTransform initialTransform)
@@ -29,18 +29,19 @@ void Robot::Draw() const
     body.Draw();
 
     const char* stateName = "Unknown";
-    switch (robotState.state)
+    switch (robotState.brainState)
     {
-        case RobotState::State::Idle: stateName = "Idle"; break;
-        case RobotState::State::Thinking: stateName = "Thinking"; break;
-        case RobotState::State::Listening: stateName = "Listening"; break;
-        case RobotState::State::Reacting: stateName = "Reacting"; break;
+        case RobotState::BrainState::Idle: stateName = "Idle"; break;
+        case RobotState::BrainState::Thinking: stateName = "Thinking"; break;
+        case RobotState::BrainState::Listening: stateName = "Listening"; break;
+        case RobotState::BrainState::Searching: stateName = "Searching"; break; 
+        case RobotState::BrainState::Reacting: stateName = "Reacting"; break;
     }
 
     const char* emotionName = "Unknown";
     switch (robotState.emotion)
     {
-        case RobotState::Emotions::Idle: emotionName = "Idle"; break;
+        case RobotState::Emotions::None: emotionName = "None"; break;
         case RobotState::Emotions::Happy: emotionName = "Happy"; break;
         case RobotState::Emotions::Sad: emotionName = "Sad"; break;
         case RobotState::Emotions::Angry: emotionName = "Angry"; break;
@@ -200,12 +201,13 @@ void Robot::Draw() const
 
 void Robot::CycleState()
 {
-    switch (robotState.state)
+    switch (robotState.brainState)
     {
-        case RobotState::State::Idle: robotState.state = RobotState::State::Thinking; break;
-        case RobotState::State::Thinking: robotState.state = RobotState::State::Listening; break;
-        case RobotState::State::Listening: robotState.state = RobotState::State::Reacting; break;
-        case RobotState::State::Reacting: robotState.state = RobotState::State::Idle; break;
+        case RobotState::BrainState::Idle: robotState.brainState = RobotState::BrainState::Thinking; break;
+        case RobotState::BrainState::Thinking: robotState.brainState = RobotState::BrainState::Listening; break;
+        case RobotState::BrainState::Listening: robotState.brainState = RobotState::BrainState::Searching; break;
+        case RobotState::BrainState::Searching: robotState.brainState = RobotState::BrainState::Reacting; break;
+        case RobotState::BrainState::Reacting: robotState.brainState = RobotState::BrainState::Idle; break;
     }
 }
 
@@ -213,11 +215,11 @@ void Robot::CycleEmotion()
 {
     switch (robotState.emotion)
     {
-        case RobotState::Emotions::Idle: robotState.emotion = RobotState::Emotions::Happy; break;
+        case RobotState::Emotions::None: robotState.emotion = RobotState::Emotions::Happy; break;
         case RobotState::Emotions::Happy: robotState.emotion = RobotState::Emotions::Sad; break;
         case RobotState::Emotions::Sad: robotState.emotion = RobotState::Emotions::Angry; break;
         case RobotState::Emotions::Angry: robotState.emotion = RobotState::Emotions::Surprised; break;
-        case RobotState::Emotions::Surprised: robotState.emotion = RobotState::Emotions::Idle; break;
+        case RobotState::Emotions::Surprised: robotState.emotion = RobotState::Emotions::None; break;
     }
 }
 
@@ -322,4 +324,9 @@ void Robot::Shutdown()
 RobotBrain& Robot::GetRobotBrain()
 {
     return robotBrain;
+}
+
+void Robot::LookAt(Vector2 point)
+{
+    body.LookAt(point);
 }

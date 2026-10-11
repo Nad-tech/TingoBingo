@@ -55,3 +55,8 @@ void Neck::Shutdown()
 {
     head.Shutdown();
 }
+
+void Neck::LookAt(Vector2 point)
+{
+    head.LookAt(point);
+}

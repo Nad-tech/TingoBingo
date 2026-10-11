@@ -46,13 +46,12 @@ public:
     void Draw() const;
 
     void SetTransform(MyTransform parentTransform);
-
-    void LookAt(Vector2 point);
-    void LookForward();
     
     void Nod();
     void Shrug();
     void Shake();
+
+    void LookAt(Vector2 point);
 
 private:
     void AdvanceNod(float dt);

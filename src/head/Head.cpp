@@ -106,16 +106,6 @@ void Head::SetTransform(MyTransform parentTransform)
     mouth.SetTransform(transform);
 }
 
-void Head::LookAt(Vector2 point)
-{
-    //eyes.GetPupils().LookAt(point);
-}
-
-void Head::LookForward()
-{
-    //eyes.GetPupils().LookForward();
-}
-
 void Head::Nod()
 {
     if(robotState.gestures.nod && nodState == NodState::None)
@@ -298,4 +288,8 @@ void Head::AdvanceShake(float dt)
     SetTransform(tempParentTransform);
 }
 
+void Head::LookAt(Vector2 point)
+{
+    eyes.LookAt(point);
+}
 

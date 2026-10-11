@@ -18,6 +18,8 @@ class Neck : public Shape
         void Draw() const override;
         
         void SetTransform(MyTransform parentTransform);
+
+        void LookAt(Vector2 point);
         
     private:
         BodyDimensions& dimensions;

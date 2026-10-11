@@ -23,6 +23,8 @@ class Eye : public Sprite
         void Close();
         void Open();
 
+        void LookAt(Vector2 point);
+
     private:
         BodyDimensions& dimensions;
         RobotState& robotState;

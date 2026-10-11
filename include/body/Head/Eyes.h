@@ -21,6 +21,8 @@ class Eyes
         void CloseLeft(float dt);
         void CloseRight(float dt);
 
+        void LookAt(Vector2 point);
+
     private:
         BodyDimensions& dimensions;
         RobotState& robotState;

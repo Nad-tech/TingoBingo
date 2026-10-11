@@ -26,6 +26,8 @@ public:
     RobotState::Gestures& GetGestures();
 
     RobotBrain& GetRobotBrain();
+
+    void LookAt(Vector2 point);
     
 private:
     BodyDimensions dimensions;

@@ -110,3 +110,8 @@ void Body::AdvanceCrouch(float dt)
 
     SetTransform(tempParentTransform);
 }
+
+void Body::LookAt(Vector2 point)
+{
+    neck.LookAt(point);
+}
