@@ -74,7 +74,7 @@ void Head::Update(float dt)
     ears.Update(dt);
     eyebrows.Update(dt);
     eyes.Update(dt);
-    mouth.UpdateMouth(dt);
+    mouth.Update(dt);
     nose.Update(dt);
 }
 

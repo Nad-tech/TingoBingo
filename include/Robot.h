@@ -24,6 +24,8 @@ public:
     void ToggleGesture(std::string gesture);
    
     RobotState::Gestures& GetGestures();
+
+    RobotBrain& GetRobotBrain();
     
 private:
     BodyDimensions dimensions;

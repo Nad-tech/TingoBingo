@@ -32,6 +32,7 @@ class RobotState
             Reacting
         };
         State state = State::Idle;
+        
         bool speaking = false;
 
         enum class Emotions

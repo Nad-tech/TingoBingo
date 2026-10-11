@@ -3,6 +3,7 @@
 #include "Robot.h"
 #include "Input.h"
 #include "BodyDimensions.h"
+#include "Phrases.h"
 class Game
 {
 public:
@@ -15,9 +16,13 @@ private:
 	void HandleInput();
 	void Update(const float dt);
 	void Draw();
+
+	void DrawLegend();
 	
 	Robot robot;
 	Vector2 robotWorldPos;
 	Input input;
 	Texture2D background;
+
+	Phrases phrases;
 };

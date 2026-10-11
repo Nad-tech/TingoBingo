@@ -10,7 +10,7 @@ class Mouth : public Sprite
         Mouth(BodyDimensions& dimensions, RobotState& robotState);
         
         void Initialise() override;
-        void UpdateMouth(float dt);
+        void Update(float dt) override;
         
         void SetTransform(MyTransform parentTransform);
 
@@ -20,4 +20,8 @@ class Mouth : public Sprite
         Vector2 positionOffset;
         
         float mouthDisplayOffset = 28.0f;
+
+        float frame = 0.0f;
+        float frameTimer = 0.0f;
+        const float FRAME_DURATION = 0.5;
 };

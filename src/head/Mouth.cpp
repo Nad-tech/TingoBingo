@@ -22,7 +22,6 @@ void Mouth::Initialise()
     const int COLUMNS = 4;
     const int ROWS = 1;
     const int TOTAL_FRAMES = COLUMNS * ROWS;
-    const float FRAME_DURATION = 0.5;
 
     dimensions.mouthWidth = texture.width / COLUMNS;
     dimensions.mouthHeight = texture.height / ROWS;
@@ -51,9 +50,36 @@ void Mouth::Initialise()
 }
 
 // Advance the mouth animation.
-void Mouth::UpdateMouth(float dt)
+void Mouth::Update(float dt)
 {
-    Update(dt);
+    Sprite::Update(dt);
+
+    if (robotState.emotion == RobotState::Emotions::Happy && !robotState.speaking)
+    {
+        frame = 0;
+        frameTimer = 0.0f;
+        animation.SetFrame(frame);
+        return;
+    }
+
+    if (!robotState.speaking)
+    {
+        frame = 1;
+        frameTimer = 0.0f;
+        animation.SetFrame(frame);
+        return;
+    }
+
+    frameTimer += dt;
+
+    if (frameTimer >= FRAME_DURATION)
+    {
+        frameTimer -= FRAME_DURATION;
+        frame = (frame == 1) ? 2 : 1;
+        animation.SetFrame(frame);
+    }
+
+    
 }
 
 void Mouth::SetTransform(MyTransform parentTransform)

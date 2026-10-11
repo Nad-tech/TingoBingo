@@ -317,3 +317,8 @@ void Robot::Shutdown()
 {
     body.Shutdown();
 }
+
+RobotBrain& Robot::GetRobotBrain()
+{
+    return robotBrain;
+}
