@@ -293,3 +293,13 @@ void Head::LookAt(Vector2 point)
     eyes.LookAt(point);
 }
 
+Vector2 Head::GetPosition()
+{
+    Vector2 v = {
+        transform.position.x, 
+        transform.position.y + 30.0f
+    };
+
+    return v;
+}
+

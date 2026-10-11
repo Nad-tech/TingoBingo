@@ -7,15 +7,30 @@ RobotBrain::RobotBrain(Robot& robot, RobotState& robotState) :
     speechController()
 {}
 
+inline Vector2 cart2Screen(Vector2 v)
+{
+    return {
+        SCREEN_WIDTH / 2.0f + v.x,
+        SCREEN_HEIGHT / 2.0f - v.y
+    };
+}
+
 void RobotBrain::Initialise()
 {
-   
+
 }
 
 void RobotBrain::Update(float dt)
 {
-    Vector2 p = {0,0};
-    robot.LookAt(p);
+    // Update gaze behaviour according to the current brain state.
+    if(robotState.brainState == RobotState::BrainState::Idle)
+    {
+        AdvanceIdleGaze(dt);
+    }
+    else if(robotState.brainState == RobotState::BrainState::Searching)
+    {
+        AdvanceSearch(dt);
+    }
 
     float idleTimeOut = 5.0f;
     idleTimer += dt;
@@ -55,7 +70,14 @@ void RobotBrain::Update(float dt)
 
 void RobotBrain::Draw() const
 {
-
+    DrawLine
+    (
+        cart2Screen(searchRayOrigin).x, 
+        cart2Screen(searchRayOrigin).y, 
+        cart2Screen(searchRayEnd).x,
+        cart2Screen(searchRayEnd).y,
+        RED 
+    );
 }
 
 void RobotBrain::Speak(std::string text)
@@ -101,4 +123,19 @@ void RobotBrain::ChooseIdleMovement(bool enable)
         if(lastIdleMovement == "closeRightClamp") robotState.gestures.closeRightClamp = false;
         if(lastIdleMovement == "closeLeftClamp") robotState.gestures.closeLeftClamp = false;
     }
+}
+
+void RobotBrain::Search()
+{
+    robotState.brainState = RobotState::BrainState::Searching;
+}
+
+void RobotBrain::AdvanceSearch(float dt)
+{
+    
+}
+
+void RobotBrain::AdvanceIdleGaze(float dt)
+{
+    
 }

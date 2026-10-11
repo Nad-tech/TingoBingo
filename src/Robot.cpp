@@ -26,8 +26,6 @@ void Robot::SetTransform(MyTransform initialTransform)
 
 void Robot::Draw() const
 {
-    body.Draw();
-
     const char* stateName = "Unknown";
     switch (robotState.brainState)
     {
@@ -197,6 +195,9 @@ void Robot::Draw() const
         fontSize,
         RAYWHITE
     );
+
+    body.Draw();
+    robotBrain.Draw();
 }
 
 void Robot::CycleState()
@@ -329,4 +330,9 @@ RobotBrain& Robot::GetRobotBrain()
 void Robot::LookAt(Vector2 point)
 {
     body.LookAt(point);
+}
+
+Head& Robot::GetHead()
+{
+    return body.GetHead();
 }

@@ -60,3 +60,8 @@ void Neck::LookAt(Vector2 point)
 {
     head.LookAt(point);
 }
+
+Head& Neck::GetHead() 
+{
+    return head;
+}

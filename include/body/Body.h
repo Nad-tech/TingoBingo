@@ -9,6 +9,7 @@
 #include "BodyDimensions.h"
 #include "MyTransform.h"
 #include "RobotState.h"
+#include "Body/Head/Head.h"
 
 
 class Body
@@ -34,6 +35,8 @@ public:
     void Crouch();
 
     void LookAt(Vector2 point);
+
+    Head& GetHead();
 
 private:
     void AdvanceCrouch(float dt);

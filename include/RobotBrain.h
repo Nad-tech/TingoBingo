@@ -22,8 +22,13 @@ class RobotBrain
 
         void SpeakRandomIdlePhrase();
         void ChooseIdleMovement(bool enable);
+
+        void Search();
         
     private:
+        void AdvanceSearch(float dt);
+        void AdvanceIdleGaze(float dt);
+
         Robot& robot;
         RobotState& robotState;
 
@@ -36,4 +41,8 @@ class RobotBrain
         std::mt19937 gen{ std::random_device{}() };
 
         std::string lastIdleMovement;
+
+        float searchAngle = 0.0f;
+        Vector2 searchRayOrigin = {0.0f, 0.0f};
+        Vector2 searchRayEnd = {0.0f, 0.0f};
 };

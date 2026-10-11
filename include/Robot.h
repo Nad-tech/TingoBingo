@@ -5,6 +5,7 @@
 #include "BodyDimensions.h"
 #include "MyTransform.h"
 #include "RobotState.h"
+#include "Body/Head/Head.h"
 
 class Robot
 {
@@ -28,6 +29,8 @@ public:
     RobotBrain& GetRobotBrain();
 
     void LookAt(Vector2 point);
+
+    Head& GetHead();
     
 private:
     BodyDimensions dimensions;

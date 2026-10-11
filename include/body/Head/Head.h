@@ -53,6 +53,8 @@ public:
 
     void LookAt(Vector2 point);
 
+    Vector2 GetPosition();
+
 private:
     void AdvanceNod(float dt);
     void AdvanceShrug(float dt);

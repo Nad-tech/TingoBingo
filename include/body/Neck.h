@@ -20,6 +20,8 @@ class Neck : public Shape
         void SetTransform(MyTransform parentTransform);
 
         void LookAt(Vector2 point);
+
+        Head& GetHead();
         
     private:
         BodyDimensions& dimensions;

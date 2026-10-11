@@ -115,3 +115,8 @@ void Body::LookAt(Vector2 point)
 {
     neck.LookAt(point);
 }
+
+Head& Body::GetHead()
+{
+    return neck.GetHead();
+}

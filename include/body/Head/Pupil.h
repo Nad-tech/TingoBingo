@@ -26,6 +26,8 @@ class Pupil : public Sprite
         Vector2 positionOffset = {0.0f, 0.0f};
 
         Vector2 lookOffset = {0.0f, 0.0f};
+        Vector2 targetLookOffset = { 0.0f, 0.0f };
+        float lookSpeed = 12.0f;
 
         MyTransform tempParentTransform;
 };

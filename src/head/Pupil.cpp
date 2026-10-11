@@ -44,6 +44,12 @@ void Pupil::Initialise()
 void Pupil::Update(float dt)
 {
     Sprite::Update(dt);
+
+    // Smoothly move the pupil towards its target.
+    float smoothing = 1.0f - expf(-lookSpeed * dt);
+
+    lookOffset.x += (targetLookOffset.x - lookOffset.x) * smoothing;
+    lookOffset.y += (targetLookOffset.y - lookOffset.y) * smoothing;
 }
 
 void Pupil::Draw() const
@@ -72,35 +78,25 @@ void Pupil::SetTransform(MyTransform parentTransform)
 
 void Pupil::LookAt(Vector2 point)
 {
-    // Limit how far the pupil can move from its resting position.
     const float MAX_LOOK_DISTANCE = 15.0f;
 
-    // Calculate the direction and distance from the pupil to the target.
-    Vector2 direction =
-    {
+    Vector2 direction = {
         point.x - transform.position.x,
         point.y - transform.position.y
     };
 
-    // Calculate the distance to the target using the direction vector's length.
     float distance = Vector2Length(direction);
 
     if (distance > 0.0f)
     {
-        // Normalize the direction so its length is 1, independent of distance.
         direction = Vector2Scale(direction, 1.0f / distance);
 
-        // Move towards the target, but never farther than MAX_LOOK_DISTANCE.
         float movement = fminf(distance, MAX_LOOK_DISTANCE);
 
-        // Calculate the final offset in the target's direction.
-        lookOffset = Vector2Scale(direction, movement);
+        targetLookOffset = Vector2Scale(direction, movement);
     }
     else
     {
-        // The target is at the pupil's position, so no movement is needed.
-        lookOffset = { 0.0f, 0.0f };
+        targetLookOffset = { 0.0f, 0.0f };
     }
-    
-    SetTransform(tempParentTransform);
 }
