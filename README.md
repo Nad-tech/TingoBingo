@@ -1,77 +1,79 @@
-﻿# TingoBingo
+# TingoBingo
 
-TingoBingo is a Windows desktop prototype for building and animating Tingo, a cardboard robot. It is written in C++23 and uses raylib for the window, drawing, input, and audio playback.
+TingoBingo is a Windows desktop prototype for **Tingo**, a cardboard robot. It is written in C++23 and uses raylib for its window, input, graphics, and audio. The project is being used to explore a component based character, procedural animation, robot state, and speech playback.
 
-The project is currently a hands-on animation and architecture prototype. The robot is assembled from separate body parts, and keyboard controls expose its state and several gesture animations for development.
+## Build and run
 
-## Run the Prototype
-
-Build and launch from an MSYS2 MinGW64 terminal at the repository root:
-
-```bash
-./scripts/build.sh
-```
-
-To build without launching:
+Build from the repository root in an MSYS2 MinGW64 terminal with `g++`, `mingw32-make`, and the raylib development libraries installed:
 
 ```bash
 mingw32-make
 ```
 
-The executable is created at `build/TingoBingo.exe`. Run it with the repository root as the working directory, because images and audio are loaded using paths relative to that directory.
-
-### Build Requirements
-
-- Windows
-- [MSYS2](https://www.msys2.org/) with the MinGW64 environment
-- GCC/G++, `mingw32-make`, and raylib development libraries available in that environment
-
-Other Makefile targets:
+The executable is `build/TingoBingo.exe`. Launch it with the repository root as the working directory so the relative image and audio paths resolve. The helper script builds and launches it:
 
 ```bash
-mingw32-make clean      # Remove generated object, dependency, and executable files
-mingw32-make rebuild    # Clean and build again
+./scripts/build.sh
 ```
 
-## Keyboard Reference
+Other Make targets:
 
-| Key | Effect |
+```bash
+mingw32-make clean
+mingw32-make rebuild
+```
+
+## Controls
+
+| Key | Action |
 | --- | --- |
-| `S` | Cycle the displayed robot state: Idle, Thinking, Listening, Reacting |
-| `E` | Cycle the displayed emotion: Idle, Happy, Sad, Angry, Surprised |
-| `G` | Toggle the speaking status indicator |
-| `1` | Toggle the idle gesture flag |
-| `2` | Nod |
-| `3` | Toggle the head-shake gesture flag |
-| `4` / `5` | Wave the left / right arm |
-| `6` / `7` | Toggle the left / right kick gesture flags |
-| `8` | Toggle the jump gesture flag |
-| `9` | Shrug |
-| `0` | Toggle the celebrate gesture flag |
-| `C` | Crouch |
-| `Z` | Toggle the spin gesture flag |
+| `S` | Cycle the displayed brain state: Idle, Thinking, Listening, Searching, Reacting |
+| `E` | Cycle the displayed emotion: None, Happy, Sad, Angry, Surprised |
+| `G` | Toggle the speaking status |
+| `1` | Toggle idle gesture flag |
+| `2` | Toggle nod |
+| `3` | Toggle head shake |
+| `4` / `5` | Toggle left / right wave |
+| `6` / `7` | Toggle left / right kick |
+| `8` | Toggle jump |
+| `9` | Toggle shrug |
+| `0` | Toggle celebrate |
+| `C` | Toggle crouch |
+| `Z` | Toggle spin |
+| `Q` / `W` | Close left / right eye |
+| `A` / `D` | Close left / right clamp |
+| `X` | Speak the greeting phrase |
 
-The current state, emotion, speaking value, and gesture flags are shown in the on-screen debug readout. State, emotion, and speaking inputs currently update that readout; they do not yet drive a behaviour system. Nod, crouch, arm wave, and shrug have animation code. Several other gesture flags are present as controls and state, but do not yet have a completed animation.
+The current brain state, emotion, speaking status, and gesture flags appear in the on-screen debug readout. These controls are useful for exercising the prototype; a state or gesture flag does not necessarily mean a complete animation or behavior is implemented for it.
 
-## What Is in the Code
-
-The application is organised around a frame loop in `Game`:
+## Project structure
 
 ```text
-Initialise → HandleInput → Update → Draw → Shutdown
+assets/                 Character, background, toy, voice, and sound assets
+include/                Public headers
+  Body/                 Body, head, arms, and legs component headers
+src/                    C++ implementations and application entry point
+  Body/                 Body, arm, and leg implementations
+  Head/                 Head and facial component implementations
+scripts/                Build and project utility scripts
+tools/                  Bundled Piper and FFmpeg resources
+utilities/              Project tree and source dump utilities
+Makefile                MinGW build rules
 ```
 
-`Game` creates the raylib window and audio device, loads the background, handles keyboard input, and updates and draws the robot. `Robot` owns the robot's state and composes the body. `Body`, `Head`, `Arms`, and `Legs` delegate transforms, animation updates, and drawing to their component classes.
+The application starts in `src/main.cpp`. `Game` owns the raylib window and frame loop, handles input, and delegates updates and drawing to `Robot`. `Robot` owns `RobotState`, composes the body, and passes behavior work to `RobotBrain`. The body is split into head, arms, and legs, with smaller components responsible for their own transforms, updates, and drawing.
 
-The head is made from a head base, eyes and pupils, eyebrows, mouth, nose, ears, and antenna. The arms include shoulders, upper arms, elbows, forearms, hands, fingers, and clamps. The legs are split into thighs, knees, shins, and feet. Shared transform and shape types support component placement and rendering.
+The main frame flow is:
 
-`RobotBrain` is the intended home for higher-level behaviour, but its update method is currently empty. The state and emotion values can be cycled for inspection; autonomous reactions and transitions have not yet been implemented.
+```text
+Initialise -> HandleInput -> Update -> Draw -> Shutdown
+```
 
-## Speech Experiment
+`RobotBrain` currently looks the robot at `{0, 0}`, manages idle timing and random idle phrases and gestures, and updates the speech controller. State and emotion cycling currently updates the debug display; it does not by itself implement state driven behavior or facial expressions. Gesture implementation varies by flag.
 
-Speech support is present in `SpeechGenerator` and `SpeechController`. The intended pipeline generates a WAV with Piper on a worker thread, processes it with FFmpeg, then loads and plays the result through raylib on the main thread.
+## Speech
 
-Speech generation expects these paths relative to the repository root:
+Press `X` to request the greeting through the speech controller. `RobotBrain` can also request a random idle phrase after five seconds while its brain state is Idle and it is not speaking. Speech generation uses Piper and FFmpeg, with paths resolved from the project root:
 
 ```text
 tools/piper/piper.exe
@@ -79,32 +81,14 @@ tools/piper/en_GB-alan-medium.onnx
 tools/ffmpeg/bin/ffmpeg.exe
 ```
 
-The voice model and supporting speech resources are in the repository, but the expected Piper and FFmpeg executables must also be available at those paths. Speech is not currently triggered by the game loop.
+Piper generates a raw WAV, FFmpeg processes it, and raylib loads and plays the final file from `assets/audio/voice/speech.wav`. The required executables and model must be present at those paths for speech generation to work.
 
-## Repository Map
+## Development notes
 
-```text
-assets/                 Robot and background images, audio files
-include/                Public headers for game and robot components
-  Body/Head/            Head and facial component headers
-  Body/Arms/            Arm, hand, finger, and clamp headers
-  Body/Legs/            Leg component headers
-src/                    C++ implementations and application entry point
-  head/                 Head and facial components
-  body/                 Body, head, arms, and legs
-scripts/                Build and project utility scripts
-tools/                  Piper and FFmpeg resources
-utilities/              Project tree and source dump utilities
-Makefile                MinGW build rules
-build/                  Generated compiler output
-```
+Add headers under `include/` and implementations under the matching `src/` subsystem, following the existing component lifecycle where practical. Build output is written under `build/`; do not edit generated files directly. Asset paths are relative to the project root.
 
-## Development
-
-Add component headers under `include/` and implementations under the matching `src/` subsystem. The Makefile discovers application, head, body, arm, and leg `.cpp` files and places generated output in `build/`.
-
-There is no automated test suite at present. A successful `mingw32-make` build checks compilation; run the executable to inspect visual and animation changes.
+There is no dedicated automated test suite. A successful build checks compilation; run the application to inspect visual, input, animation, and audio behavior.
 
 ## License
 
-No license is declared. Contact the author before redistributing this project or its bundled assets.
+No project license is currently declared. Check with the author before redistributing the project or its bundled assets.

@@ -11,7 +11,6 @@ class Robot;
 class RobotBrain
 {
     public:
-
         RobotBrain(Robot& robot, RobotState& robotState);
 
         void Initialise();
