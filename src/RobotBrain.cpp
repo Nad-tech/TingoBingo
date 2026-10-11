@@ -7,16 +7,23 @@ RobotBrain::RobotBrain(Robot& robot, RobotState& robotState) :
     speechController()
 {}
 
-int rrrrrr = 0;
 void RobotBrain::Update(float dt)
 {
-    rrrrrr += dt;
+    idleTimer += dt;
+
+    if(idleTimer >= 10.0f)
+    {
+        Speak(phrases.idleHello);
+        idleTimer = 0.0f;
+        robotState.gestures.waveRight = true;
+    }
 
     speechController.Update();
 
     if(speechController.SpeechFinished())
     {
         robotState.speaking = false;
+        robotState.gestures.waveRight = false;
     }
     else {
         robotState.speaking = true;

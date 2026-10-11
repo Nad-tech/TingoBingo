@@ -2,6 +2,7 @@
 
 #include "RobotState.h"
 #include "SpeechController.h"
+#include "Phrases.h"
 
 class Robot;
 
@@ -21,4 +22,8 @@ class RobotBrain
         RobotState& robotState;
 
         SpeechController speechController;
+
+        Phrases phrases;
+
+        float idleTimer = 0.0f;
 };
