@@ -46,6 +46,11 @@ void Robot::Draw() const
         case RobotState::Emotions::Surprised: emotionName = "Surprised"; break;
     }
 
+    const char* searchTypeName = robotState.searchType == RobotState::SearchType::Environmental
+        ? "Environmental" : "Thinking";
+    const char* searchPhaseName = robotState.searchPhase == RobotState::SearchPhase::Scanning
+        ? "Scanning" : "Investigating";
+
     const auto flag = [](bool value) { return value ? "ON" : "off"; };
     const auto& gestures = robotState.gestures;
     const int x = 12;
@@ -81,7 +86,28 @@ void Robot::Draw() const
         fontSize, 
         RAYWHITE
     ); 
+
+    y += lineHeight;
+
+    DrawText(
+        TextFormat("Search type: %s", searchTypeName),
+        x,
+        y,
+        fontSize,
+        RAYWHITE
+    );
     
+    y += lineHeight;
+
+    DrawText(
+        TextFormat("Phase: %s",searchPhaseName),
+        x,
+        y,
+        fontSize,
+        RAYWHITE
+    );
+
+
     y += lineHeight;
     
     DrawText
@@ -222,6 +248,20 @@ void Robot::CycleEmotion()
         case RobotState::Emotions::Angry: robotState.emotion = RobotState::Emotions::Surprised; break;
         case RobotState::Emotions::Surprised: robotState.emotion = RobotState::Emotions::None; break;
     }
+}
+
+void Robot::CycleSearchType()
+{
+    robotState.searchType = robotState.searchType == RobotState::SearchType::Environmental
+        ? RobotState::SearchType::Thinking
+        : RobotState::SearchType::Environmental;
+}
+
+void Robot::CycleSearchPhase()
+{
+    robotState.searchPhase = robotState.searchPhase == RobotState::SearchPhase::Scanning
+        ? RobotState::SearchPhase::Investigating
+        : RobotState::SearchPhase::Scanning;
 }
 
 void Robot::ToggleSpeaking()

@@ -21,6 +21,8 @@ public:
 
     void CycleState();
     void CycleEmotion();
+    void CycleSearchType();
+    void CycleSearchPhase();
     void ToggleSpeaking();
     void ToggleGesture(std::string gesture);
    

@@ -63,6 +63,8 @@ void Game::HandleInput()
 	if (input.S_Pressed()) robot.CycleState();
 	if (input.E_Pressed()) robot.CycleEmotion();
 	if (input.G_Pressed()) robot.ToggleSpeaking();
+	if (IsKeyPressed(KEY_B)) robot.CycleSearchType();
+	if (IsKeyPressed(KEY_F)) robot.CycleSearchPhase();
 
 	if (IsKeyPressed(KEY_ONE)) robot.ToggleGesture("idle");
 	if (IsKeyPressed(KEY_TWO)) robot.ToggleGesture("nod");
@@ -138,13 +140,13 @@ void Game::Run()
 
 void Game::DrawLegend()
 {
-	const int legendX = SCREEN_WIDTH - 292;
+	const int legendX = SCREEN_WIDTH - 350;
 	const int legendY = 12;
-	const int legendWidth = 290;
-	const int legendHeight = 270;
+	const int legendWidth = 335;
+	const int legendHeight = 310;
 	const int lineHeight = 20;
 	const int textX = legendX + 10;
-	const int rightColumnX = legendX + 148;
+	const int rightColumnX = legendX + 160;
 	int textY = legendY + 10;
 
 	DrawRectangle(
@@ -162,6 +164,9 @@ void Game::DrawLegend()
 	DrawText("E  Cycle emotion", rightColumnX, textY, 14, RAYWHITE);
 	textY += lineHeight;
 	DrawText("G  Toggle speaking", textX, textY, 14, RAYWHITE);
+	textY += lineHeight;
+	DrawText("B  Cycle search type", textX, textY, 14, RAYWHITE);
+	DrawText("F  Cycle search phase", rightColumnX, textY, 14, RAYWHITE);
 	textY += lineHeight;
 	DrawText("GESTURES", textX, textY, 14, YELLOW);
 	textY += lineHeight;

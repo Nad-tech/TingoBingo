@@ -212,6 +212,10 @@ void RobotBrain::AdvanceIdleGaze(float dt)
         idleLookTimer = pauseDuration(gen);
     }
 
+    searchRayOrigin = robot.GetHead().GetPosition();
+    searchRayOrigin.y += eyeOffset;
+    searchRayEnd = lookTarget;
+
     // Tell the robot to look towards the current gaze target.
     // This runs every frame, allowing the pupil movement system to
     // smoothly follow the target until a new one is selected.
@@ -220,16 +224,116 @@ void RobotBrain::AdvanceIdleGaze(float dt)
 
 void RobotBrain::AdvanceSearch(float dt)
 {
-    float pauseMin = 1.0f;
-    float pauseMax = 2.0f;
+    // Search behaviour constants.
+    const float PAUSE_MIN = 5.0f;
+    const float PAUSE_MAX = 15.0f;
+    const float TARGET_DISTANCE = 300.0f;
 
+    // Horizontal search movement.
+    const float SEARCH_HORIZONTAL_RADIUS = 200.0f;
+    const float SEARCH_HORIZONTAL_SPEED = 1.5f;
+    const float SEARCH_HORIZONTAL_LIMIT = 0.6f;
+
+    // Vertical search movement.
+    const float SEARCH_VERTICAL_RADIUS = 100.0f;
+    const float SEARCH_VERTICAL_SPEED = 2.0f;
+
+    // Count down until Tingo chooses a new search location.
     searchLookTimer -= dt;
 
-    
+    if(searchLookTimer <= 0.0f)
+    {
+        if(robotState.searchType == RobotState::SearchType::Environmental)
+        {
+            // Generate a random environmental direction.
+            std::uniform_real_distribution<float> horizontal(-1.0f, 1.0f);
+            std::uniform_real_distribution<float> vertical(-0.6f, 0.6f);
 
-    std::uniform_real_distribution<float> pauseDuration(pauseMin, pauseMax);
-    idleLookTimer = pauseDuration(gen);
+            Vector2 direction =
+            {
+                horizontal(gen),
+                vertical(gen)
+            };
 
+            // Calculate the direction vector's length.
+            float length = sqrtf(
+                direction.x * direction.x +
+                direction.y * direction.y
+            );
+
+            // Prevent division by zero when normalising.
+            if(length < 0.001f)
+            {
+                direction = { 1.0f, 0.0f };
+                length = 1.0f;
+            }
+
+            // Normalise the direction vector.
+            direction.x /= length;
+            direction.y /= length;
+
+            // Get the head's current position.
+            Vector2 headPosition = robot.GetHead().GetPosition();
+
+            // Select a new environmental search centre.
+            searchCentre =
+            {
+                headPosition.x + direction.x * TARGET_DISTANCE,
+                headPosition.y + direction.y * TARGET_DISTANCE
+            };
+
+            // Reset the horizontal and vertical search movement.
+            searchHorizontalAngle = 0.0f;
+            searchHorizontalDirection = 1.0f;
+            searchVerticalAngle = 0.0f;
+
+            // Choose how long to examine this area.
+            std::uniform_real_distribution<float> pauseDuration(
+                PAUSE_MIN,
+                PAUSE_MAX
+            );
+
+            searchLookTimer = pauseDuration(gen);
+        }
+    }
+
+    // Move the horizontal search angle back and forth.
+    searchHorizontalAngle +=
+        SEARCH_HORIZONTAL_SPEED * searchHorizontalDirection * dt;
+
+    // Reverse direction at the horizontal limits.
+    if(searchHorizontalAngle >= SEARCH_HORIZONTAL_LIMIT)
+    {
+        searchHorizontalAngle = SEARCH_HORIZONTAL_LIMIT;
+        searchHorizontalDirection = -1.0f;
+    }
+    else if(searchHorizontalAngle <= -SEARCH_HORIZONTAL_LIMIT)
+    {
+        searchHorizontalAngle = -SEARCH_HORIZONTAL_LIMIT;
+        searchHorizontalDirection = 1.0f;
+    }
+
+    // Advance the vertical search angle.
+    searchVerticalAngle += SEARCH_VERTICAL_SPEED * dt;
+
+    // Calculate the horizontal and vertical offsets.
+    float horizontalOffset =
+        sinf(searchHorizontalAngle) * SEARCH_HORIZONTAL_RADIUS;
+
+    float verticalOffset =
+        sinf(searchVerticalAngle) * SEARCH_VERTICAL_RADIUS;
+
+    // Calculate the final gaze target around the search centre.
+    lookTarget =
+    {
+        searchCentre.x + horizontalOffset,
+        searchCentre.y + verticalOffset
+    };
+
+    searchRayOrigin = robot.GetHead().GetPosition();
+    searchRayOrigin.y += eyeOffset;
+    searchRayEnd = lookTarget;
+
+    // Tell Tingo to look towards the calculated target.
     robot.LookAt(lookTarget);
 }
-
