@@ -69,6 +69,20 @@ class RobotState
             Reacting
         };
         BrainState brainState = BrainState::Idle;
+
+        enum class SearchType
+        {
+            Environmental,
+            Thinking
+        };
+        SearchType searchType = SearchType::Environmental;
+
+        enum class SearchPhase
+        {
+            Scanning,
+            Investigating
+        };
+        SearchPhase searchPhase = SearchPhase::Scanning;
         
         bool speaking = false;
 

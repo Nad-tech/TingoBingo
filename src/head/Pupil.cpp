@@ -45,11 +45,23 @@ void Pupil::Update(float dt)
 {
     Sprite::Update(dt);
 
-    // Smoothly move the pupil towards its target.
+    // Calculate a frame-rate-independent smoothing factor using exponential decay.
+    // lookSpeed controls how quickly the pupil moves towards its target, while dt
+    // accounts for the time elapsed since the previous frame. The exponential
+    // function makes the pupil approach its target smoothly without overshooting.
     float smoothing = 1.0f - expf(-lookSpeed * dt);
 
+    // Gradually move the pupil's current horizontal offset towards its target.
+    // The difference between the target and current offsets determines how far
+    // the pupil still needs to move. Multiplying this difference by smoothing
+    // moves the pupil a fraction of the remaining distance each frame.
     lookOffset.x += (targetLookOffset.x - lookOffset.x) * smoothing;
+
+    // Apply the same smoothing to the vertical offset so the pupil moves
+    // smoothly in both horizontal and vertical directions.
     lookOffset.y += (targetLookOffset.y - lookOffset.y) * smoothing;
+
+    SetTransform(tempParentTransform);
 }
 
 void Pupil::Draw() const
@@ -87,12 +99,21 @@ void Pupil::LookAt(Vector2 point)
 
     float distance = Vector2Length(direction);
 
-    if (distance > 0.0f)
+   if (distance > 0.0f)
     {
+        // Normalise the direction vector so its length becomes 1.
+        // This preserves the direction towards the target while removing
+        // the original distance, giving us a consistent direction to use.
         direction = Vector2Scale(direction, 1.0f / distance);
 
+        // Limit the pupil's movement to MAX_LOOK_DISTANCE.
+        // If the target is closer than this limit, use the actual distance;
+        // otherwise, cap the movement to prevent the pupil moving too far.
         float movement = fminf(distance, MAX_LOOK_DISTANCE);
 
+        // Scale the normalised direction by the allowed movement distance.
+        // This produces the final offset that moves the pupil towards the target
+        // without exceeding MAX_LOOK_DISTANCE.
         targetLookOffset = Vector2Scale(direction, movement);
     }
     else

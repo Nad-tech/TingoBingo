@@ -53,6 +53,7 @@ void Eye::ShutDown()
 void Eye::Update(float dt)
 {
     Sprite::Update(dt);
+    pupil.Update(dt);
 }
 
 void Eye::Draw() const
