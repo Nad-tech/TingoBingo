@@ -2,10 +2,12 @@
 
 #include "MyTransform3D.h"
 #include "TingoBingo/TingoDimensions.h"
-#include "TingoBingo/Body/Pelvis.h"
 #include "TingoBingo/TingoAssets.h"
-#include "TingoBingo/Body/Neck.h"
 
+#include "TingoBingo/Body/Neck.h"
+#include "TingoBingo/Body/Pelvis.h"
+#include "TingoBingo/Body/Arm/Shoulder.h"
+#include "TingoBingo/Body/Head/Head.h"
 class Body
 {
 public:
@@ -22,9 +24,12 @@ public:
 private:
     TingoAssets& assets;
     TingoDimensions& dimensions;
-    Pelvis pelvis;
-
+    
     MyTransform3D transform;
 
+    Pelvis pelvis;
     Neck neck;
+    Shoulder leftShoulder;
+    Shoulder rightShoulder;
+    Head head;
 };

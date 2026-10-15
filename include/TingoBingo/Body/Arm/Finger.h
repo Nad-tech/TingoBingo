@@ -2,13 +2,13 @@
 
 #include "MyTransform3D.h"
 #include "TingoBingo/TingoDimensions.h"
-#include "TingoBingo/Body/Leg/Thigh.h"
 #include "TingoBingo/TingoAssets.h"
+#include <string>
 
-class Legs
+class Finger
 {
 public:
-    Legs(TingoAssets& assets,TingoDimensions& dimensions);
+    Finger(TingoAssets& assets, TingoDimensions& dimensions, std::string side);
 
     void Initialise();
     void ShutDown();
@@ -22,6 +22,9 @@ private:
     TingoAssets& assets;
     TingoDimensions& dimensions;
 
-    Thigh leftThigh;
-    Thigh rightThigh;
+    Vector3 positionOffset;
+    
+    std::string side;
+    
+    MyTransform3D transform;
 };

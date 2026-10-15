@@ -27,7 +27,14 @@ void GameWorld::Initialise(ScreenDimensions& screenDimensions)
         assets.GetKneeDimensions(),
         assets.GetShinDimensions(),
         assets.GetFootDimensions(),
-        assets.GetNeckDimensions()
+        assets.GetNeckDimensions(),
+        assets.GetShoulderDimensions(),
+        assets.GetHeadDimensions(),
+        assets.GetUpperArmDimensions(),
+        assets.GetForeArmDimensions(),
+        assets.GetElbowDimensions(),
+        assets.GetHandDimensions(),
+        assets.GetFingerDimensions()
     );
 
     initialTransform.position = {

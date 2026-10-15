@@ -2,7 +2,7 @@
 
 #include "MyTransform3D.h"
 #include "TingoBingo/TingoDimensions.h"
-#include "TingoBingo/Body/Leg/Legs.h"
+#include "TingoBingo/Body/Leg/Thigh.h"
 #include "TingoBingo/TingoAssets.h"
 
 class Pelvis
@@ -25,5 +25,6 @@ private:
     
     Vector3 positionOffset;
 
-    Legs legs;    
+    Thigh leftThigh;
+    Thigh rightThigh;
 };

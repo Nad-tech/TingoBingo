@@ -1,5 +1,4 @@
 #include "TingoBingo/Body/Leg/Knee.h"
-#include "TingoBingo/TingoColours.h"
 #include "raymath.h"
 
 Knee::Knee(TingoAssets& assets, TingoDimensions& dimensions) :

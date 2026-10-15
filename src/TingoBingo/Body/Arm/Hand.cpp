@@ -1,0 +1,64 @@
+#include "TingoBingo/Body/Arm/Hand.h"
+#include "raymath.h"
+
+Hand::Hand(TingoAssets& assets, TingoDimensions& dimensions) :
+    assets(assets),
+    dimensions(dimensions),
+    leftFinger(assets, dimensions, "left"),
+    rightFinger(assets, dimensions, "right")
+{}
+
+
+void Hand::Initialise()
+{
+    positionOffset = {
+        0.0f,
+        -dimensions.foreArm.height / 2.0f - dimensions.hand.height / 2.0f,
+        0.0f
+    };
+
+    leftFinger.Initialise();
+    rightFinger.Initialise();
+}
+
+void Hand::ShutDown()
+{
+
+}
+
+void Hand::Update(float dt)
+{
+    (void)dt;
+}
+
+void Hand::Draw()
+{
+    DrawModelEx(
+        assets.hand,
+        transform.position,
+        transform.rotationAxis,
+        transform.rotationAngle,
+        transform.scale,
+        WHITE
+    );
+
+    DrawModelWiresEx(
+        assets.hand,
+        transform.position,
+        transform.rotationAxis,
+        transform.rotationAngle,
+        transform.scale,
+        GREEN
+    );
+
+    leftFinger.Draw();
+    rightFinger.Draw();
+}
+
+void Hand::SetTransform(MyTransform3D parentTransform)
+{
+    transform = parentTransform;
+    transform.position = Vector3Add(parentTransform.position, positionOffset);
+    leftFinger.SetTransform(transform);
+    rightFinger.SetTransform(transform);
+}

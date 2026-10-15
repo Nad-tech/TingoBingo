@@ -1,5 +1,4 @@
 #include "TingoBingo/Body/Neck.h"
-#include "TingoBingo/TingoColours.h"
 #include "raymath.h"
 
 Neck::Neck(TingoAssets& assets, TingoDimensions& dimensions) :

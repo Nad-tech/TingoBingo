@@ -8,7 +8,14 @@ void TingoDimensions::Initialise
     Vector3 kneeDimensions,
     Vector3 shinDimensions,
     Vector3 footDimensions,
-    Vector3 neckDimensions
+    Vector3 neckDimensions,
+    Vector3 shoulderDimensions,
+    Vector3 headDimensions,
+    Vector3 upperArmDimensions,
+    Vector3 foreArmDimensions,
+    Vector3 elbowDimensions,
+    Vector3 handDimensions,
+    Vector3 fingerDimensions
 )
 {
     bodyShape.width = bodyDimensions.x;
@@ -38,4 +45,32 @@ void TingoDimensions::Initialise
     neck.width = neckDimensions.x;
     neck.height = neckDimensions.y;
     neck.length = neckDimensions.z;
+
+    shoulder.width = shoulderDimensions.x;
+    shoulder.height = shoulderDimensions.y;
+    shoulder.length = shoulderDimensions.z;
+
+    head.width = headDimensions.x;
+    head.height = headDimensions.y; 
+    head.length = headDimensions.z;
+
+    upperArm.width = upperArmDimensions.x;
+    upperArm.height = upperArmDimensions.y;
+    upperArm.length = upperArmDimensions.z;
+
+    foreArm.width = foreArmDimensions.x;
+    foreArm.height = foreArmDimensions.y;
+    foreArm.length = foreArmDimensions.z;
+
+    elbow.width = elbowDimensions.x;
+    elbow.height = elbowDimensions.y;
+    elbow.length = elbowDimensions.z;
+
+    hand.width = handDimensions.x;
+    hand.height = handDimensions.y;
+    hand.length = handDimensions.z;
+
+    finger.width = fingerDimensions.x;
+    finger.height = fingerDimensions.y;
+    finger.length = fingerDimensions.z;
 }

@@ -1,11 +1,11 @@
 #include "TingoBingo/Body/Pelvis.h"
-#include "TingoBingo/TingoColours.h"
 #include "raymath.h"
 
 Pelvis::Pelvis(TingoAssets& assets, TingoDimensions& dimensions) :
     assets(assets),
     dimensions(dimensions),
-    legs(assets, dimensions)
+    leftThigh(assets, dimensions, "left"),
+    rightThigh(assets, dimensions, "right")
 {}
 
 void Pelvis::Initialise()
@@ -17,17 +17,18 @@ void Pelvis::Initialise()
         0.0f
     };
 
-    legs.Initialise();
+    leftThigh.Initialise();
+    rightThigh.Initialise();
 }
 
 void Pelvis::ShutDown()
 {
-    legs.ShutDown();
+    
 }
 
 void Pelvis::Update(float dt)
 {
-    legs.Update(dt);
+    (void)dt;
 }
 
 void Pelvis::Draw()
@@ -50,12 +51,14 @@ void Pelvis::Draw()
         GREEN
     );
 
-    legs.Draw();
+    leftThigh.Draw();
+    rightThigh.Draw();  
 }
 
 void Pelvis::SetTransform(MyTransform3D parentTransform)
 {
     transform = parentTransform;
     transform.position = Vector3Add(parentTransform.position, positionOffset);
-    legs.SetTransform(transform);
+    leftThigh.SetTransform(transform);
+    rightThigh.SetTransform(transform);
 }

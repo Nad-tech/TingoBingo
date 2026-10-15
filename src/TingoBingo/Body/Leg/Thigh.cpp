@@ -1,5 +1,4 @@
 #include "TingoBingo/Body/Leg/Thigh.h"
-#include "TingoBingo/TingoColours.h"
 #include "raymath.h"
 
 Thigh::Thigh(TingoAssets& assets, TingoDimensions& dimensions, std::string side) :

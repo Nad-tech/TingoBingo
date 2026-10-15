@@ -1,5 +1,4 @@
 #include "TingoBingo/Body/Leg/Foot.h"
-#include "TingoBingo/TingoColours.h"
 #include "raymath.h"
 
 Foot::Foot(TingoAssets& assets, TingoDimensions& dimensions) :
