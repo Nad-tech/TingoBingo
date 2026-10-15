@@ -2,10 +2,14 @@
 
 #include "MyTransform3D.h"
 #include "TingoBingo/Body/Body.h"
+#include "TingoDimensions.h"
+#include "TingoAssets.h"
 
 class Tingo
 {
 public:
+    Tingo(TingoAssets& assets, TingoDimensions& dimensions);
+    
     void Initialise();
     void ShutDown();
     
@@ -16,5 +20,7 @@ public:
 
 private:
     MyTransform3D transform;
+    TingoAssets &assets;
+    TingoDimensions& dimensions;
     Body body;
 };

@@ -1,17 +1,52 @@
 #include "GameWorld.h"
 #include <cmath>
 #include "raymath.h"
+#include "TingoBingo/TingoDimensions.h"
 
-void GameWorld::Initialise()
+GameWorld::GameWorld() :
+    tingo(assets, dimensions)
+{}
+
+void GameWorld::Initialise(ScreenDimensions& screenDimensions)
 {
+    this->screenDimensions = screenDimensions;
+
     // Configure the 3D camera.
-    camera.position = { 18.0f, 15.0f, 20.0f };  // Move camera further away and higher // Camera's position in the 3D world (X, Y, Z)
+    camera.position = { -5.0, 10.0f, 20.0f };  // Move camera further away and higher // Camera's position in the 3D world (X, Y, Z)
     camera.target = { 0.0f, 0.0f, 0.0f };  // Point the camera looks at
     camera.up = { 0.0f, 1.0f, 0.0f };      // Defines the upward direction (positive Y)
     camera.fovy = 45.0f;                   // Vertical field of view in degrees
     camera.projection = CAMERA_PERSPECTIVE;// Objects farther away appear smaller
 
+    assets.Initialise();
+    dimensions.Initialise
+    (
+        assets.GetBodyDimensions(),
+        assets.GetPelvisDimensions(),
+        assets.GetThighDimensions(),
+        assets.GetKneeDimensions(),
+        assets.GetShinDimensions(),
+        assets.GetFootDimensions(),
+        assets.GetNeckDimensions()
+    );
+
+    initialTransform.position = {
+        0.0f, 
+        dimensions.bodyShape.height / 2.0f +
+        dimensions.pelvis.height +
+        dimensions.thigh.height +
+        dimensions.knee.height +
+        dimensions.shin.height +
+        dimensions.foot.height, 
+        0.0f
+    };
+    initialTransform.rotationAxis = {1.0f, 0.0f, 0.0f};
+    initialTransform.rotationAngle = 0.0f;
+    initialTransform.scale = {1.0f, 1.0f, 1.0f};
+
+    
     tingo.Initialise();
+    tingo.SetTransform(initialTransform);
 }
 
 void GameWorld::Update(float dt)
@@ -23,9 +58,14 @@ void GameWorld::Update(float dt)
 }
 
 // Draw a screen-space widget showing the camera's orientation.
-static void DrawOrientationGizmo(const Camera3D& camera)
+void GameWorld::DrawOrientationGizmo()
 {
-    const Vector2 centre = { 740.0f, 80.0f };
+    float x = screenDimensions.screenWidth;
+
+    const Vector2 centre = {
+    static_cast<float>(x - 100),
+    100.0f
+};
     const float axisLength = 35.0f;
 
     // Calculate the direction from the camera towards its target.
@@ -112,14 +152,14 @@ void GameWorld::Draw()
         LIGHTGRAY
     );
 
-    // Back wall: positive Z.
-    DrawCube(
+    // Front wall: positive Z.
+    /*DrawCube(
         { 0.0f, roomHeight / 2.0f, halfDepth },
         roomWidth, roomHeight, 0.2f,
         GRAY
-    );
+    );*/
 
-    // Front wall: negative Z.
+    // Back wall wall: negative Z.
     DrawCube(
         { 0.0f, roomHeight / 2.0f, -halfDepth },
         roomWidth, roomHeight, 0.2f,
@@ -146,7 +186,7 @@ void GameWorld::Draw()
 
     EndMode3D();
 
-    DrawOrientationGizmo(camera);
+    DrawOrientationGizmo();
 }
 
 void GameWorld::Shutdown()

@@ -1,4 +1,13 @@
 #include "TingoBingo/Tingo.h"
+#include "raymath.h"
+
+#include <iostream>
+
+Tingo::Tingo(TingoAssets& assets, TingoDimensions& dimensions) :
+    assets(assets),
+    dimensions(dimensions),
+    body(assets, dimensions)
+{}
 
 void Tingo::Initialise()
 {
@@ -7,6 +16,7 @@ void Tingo::Initialise()
 
 void Tingo::ShutDown()
 {
+    assets.ShutDown();
     body.ShutDown();
 }
 

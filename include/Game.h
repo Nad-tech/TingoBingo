@@ -1,6 +1,7 @@
 #pragma once
 
 #include "GameWorld.h"
+#include "ScreenDimensions.h"
 
 class Game
 {
@@ -11,4 +12,5 @@ public:
 
 private:
     GameWorld world;
+    ScreenDimensions screenDimensions;
 };

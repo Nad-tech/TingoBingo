@@ -3,12 +3,22 @@
 
 void Game::Initialise()
 {
-    InitWindow(800, 600, "Tingo Bingo 3D Version 1");
+    InitWindow(10, 10, "TingoBingo 3D");
+
+    int monitor = GetCurrentMonitor();
+    int width = GetMonitorWidth(monitor);
+    int height = GetMonitorHeight(monitor);
+
+    screenDimensions.screenWidth = width;
+    screenDimensions.screenHeight = height;
+
+    SetWindowSize(width, height);
+    SetWindowPosition(0, 0);
+
     SetTargetFPS(60);
+    DisableCursor();
 
-    DisableCursor();  // Keep the mouse captured inside the game window
-
-    world.Initialise();
+    world.Initialise(screenDimensions);
 }
 
 void Game::Run()
