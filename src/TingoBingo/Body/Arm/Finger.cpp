@@ -61,17 +61,22 @@ void Finger::Draw()
 
 void Finger::SetTransform(MyTransform3D parentTransform)
 {
-    transform = parentTransform;
+    MyTransform3D localTransform{};
+
+    localTransform.position = positionOffset;
     
     if(side == "left")
     {
-        transform.rotationAxis = {0.0f, 0.0f, 1.0f};
-        transform.rotationAngle = -15.0f;
+        localTransform.rotationAxis = {0.0f, 0.0f, 1.0f};
+        localTransform.rotationAngle = -15.0f;
     }
     else if(side == "right")
     {
-        transform.rotationAxis = {0.0f, 0.0f, 1.0f};
-        transform.rotationAngle = 15.0f;
+        localTransform.rotationAxis = {0.0f, 0.0f, 1.0f};
+        localTransform.rotationAngle = 15.0f;
     }
-    transform.position = Vector3Add(parentTransform.position, positionOffset);
+
+    localTransform.scale = {1.0f, 1.0f, 1.0f};
+
+    transform = MakeChildTransform(parentTransform, localTransform);
 }

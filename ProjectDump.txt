@@ -1,0 +1,2477 @@
+=====================================
+.\include\Game.h
+=====================================
+
+#pragma once
+
+#include "GameWorld.h"
+#include "ScreenDimensions.h"
+
+class Game
+{
+public:
+    void Initialise();
+    void Run();
+    void Shutdown();
+
+private:
+    GameWorld world;
+    ScreenDimensions screenDimensions;
+};
+
+
+=====================================
+.\include\GameWorld.h
+=====================================
+
+#pragma once
+
+#include "raylib.h"
+#include "TingoBingo/Tingo.h"
+#include "TingoBingo/TingoDimensions.h"
+#include "TingoBingo/TingoAssets.h"
+#include "ScreenDimensions.h"
+
+class GameWorld
+{
+public:
+    GameWorld();
+    void Initialise(ScreenDimensions& screenDimensions);
+    void Update(float dt);
+    void Draw();
+    void Shutdown();
+
+private:
+    void DrawOrientationGizmo();
+    Camera3D camera{};
+    TingoAssets assets;
+    TingoDimensions dimensions;
+    Tingo tingo;
+    MyTransform3D initialTransform; 
+    ScreenDimensions screenDimensions;
+};
+
+
+=====================================
+.\include\MyTransform3D.h
+=====================================
+
+#pragma once
+
+#include "raylib.h"
+#include "raymath.h"
+
+struct MyTransform3D
+{
+    Vector3 position = { 0.0f, 0.0f, 0.0f };
+
+    // Axis around which the model rotates.
+    Vector3 rotationAxis = { 0.0f, 0.0f, 0.0f };
+
+    // Rotation angle in degrees.
+    float rotationAngle = 0.0f;
+
+    // Scale along the X, Y and Z axes.
+    Vector3 scale = { 1.0f, 1.0f, 1.0f };
+};
+
+inline MyTransform3D MakeChildTransform(
+    const MyTransform3D& parent,
+    const MyTransform3D& child)
+{
+    MyTransform3D result{};
+
+    // 1. Scale the child's local position.
+    Vector3 scaledOffset = Vector3Multiply(
+        child.position,
+        parent.scale
+    );
+
+    // 2. Convert the parent's rotation to a quaternion.
+    Quaternion parentRotation = QuaternionFromAxisAngle(
+        parent.rotationAxis,
+        parent.rotationAngle * DEG2RAD
+    );
+
+    // 3. Rotate the child's offset around the parent.
+    Vector3 rotatedOffset = Vector3RotateByQuaternion(
+        scaledOffset,
+        parentRotation
+    );
+
+    // 4. Calculate the child's world position.
+    result.position = Vector3Add(
+        parent.position,
+        rotatedOffset
+    );
+
+    // 5. Combine rotations.
+    Quaternion childRotation = QuaternionFromAxisAngle(
+        child.rotationAxis,
+        child.rotationAngle * DEG2RAD
+    );
+
+    Quaternion combinedRotation = QuaternionMultiply(
+        parentRotation,
+        childRotation
+    );
+
+    // 6. Convert the combined rotation back to axis-angle.
+    Vector3 axis;
+    float angle;
+
+    QuaternionToAxisAngle(
+        combinedRotation,
+        &axis,
+        &angle
+    );
+
+    result.rotationAxis = axis;
+    result.rotationAngle = angle * RAD2DEG;
+
+    // 7. Combine scales.
+    result.scale = Vector3Multiply(
+        parent.scale,
+        child.scale
+    );
+
+    return result;
+}
+
+
+=====================================
+.\include\ScreenDimensions.h
+=====================================
+
+#pragma once
+
+#include "raylib.h"
+
+struct ScreenDimensions
+{
+    int screenWidth = 0;
+    int screenHeight = 0;
+};
+
+
+=====================================
+.\include\TingoBingo\Body\Arm\Elbow.h
+=====================================
+
+#pragma once
+
+#include "MyTransform3D.h"
+#include "TingoBingo/TingoDimensions.h"
+#include "TingoBingo/TingoAssets.h"
+#include "TingoBingo/Body/Arm/ForeArm.h"
+
+class Elbow
+{
+public:
+    Elbow(TingoAssets& assets, TingoDimensions& dimensions);
+
+    void Initialise();
+    void ShutDown();
+    
+    void Update(float dt);
+    void Draw();
+
+    void SetTransform(MyTransform3D parentTransform);
+
+private:
+    TingoAssets& assets;
+    TingoDimensions& dimensions;
+
+    Vector3 positionOffset;
+    
+    MyTransform3D transform;
+
+    ForeArm foreArm;
+};
+
+
+=====================================
+.\include\TingoBingo\Body\Arm\Finger.h
+=====================================
+
+#pragma once
+
+#include "MyTransform3D.h"
+#include "TingoBingo/TingoDimensions.h"
+#include "TingoBingo/TingoAssets.h"
+#include <string>
+
+class Finger
+{
+public:
+    Finger(TingoAssets& assets, TingoDimensions& dimensions, std::string side);
+
+    void Initialise();
+    void ShutDown();
+    
+    void Update(float dt);
+    void Draw();
+
+    void SetTransform(MyTransform3D parentTransform);
+
+private:
+    TingoAssets& assets;
+    TingoDimensions& dimensions;
+
+    Vector3 positionOffset;
+    
+    std::string side;
+    
+    MyTransform3D transform;
+};
+
+
+=====================================
+.\include\TingoBingo\Body\Arm\ForeArm.h
+=====================================
+
+#pragma once
+
+#include "MyTransform3D.h"
+#include "TingoBingo/TingoDimensions.h"
+#include "TingoBingo/TingoAssets.h"
+#include "Hand.h"
+
+class ForeArm
+{
+public:
+    ForeArm(TingoAssets& assets, TingoDimensions& dimensions);
+
+    void Initialise();
+    void ShutDown();
+    
+    void Update(float dt);
+    void Draw();
+
+    void SetTransform(MyTransform3D parentTransform);
+
+private:
+    TingoAssets& assets;
+    TingoDimensions& dimensions;
+
+    Vector3 positionOffset;
+    
+    std::string side;
+    
+    MyTransform3D transform;
+
+    Hand hand;
+};
+
+
+=====================================
+.\include\TingoBingo\Body\Arm\Hand.h
+=====================================
+
+#pragma once
+
+#include "MyTransform3D.h"
+#include "TingoBingo/TingoDimensions.h"
+#include "TingoBingo/TingoAssets.h"
+#include "Finger.h"
+
+class Hand
+{
+public:
+    Hand(TingoAssets& assets, TingoDimensions& dimensions);
+
+    void Initialise();
+    void ShutDown();
+    
+    void Update(float dt);
+    void Draw();
+
+    void SetTransform(MyTransform3D parentTransform);
+
+private:
+    TingoAssets& assets;
+    TingoDimensions& dimensions;
+
+    Vector3 positionOffset;
+    
+    MyTransform3D transform;
+
+    Finger leftFinger;
+    Finger rightFinger;
+};
+
+
+=====================================
+.\include\TingoBingo\Body\Arm\Shoulder.h
+=====================================
+
+#pragma once
+
+#include "MyTransform3D.h"
+#include "TingoBingo/TingoDimensions.h"
+#include "TingoBingo/TingoAssets.h"
+#include <string>
+#include "TingoBingo/Body/Arm/UpperArm.h"
+
+class Shoulder
+{
+public:
+    Shoulder(TingoAssets& assets, TingoDimensions& dimensions, std::string side);
+
+    void Initialise();
+    void ShutDown();
+    
+    void Update(float dt);
+    void Draw();
+
+    void SetTransform(MyTransform3D parentTransform);
+
+private:
+    TingoAssets& assets;
+    TingoDimensions& dimensions;
+
+    Vector3 positionOffset;
+    
+    std::string side;
+    
+    MyTransform3D transform;
+
+    UpperArm upperArm;
+};
+
+
+=====================================
+.\include\TingoBingo\Body\Arm\UpperArm.h
+=====================================
+
+#pragma once
+
+#include "MyTransform3D.h"
+#include "TingoBingo/TingoDimensions.h"
+#include "TingoBingo/TingoAssets.h"
+#include "Elbow.h"
+
+class UpperArm
+{
+public:
+    UpperArm(TingoAssets& assets, TingoDimensions& dimensions);
+
+    void Initialise();
+    void ShutDown();
+    
+    void Update(float dt);
+    void Draw();
+
+    void SetTransform(MyTransform3D parentTransform);
+
+private:
+    TingoAssets& assets;
+    TingoDimensions& dimensions;
+
+    Vector3 positionOffset;
+    
+    std::string side;
+    
+    MyTransform3D transform;
+
+    Elbow elbow;
+};
+
+
+=====================================
+.\include\TingoBingo\Body\Body.h
+=====================================
+
+#pragma once
+
+#include "MyTransform3D.h"
+#include "TingoBingo/TingoDimensions.h"
+#include "TingoBingo/TingoAssets.h"
+
+#include "TingoBingo/Body/Neck.h"
+#include "TingoBingo/Body/Pelvis.h"
+#include "TingoBingo/Body/Arm/Shoulder.h"
+#include "TingoBingo/Body/Head/Head.h"
+class Body
+{
+public:
+    Body(TingoAssets& assets, TingoDimensions& dimensions);
+
+    void Initialise();
+    void ShutDown();
+    
+    void Update(float dt);
+    void Draw();
+
+    void SetTransform(MyTransform3D parentTransform);
+
+private:
+    TingoAssets& assets;
+    TingoDimensions& dimensions;
+    
+    MyTransform3D transform;
+
+    Vector3 positionOffset;
+
+    Pelvis pelvis;
+    Neck neck;
+    Shoulder leftShoulder;
+    Shoulder rightShoulder;
+    Head head;
+};
+
+
+=====================================
+.\include\TingoBingo\Body\Head\Head.h
+=====================================
+
+#pragma once
+
+#include "MyTransform3D.h"
+#include "TingoBingo/TingoDimensions.h"
+#include "TingoBingo/TingoAssets.h"
+
+class Head
+{
+public:
+    Head(TingoAssets& assets, TingoDimensions& dimensions);
+
+    void Initialise();
+    void ShutDown();
+    
+    void Update(float dt);
+    void Draw();
+
+    void SetTransform(MyTransform3D parentTransform);
+
+private:
+    TingoAssets& assets;
+    TingoDimensions& dimensions;
+
+    Vector3 positionOffset;
+    
+    MyTransform3D transform;
+};
+
+
+=====================================
+.\include\TingoBingo\Body\Leg\Foot.h
+=====================================
+
+#pragma once
+
+#include "MyTransform3D.h"
+#include "TingoBingo/TingoDimensions.h"
+#include "TingoBingo/TingoAssets.h"
+
+class Foot
+{
+public:
+    Foot(TingoAssets& assets,TingoDimensions& dimensions);
+
+    void Initialise();
+    void ShutDown();
+    
+    void Update(float dt);
+    void Draw();
+
+    void SetTransform(MyTransform3D parentTransform);
+
+private:
+    TingoAssets& assets;
+    TingoDimensions& dimensions;
+
+    MyTransform3D transform;
+    Vector3 positionOffset;
+};
+
+
+=====================================
+.\include\TingoBingo\Body\Leg\Knee.h
+=====================================
+
+#pragma once
+
+#include "MyTransform3D.h"
+#include "TingoBingo/TingoDimensions.h"
+#include "TingoBingo/TingoAssets.h"
+#include "Shin.h"
+
+class Knee
+{
+public:
+    Knee(TingoAssets& assets,TingoDimensions& dimensions);
+
+    void Initialise();
+    void ShutDown();
+    
+    void Update(float dt);
+    void Draw();
+
+    void SetTransform(MyTransform3D parentTransform);
+
+private:
+    TingoAssets& assets;
+    TingoDimensions& dimensions;
+
+    MyTransform3D transform;
+    Vector3 positionOffset;
+
+    Shin shin;
+};
+
+
+=====================================
+.\include\TingoBingo\Body\Leg\Shin.h
+=====================================
+
+#pragma once
+
+#include "MyTransform3D.h"
+#include "TingoBingo/TingoDimensions.h"
+#include "TingoBingo/TingoAssets.h"
+#include "TingoBingo/Body/Leg/Foot.h"
+
+class Shin
+{
+public:
+    Shin(TingoAssets& assets,TingoDimensions& dimensions);
+
+    void Initialise();
+    void ShutDown();
+    
+    void Update(float dt);
+    void Draw();
+
+    void SetTransform(MyTransform3D parentTransform);
+
+private:
+    TingoAssets& assets;
+    TingoDimensions& dimensions;
+
+    MyTransform3D transform;
+    Vector3 positionOffset;
+
+    Foot foot;
+};
+
+
+=====================================
+.\include\TingoBingo\Body\Leg\Thigh.h
+=====================================
+
+#pragma once
+
+#include "MyTransform3D.h"
+#include "TingoBingo/TingoDimensions.h"
+#include <string>
+#include "TingoBingo/TingoAssets.h"
+#include "Knee.h"
+
+class Thigh
+{
+public:
+    Thigh(TingoAssets& assets, TingoDimensions& dimensions, std::string side);
+
+    void Initialise();
+    void ShutDown();
+    
+    void Update(float dt);
+    void Draw();
+
+    void SetTransform(MyTransform3D parentTransform);
+
+private:
+    TingoAssets& assets;
+    TingoDimensions& dimensions;
+    MyTransform3D transform;
+
+    Vector3 positionOffset;
+
+    std::string side;
+
+    Knee knee;
+};
+
+
+=====================================
+.\include\TingoBingo\Body\Neck.h
+=====================================
+
+#pragma once
+
+#include "MyTransform3D.h"
+#include "TingoBingo/TingoDimensions.h"
+#include "TingoBingo/TingoAssets.h"
+
+class Neck
+{
+public:
+    Neck(TingoAssets& assets,TingoDimensions& dimensions);
+
+    void Initialise();
+    void ShutDown();
+    
+    void Update(float dt);
+    void Draw();
+
+    void SetTransform(MyTransform3D parentTransform);
+
+private:
+    TingoAssets& assets;
+    TingoDimensions& dimensions;
+
+    MyTransform3D transform;
+    Vector3 positionOffset;
+};
+
+
+=====================================
+.\include\TingoBingo\Body\Pelvis.h
+=====================================
+
+#pragma once
+
+#include "MyTransform3D.h"
+#include "TingoBingo/TingoDimensions.h"
+#include "TingoBingo/Body/Leg/Thigh.h"
+#include "TingoBingo/TingoAssets.h"
+
+class Pelvis
+{
+public:
+    Pelvis(TingoAssets& assets, TingoDimensions& dimensions);
+
+    void Initialise();
+    void ShutDown();
+    
+    void Update(float dt);
+    void Draw();
+
+    void SetTransform(MyTransform3D parentTransform);
+
+private:
+    TingoAssets& assets;
+    TingoDimensions& dimensions;
+    MyTransform3D transform;
+    
+    Vector3 positionOffset;
+
+    Thigh leftThigh;
+    Thigh rightThigh;
+};
+
+
+=====================================
+.\include\TingoBingo\Tingo.h
+=====================================
+
+#pragma once
+
+#include "MyTransform3D.h"
+#include "TingoBingo/Body/Body.h"
+#include "TingoDimensions.h"
+#include "TingoAssets.h"
+
+class Tingo
+{
+public:
+    Tingo(TingoAssets& assets, TingoDimensions& dimensions);
+    
+    void Initialise();
+    void ShutDown();
+    
+    void Update(float dt);
+    void Draw();
+
+    void SetTransform(MyTransform3D initialTransform);
+
+private:
+    MyTransform3D transform;
+    TingoAssets &assets;
+    TingoDimensions& dimensions;
+    Body body;
+};
+
+
+=====================================
+.\include\TingoBingo\TingoAssets.h
+=====================================
+
+#pragma once
+
+#include "raylib.h"
+
+class TingoAssets {
+public:
+    void Initialise();
+    void ShutDown();
+
+    Vector3 GetBodyDimensions();
+    Vector3 GetPelvisDimensions();
+    Vector3 GetThighDimensions();
+    Vector3 GetKneeDimensions();
+    Vector3 GetShinDimensions();
+    Vector3 GetFootDimensions();
+    Vector3 GetNeckDimensions();
+    Vector3 GetShoulderDimensions();
+    Vector3 GetHeadDimensions();
+    Vector3 GetUpperArmDimensions();
+    Vector3 GetForeArmDimensions();
+    Vector3 GetElbowDimensions();
+    Vector3 GetHandDimensions();
+    Vector3 GetFingerDimensions();
+
+    Model bodyShape{};
+    Model pelvis{};
+    Model thigh{};
+    Model knee{};
+    Model shin{};
+    Model foot{};
+    Model neck{};
+    Model head{};
+    Model shoulder{};
+    Model upperArm{};
+    Model elbow{};
+    Model foreArm{};
+    Model hand{};
+    Model finger{};
+
+};
+
+
+=====================================
+.\include\TingoBingo\TingoDimensions.h
+=====================================
+
+#pragma once
+
+#include "raylib.h"
+
+class TingoDimensions 
+{
+public:
+    void Initialise
+    (
+        Vector3 bodyDimensions,
+        Vector3 pelvisDimensions,
+        Vector3 thighDimensions,
+        Vector3 kneeDimensions,
+        Vector3 shinDimensions, 
+        Vector3 footDimensions,
+        Vector3 neckDimensions,
+        Vector3 shoulderDimensions,
+        Vector3 headDimensions,
+        Vector3 upperArmDimensions,
+        Vector3 foreArmDimensions,
+        Vector3 elbowDimensions,
+        Vector3 handDimensions,
+        Vector3 fingerDimensions
+    );
+
+    struct BodyShape {
+        float width;
+        float height;
+        float length;
+    };
+    BodyShape bodyShape;
+
+    struct Pelvis {
+        float width;
+        float height;
+        float length;
+    };
+    Pelvis pelvis;
+
+    struct Thigh {
+        float width;
+        float height;
+        float length;
+    };
+    Thigh thigh;
+
+    struct Knee {
+        float width;
+        float height;
+        float length;
+    };
+    Knee knee;
+
+    struct Shin {
+        float width;
+        float height;
+        float length;
+    };
+    Shin shin;
+
+    struct Foot {
+        float width;
+        float height;
+        float length;
+    };
+    Foot foot;
+
+    struct Neck {
+        float width;
+        float height;
+        float length;
+    };
+    Neck neck;
+
+    struct Shoulder {
+        float width;
+        float height;
+        float length;
+    };
+    Shoulder shoulder;
+
+    struct Head {
+        float width;
+        float height;
+        float length;
+    };
+    Head head;
+
+    struct UpperArm {
+        float width;
+        float height;
+        float length;
+    };
+    UpperArm upperArm;
+
+    struct ForeArm {
+        float width;
+        float height;
+        float length;
+    };
+    ForeArm foreArm;
+
+    struct Elbow {
+        float width;
+        float height;
+        float length;
+    };
+    Elbow elbow;
+
+    struct Hand {
+        float width;
+        float height;
+        float length;
+    };
+    Hand hand;
+
+    struct Finger {
+        float width;
+        float height;
+        float length;
+    };
+    Finger finger;    
+};
+
+
+=====================================
+.\src\Game.cpp
+=====================================
+
+#include "Game.h"
+#include "raylib.h"
+
+void Game::Initialise()
+{
+    InitWindow(10, 10, "TingoBingo 3D");
+
+    int monitor = GetCurrentMonitor();
+    int width = GetMonitorWidth(monitor);
+    int height = GetMonitorHeight(monitor);
+
+    screenDimensions.screenWidth = width;
+    screenDimensions.screenHeight = height;
+
+    SetWindowSize(width, height);
+    SetWindowPosition(0, 0);
+
+    SetTargetFPS(60);
+    DisableCursor();
+
+    world.Initialise(screenDimensions);
+}
+
+void Game::Run()
+{
+    while (!WindowShouldClose())
+    {
+        float dt = GetFrameTime();
+
+        world.Update(dt);
+
+        BeginDrawing();
+
+        ClearBackground(RAYWHITE);
+
+        world.Draw();
+
+        EndDrawing();
+    }
+}
+
+void Game::Shutdown()
+{
+    world.Shutdown();
+
+    CloseWindow();
+}
+
+
+=====================================
+.\src\GameWorld.cpp
+=====================================
+
+#include "GameWorld.h"
+#include <cmath>
+#include "raymath.h"
+#include "TingoBingo/TingoDimensions.h"
+
+GameWorld::GameWorld() :
+    tingo(assets, dimensions)
+{}
+
+void GameWorld::Initialise(ScreenDimensions& screenDimensions)
+{
+    this->screenDimensions = screenDimensions;
+
+    // Configure the 3D camera.
+    camera.position = { -5.0, 10.0f, 20.0f };  // Move camera further away and higher // Camera's position in the 3D world (X, Y, Z)
+    camera.target = { 0.0f, 0.0f, 0.0f };  // Point the camera looks at
+    camera.up = { 0.0f, 1.0f, 0.0f };      // Defines the upward direction (positive Y)
+    camera.fovy = 45.0f;                   // Vertical field of view in degrees
+    camera.projection = CAMERA_PERSPECTIVE;// Objects farther away appear smaller
+
+    assets.Initialise();
+    dimensions.Initialise
+    (
+        assets.GetBodyDimensions(),
+        assets.GetPelvisDimensions(),
+        assets.GetThighDimensions(),
+        assets.GetKneeDimensions(),
+        assets.GetShinDimensions(),
+        assets.GetFootDimensions(),
+        assets.GetNeckDimensions(),
+        assets.GetShoulderDimensions(),
+        assets.GetHeadDimensions(),
+        assets.GetUpperArmDimensions(),
+        assets.GetForeArmDimensions(),
+        assets.GetElbowDimensions(),
+        assets.GetHandDimensions(),
+        assets.GetFingerDimensions()
+    );
+
+    initialTransform.position = {
+        0.0f, 
+        dimensions.bodyShape.height / 2.0f +
+        dimensions.pelvis.height +
+        dimensions.thigh.height +
+        dimensions.knee.height +
+        dimensions.shin.height +
+        dimensions.foot.height, 
+        0.0f
+    };
+    initialTransform.rotationAxis = {1.0f, 0.0f, 0.0f};
+    initialTransform.rotationAngle = 0.0f;
+    initialTransform.scale = {1.0f, 1.0f, 1.0f};
+
+    
+    tingo.Initialise();
+    tingo.SetTransform(initialTransform);
+}
+
+void GameWorld::Update(float dt)
+{
+    // Allow free movement around the 3D world.
+    UpdateCamera(&camera, CAMERA_FREE);
+
+    initialTransform.rotationAngle += dt * 30;
+    tingo.SetTransform(initialTransform);
+    tingo.Update(dt);
+}
+
+// Draw a screen-space widget showing the camera's orientation.
+void GameWorld::DrawOrientationGizmo()
+{
+    float x = screenDimensions.screenWidth;
+
+    const Vector2 centre = {
+    static_cast<float>(x - 100),
+    100.0f
+};
+    const float axisLength = 35.0f;
+
+    // Calculate the direction from the camera towards its target.
+    Vector3 forward = Vector3Normalize(
+        Vector3Subtract(camera.target, camera.position)
+    );
+
+    // Calculate the camera's right and up directions.
+    Vector3 right = Vector3Normalize(
+        Vector3CrossProduct(forward, camera.up)
+    );
+
+    Vector3 up = Vector3Normalize(
+        Vector3CrossProduct(right, forward)
+    );
+
+    // World axes and their colours.
+    const Vector3 axes[] = {
+        { 1.0f, 0.0f, 0.0f },  // X
+        { 0.0f, 1.0f, 0.0f },  // Y
+        { 0.0f, 0.0f, 1.0f }   // Z
+    };
+
+    const Color colours[] = {
+        RED,
+        GREEN,
+        BLUE
+    };
+
+    const char* labels[] = { "X", "Y", "Z" };
+
+    // Draw each world axis from the widget's centre.
+    for (int i = 0; i < 3; i++)
+    {
+        const Vector3& axis = axes[i];
+
+        // Project the world axis onto the camera's screen directions.
+        float screenX = Vector3DotProduct(axis, right);
+        float screenY = -Vector3DotProduct(axis, up);
+
+        Vector2 end = {
+            centre.x + screenX * axisLength,
+            centre.y + screenY * axisLength
+        };
+
+        DrawLineEx(centre, end, 3.0f, colours[i]);
+
+        // Place the axis label just beyond the line's endpoint.
+        Vector2 labelPosition = {
+            end.x + screenX * 8.0f - 5.0f,
+            end.y + screenY * 8.0f - 6.0f
+        };
+
+        DrawText(
+            labels[i],
+            static_cast<int>(labelPosition.x),
+            static_cast<int>(labelPosition.y),
+            14,
+            colours[i]
+        );
+    }
+
+    // Mark the widget's centre.
+    DrawCircleV(centre, 3.0f, DARKGRAY);
+}
+
+void GameWorld::Draw()
+{
+    BeginMode3D(camera);
+
+    // Room dimensions.
+    const float roomWidth = 20.0f;
+    const float roomHeight = 8.0f;
+    const float roomDepth = 20.0f;
+
+    // Half-dimensions make positioning the walls easier.
+    const float halfWidth = roomWidth / 2.0f;
+    const float halfDepth = roomDepth / 2.0f;
+
+    // Floor.
+    DrawPlane(
+        { 0.0f, 0.0f, 0.0f },
+        { roomWidth, roomDepth },
+        LIGHTGRAY
+    );
+
+    // Front wall: positive Z.
+    /*DrawCube(
+        { 0.0f, roomHeight / 2.0f, halfDepth },
+        roomWidth, roomHeight, 0.2f,
+        GRAY
+    );*/
+
+    // Back wall wall: negative Z.
+    DrawCube(
+        { 0.0f, roomHeight / 2.0f, -halfDepth },
+        roomWidth, roomHeight, 0.2f,
+        GRAY
+    );
+
+    // Left wall: negative X.
+    DrawCube(
+        { -halfWidth, roomHeight / 2.0f, 0.0f },
+        0.2f, roomHeight, roomDepth,
+        DARKGRAY
+    );
+
+    // Right wall: positive X.
+    DrawCube(
+        { halfWidth, roomHeight / 2.0f, 0.0f },
+        0.2f, roomHeight, roomDepth,
+        DARKGRAY
+    );
+
+    DrawGrid(100, 1.0f);
+
+    tingo.Draw();
+
+    EndMode3D();
+
+    DrawOrientationGizmo();
+}
+
+void GameWorld::Shutdown()
+{
+    tingo.ShutDown();
+}
+
+
+=====================================
+.\src\main.cpp
+=====================================
+
+#include "Game.h"
+
+#include <iostream>
+
+int main()
+{
+    Game game;
+
+    game.Initialise();
+    game.Run();
+    game.Shutdown();
+
+    return 0;
+}
+
+
+=====================================
+.\src\TingoBingo\Body\Arm\Elbow.cpp
+=====================================
+
+#include "TingoBingo/Body/Arm/Elbow.h"
+#include "raymath.h"
+
+Elbow::Elbow(TingoAssets& assets, TingoDimensions& dimensions) :
+    assets(assets),
+    dimensions(dimensions),
+    foreArm(assets, dimensions)
+{}
+
+
+void Elbow::Initialise()
+{
+    positionOffset = {
+        0.0f,
+        -dimensions.upperArm.height / 2.0f - dimensions.elbow.height / 2.0f, 
+        0.0f
+    };
+
+    foreArm.Initialise();
+}
+
+void Elbow::ShutDown()
+{
+    
+}
+
+void Elbow::Update(float dt)
+{
+    (void)dt;
+}
+
+void Elbow::Draw()
+{
+    DrawModelEx(
+        assets.elbow,
+        transform.position,
+        transform.rotationAxis,
+        transform.rotationAngle,
+        transform.scale,
+        WHITE
+    );
+
+    DrawModelWiresEx(
+        assets.elbow,
+        transform.position,
+        transform.rotationAxis,
+        transform.rotationAngle,
+        transform.scale,
+        GREEN
+    );
+
+    foreArm.Draw();
+}
+
+void Elbow::SetTransform(MyTransform3D parentTransform)
+{
+    transform = parentTransform;
+    transform.position = Vector3Add(parentTransform.position, positionOffset);
+    foreArm.SetTransform(transform);
+}
+
+
+=====================================
+.\src\TingoBingo\Body\Arm\Finger.cpp
+=====================================
+
+#include "TingoBingo/Body/Arm/Finger.h"
+#include "raymath.h"
+
+Finger::Finger(TingoAssets& assets, TingoDimensions& dimensions, std::string side) :
+    assets(assets),
+    dimensions(dimensions),
+    side(side)
+{}
+
+
+void Finger::Initialise()
+{
+    if(side == "left")
+    {
+        positionOffset = {
+            dimensions.hand.width / 2.0f - dimensions.finger.width / 2.0f,
+            -dimensions.hand.height / 2.0f,
+            0.0f
+        };
+    }
+    else if (side == "right")
+    {
+        positionOffset = {
+            -dimensions.hand.width / 2.0f + dimensions.finger.width / 2.0f,
+            -dimensions.hand.height / 2.0f,
+            0.0f
+        };
+    }
+}
+
+void Finger::ShutDown()
+{
+    
+}
+
+void Finger::Update(float dt)
+{
+    (void)dt;
+}
+
+void Finger::Draw()
+{
+    DrawModelEx(
+        assets.finger,
+        transform.position,
+        transform.rotationAxis,
+        transform.rotationAngle,
+        transform.scale,
+        WHITE
+    );
+
+    DrawModelWiresEx(
+        assets.finger,
+        transform.position,
+        transform.rotationAxis,
+        transform.rotationAngle,
+        transform.scale,
+        GREEN
+    );
+}
+
+void Finger::SetTransform(MyTransform3D parentTransform)
+{
+    transform = parentTransform;
+    
+    if(side == "left")
+    {
+        transform.rotationAxis = {0.0f, 0.0f, 1.0f};
+        transform.rotationAngle = -15.0f;
+    }
+    else if(side == "right")
+    {
+        transform.rotationAxis = {0.0f, 0.0f, 1.0f};
+        transform.rotationAngle = 15.0f;
+    }
+    transform.position = Vector3Add(parentTransform.position, positionOffset);
+}
+
+
+=====================================
+.\src\TingoBingo\Body\Arm\ForeArm.cpp
+=====================================
+
+#include "TingoBingo/Body/Arm/ForeArm.h"
+#include "raymath.h"
+
+ForeArm::ForeArm(TingoAssets& assets, TingoDimensions& dimensions) :
+    assets(assets),
+    dimensions(dimensions),
+    hand(assets, dimensions)
+{}
+
+
+void ForeArm::Initialise()
+{
+    positionOffset = {
+        0.0f,
+        -dimensions.elbow.height / 2.0f - dimensions.foreArm.height / 2.0f,
+        0.0f
+    };
+
+    hand.Initialise();
+}
+
+void ForeArm::ShutDown()
+{
+
+}
+
+void ForeArm::Update(float dt)
+{
+    (void)dt;
+}
+
+void ForeArm::Draw()
+{
+    DrawModelEx(
+        assets.foreArm,
+        transform.position,
+        transform.rotationAxis,
+        transform.rotationAngle,
+        transform.scale,
+        WHITE
+    );
+
+    DrawModelWiresEx(
+        assets.foreArm,
+        transform.position,
+        transform.rotationAxis,
+        transform.rotationAngle,
+        transform.scale,
+        GREEN
+    );
+
+    hand.Draw();
+}
+
+void ForeArm::SetTransform(MyTransform3D parentTransform)
+{
+    transform = parentTransform;
+    transform.position = Vector3Add(parentTransform.position, positionOffset);
+    hand.SetTransform(transform);
+}
+
+
+=====================================
+.\src\TingoBingo\Body\Arm\Hand.cpp
+=====================================
+
+#include "TingoBingo/Body/Arm/Hand.h"
+#include "raymath.h"
+
+Hand::Hand(TingoAssets& assets, TingoDimensions& dimensions) :
+    assets(assets),
+    dimensions(dimensions),
+    leftFinger(assets, dimensions, "left"),
+    rightFinger(assets, dimensions, "right")
+{}
+
+
+void Hand::Initialise()
+{
+    positionOffset = {
+        0.0f,
+        -dimensions.foreArm.height / 2.0f - dimensions.hand.height / 2.0f,
+        0.0f
+    };
+
+    leftFinger.Initialise();
+    rightFinger.Initialise();
+}
+
+void Hand::ShutDown()
+{
+
+}
+
+void Hand::Update(float dt)
+{
+    (void)dt;
+}
+
+void Hand::Draw()
+{
+    DrawModelEx(
+        assets.hand,
+        transform.position,
+        transform.rotationAxis,
+        transform.rotationAngle,
+        transform.scale,
+        WHITE
+    );
+
+    DrawModelWiresEx(
+        assets.hand,
+        transform.position,
+        transform.rotationAxis,
+        transform.rotationAngle,
+        transform.scale,
+        GREEN
+    );
+
+    leftFinger.Draw();
+    rightFinger.Draw();
+}
+
+void Hand::SetTransform(MyTransform3D parentTransform)
+{
+    transform = parentTransform;
+    transform.position = Vector3Add(parentTransform.position, positionOffset);
+    leftFinger.SetTransform(transform);
+    rightFinger.SetTransform(transform);
+}
+
+
+=====================================
+.\src\TingoBingo\Body\Arm\Shoulder.cpp
+=====================================
+
+#include "TingoBingo/Body/Arm/Shoulder.h"
+#include "raymath.h"
+
+Shoulder::Shoulder(TingoAssets& assets, TingoDimensions& dimensions, std::string side) :
+    assets(assets),
+    dimensions(dimensions),
+    side(side),
+    upperArm(assets, dimensions)
+{}
+
+
+void Shoulder::Initialise()
+{
+    if(side == "left")
+    {
+        positionOffset = {
+            dimensions.bodyShape.width / 2.0f + dimensions.shoulder.width / 2.0f,
+            dimensions.bodyShape.height / 2.0f - dimensions.shoulder.height / 2.0f,
+            0.0f
+        };
+    }
+    else if (side == "right")
+    {
+        positionOffset = {
+            -dimensions.bodyShape.width / 2.0f - dimensions.shoulder.width / 2.0f,
+            dimensions.bodyShape.height / 2.0f - dimensions.shoulder.height / 2.0f,
+            0.0f
+        };
+    }
+
+    upperArm.Initialise();
+}
+
+void Shoulder::ShutDown()
+{
+    
+}
+
+void Shoulder::Update(float dt)
+{
+    (void)dt;
+}
+
+void Shoulder::Draw()
+{
+    DrawModelEx(
+        assets.shoulder,
+        transform.position,
+        transform.rotationAxis,
+        transform.rotationAngle,
+        transform.scale,
+        WHITE
+    );
+
+    DrawModelWiresEx(
+        assets.shoulder,
+        transform.position,
+        transform.rotationAxis,
+        transform.rotationAngle,
+        transform.scale,
+        GREEN
+    );
+
+    upperArm.Draw();
+}
+
+void Shoulder::SetTransform(MyTransform3D parentTransform)
+{
+    transform = parentTransform;
+    transform.position = Vector3Add(parentTransform.position, positionOffset);
+    upperArm.SetTransform(transform);
+}
+
+
+=====================================
+.\src\TingoBingo\Body\Arm\UpperArm.cpp
+=====================================
+
+#include "TingoBingo/Body/Arm/UpperArm.h"
+#include "raymath.h"
+
+UpperArm::UpperArm(TingoAssets& assets, TingoDimensions& dimensions) :
+    assets(assets),
+    dimensions(dimensions),
+    elbow(assets, dimensions)
+{}
+
+
+void UpperArm::Initialise()
+{
+    positionOffset = {
+        0.0f,
+        -dimensions.upperArm.height / 2.0f - dimensions.shoulder.height / 2.0f,
+        0.0f
+    };
+    
+    elbow.Initialise();
+}
+
+void UpperArm::ShutDown()
+{
+    
+}
+
+void UpperArm::Update(float dt)
+{
+    (void)dt;
+}
+
+void UpperArm::Draw()
+{
+    DrawModelEx(
+        assets.upperArm,
+        transform.position,
+        transform.rotationAxis,
+        transform.rotationAngle,
+        transform.scale,
+        WHITE
+    );
+
+    DrawModelWiresEx(
+        assets.upperArm,
+        transform.position,
+        transform.rotationAxis,
+        transform.rotationAngle,
+        transform.scale,
+        GREEN
+    );
+
+    elbow.Draw();
+}
+
+void UpperArm::SetTransform(MyTransform3D parentTransform)
+{
+    transform = parentTransform;
+    transform.position = Vector3Add(parentTransform.position, positionOffset);
+    elbow.SetTransform(transform);
+}
+
+
+=====================================
+.\src\TingoBingo\Body\Body.cpp
+=====================================
+
+#include "TingoBingo/Body/Body.h"
+
+Body::Body(TingoAssets& assets, TingoDimensions& dimensions) :
+    assets(assets),
+    dimensions(dimensions),
+    pelvis(assets, dimensions),
+    neck(assets, dimensions),
+    leftShoulder(assets, dimensions, "left"),
+    rightShoulder(assets, dimensions, "right"),
+    head(assets, dimensions)
+{}
+
+void Body::Initialise()
+{
+    positionOffset = {0.0f, 0.0f, 0.0f};
+
+    pelvis.Initialise();
+    neck.Initialise();
+    leftShoulder.Initialise();
+    rightShoulder.Initialise();
+    head.Initialise();
+}
+
+void Body::ShutDown()
+{
+}
+
+void Body::Update(float dt)
+{
+    pelvis.Update(dt);
+    neck.Update(dt);
+}
+
+void Body::Draw()
+{
+    DrawModelEx(
+        assets.bodyShape,
+        transform.position,
+        transform.rotationAxis,
+        transform.rotationAngle,
+        transform.scale,
+        WHITE
+    );
+
+    DrawModelWiresEx(
+        assets.bodyShape,
+        transform.position,
+        transform.rotationAxis,
+        transform.rotationAngle,
+        transform.scale,
+        GREEN
+    );
+
+    pelvis.Draw();
+    neck.Draw();
+    leftShoulder.Draw();
+    rightShoulder.Draw();
+    head.Draw();
+}
+
+void Body::SetTransform(MyTransform3D parentTransform)
+{   
+    MyTransform3D localTransform{};
+
+    localTransform.position = positionOffset;
+    localTransform.rotationAxis = {0.0f, 1.0f, 0.0f};
+    localTransform.rotationAngle = 0.0f;
+    localTransform.scale = {1.0f, 1.0f, 1.0f};
+
+    transform = MakeChildTransform(parentTransform, localTransform);
+    
+    pelvis.SetTransform(transform);
+    neck.SetTransform(transform);
+    leftShoulder.SetTransform(transform);
+    rightShoulder.SetTransform(transform);
+    head.SetTransform(transform);
+}
+
+
+=====================================
+.\src\TingoBingo\Body\Head\Head.cpp
+=====================================
+
+#include "TingoBingo/Body/Head/Head.h"
+#include "raymath.h"
+
+Head::Head(TingoAssets& assets, TingoDimensions& dimensions) :
+    assets(assets),
+    dimensions(dimensions)
+{}
+
+void Head::Initialise()
+{
+    positionOffset = {
+        0.0f,
+        dimensions.bodyShape.height / 2.0f +
+        dimensions.neck.height +
+        dimensions.head.height / 2.0f,
+        0.0f        
+    };
+}
+
+void Head::ShutDown()
+{
+    
+}
+
+void Head::Update(float dt)
+{
+    (void)dt;
+}
+
+void Head::Draw()
+{
+    DrawModelEx(
+        assets.head,
+        transform.position,
+        transform.rotationAxis,
+        transform.rotationAngle,
+        transform.scale,
+        WHITE
+    );
+
+    DrawModelWiresEx(
+        assets.head,
+        transform.position,
+        transform.rotationAxis,
+        transform.rotationAngle,
+        transform.scale,
+        GREEN
+    );
+}
+
+void Head::SetTransform(MyTransform3D parentTransform)
+{
+    transform = parentTransform;
+    transform.position = Vector3Add(parentTransform.position, positionOffset);
+}
+
+
+=====================================
+.\src\TingoBingo\Body\Leg\Foot.cpp
+=====================================
+
+#include "TingoBingo/Body/Leg/Foot.h"
+#include "raymath.h"
+
+Foot::Foot(TingoAssets& assets, TingoDimensions& dimensions) :
+    assets(assets),
+    dimensions(dimensions)
+{}
+
+void Foot::Initialise()
+{
+    positionOffset = {
+        0.0f,
+        -dimensions.shin.height / 2.0f
+        -dimensions.foot.height / 2.0f,
+        dimensions.foot.length / 2.0f
+        -dimensions.shin.length / 2.0f
+    };
+}
+
+void Foot::ShutDown()
+{
+    
+}
+
+void Foot::Update(float dt)
+{
+    (void)dt;
+}
+
+void Foot::Draw()
+{
+    DrawModelEx(
+        assets.foot,
+        transform.position,
+        transform.rotationAxis,
+        transform.rotationAngle,
+        transform.scale,
+        WHITE
+    );
+
+    DrawModelWiresEx(
+        assets.foot,
+        transform.position,
+        transform.rotationAxis,
+        transform.rotationAngle,
+        transform.scale,
+        GREEN
+    );
+}
+
+void Foot::SetTransform(MyTransform3D parentTransform)
+{
+    transform = parentTransform;
+    transform.position = Vector3Add(parentTransform.position, positionOffset);
+}
+
+
+=====================================
+.\src\TingoBingo\Body\Leg\Knee.cpp
+=====================================
+
+#include "TingoBingo/Body/Leg/Knee.h"
+#include "raymath.h"
+
+Knee::Knee(TingoAssets& assets, TingoDimensions& dimensions) :
+    assets(assets),
+    dimensions(dimensions),
+    shin(assets, dimensions)
+{}
+
+void Knee::Initialise()
+{
+    positionOffset = {
+        0.0f,
+        -dimensions.knee.height / 2.0f
+        -dimensions.shin.height / 2.0f,
+        0.0f
+    };
+
+    shin.Initialise();
+}
+
+void Knee::ShutDown()
+{
+    
+}
+
+void Knee::Update(float dt)
+{
+    (void)dt;
+}
+
+void Knee::Draw()
+{
+    DrawModelEx(
+        assets.knee,
+        transform.position,
+        transform.rotationAxis,
+        transform.rotationAngle,
+        transform.scale,
+        WHITE
+    );
+
+    DrawModelWiresEx(
+        assets.knee,
+        transform.position,
+        transform.rotationAxis,
+        transform.rotationAngle,
+        transform.scale,
+        GREEN
+    );
+
+    shin.Draw();
+}
+
+void Knee::SetTransform(MyTransform3D parentTransform)
+{
+    transform = parentTransform;
+    transform.position = Vector3Add(parentTransform.position, positionOffset);
+    shin.SetTransform(transform);
+}
+
+
+=====================================
+.\src\TingoBingo\Body\Leg\Shin.cpp
+=====================================
+
+#include "TingoBingo/Body/Leg/Shin.h"
+#include "raymath.h"
+
+Shin::Shin(TingoAssets& assets,TingoDimensions& dimensions) :
+    assets(assets),
+    dimensions(dimensions),
+    foot(assets, dimensions)
+{}
+
+void Shin::Initialise()
+{
+    positionOffset = {
+        0.0f,
+        -dimensions.knee.height / 2.0f
+        -dimensions.shin.height / 2.0f,
+        0.0f
+    };
+
+    foot.Initialise();
+}
+
+void Shin::ShutDown()
+{
+    
+}
+
+void Shin::Update(float dt)
+{
+    (void)dt;
+}
+
+void Shin::Draw()
+{
+    DrawModelEx(
+        assets.shin,
+        transform.position,
+        transform.rotationAxis,
+        transform.rotationAngle,
+        transform.scale,
+        WHITE
+    );
+
+    DrawModelWiresEx(
+        assets.shin,
+        transform.position,
+        transform.rotationAxis,
+        transform.rotationAngle,
+        transform.scale,
+        GREEN
+    );
+
+    foot.Draw();
+}
+
+void Shin::SetTransform(MyTransform3D parentTransform)
+{
+    transform = parentTransform;
+    transform.position = Vector3Add(parentTransform.position, positionOffset);
+    foot.SetTransform(transform);
+}
+
+
+
+=====================================
+.\src\TingoBingo\Body\Leg\Thigh.cpp
+=====================================
+
+#include "TingoBingo/Body/Leg/Thigh.h"
+#include "raymath.h"
+
+Thigh::Thigh(TingoAssets& assets, TingoDimensions& dimensions, std::string side) :
+    assets(assets),
+    dimensions(dimensions),
+    side(side),
+    knee(assets, dimensions)
+{}
+
+void Thigh::Initialise()
+{
+    if(side == "left")
+    {
+        positionOffset = {
+        dimensions.pelvis.width / 2.0f - dimensions.thigh.width / 2.0f, 
+        -dimensions.pelvis.height / 2.0f -
+        dimensions.thigh.height / 2.0f,
+        0.0f
+        };
+    }
+    else if (side == "right")
+    {
+        positionOffset = {
+        -dimensions.pelvis.width / 2.0f + dimensions.thigh.width / 2.0f, 
+        -dimensions.pelvis.height / 2.0f -
+        dimensions.thigh.height / 2.0f,
+        0.0f
+        };
+    }
+
+    knee.Initialise();
+}
+
+void Thigh::ShutDown()
+{
+    
+}
+
+void Thigh::Update(float dt)
+{
+    (void)dt;
+}
+
+void Thigh::Draw()
+{
+    DrawModelEx(
+        assets.thigh,
+        transform.position,
+        transform.rotationAxis,
+        transform.rotationAngle,
+        transform.scale,
+        WHITE
+    );
+
+    DrawModelWiresEx(
+        assets.thigh,
+        transform.position,
+        transform.rotationAxis,
+        transform.rotationAngle,
+        transform.scale,
+        GREEN
+    );
+
+    knee.Draw();
+}
+
+void Thigh::SetTransform(MyTransform3D parentTransform)
+{
+    transform = parentTransform;
+    transform.position = Vector3Add(parentTransform.position, positionOffset);
+    knee.SetTransform(transform);
+}
+
+
+=====================================
+.\src\TingoBingo\Body\Neck.cpp
+=====================================
+
+#include "TingoBingo/Body/Neck.h"
+#include "raymath.h"
+
+Neck::Neck(TingoAssets& assets, TingoDimensions& dimensions) :
+    assets(assets),
+    dimensions(dimensions)
+{}
+
+void Neck::Initialise()
+{
+    positionOffset = {
+        0.0f,
+        dimensions.bodyShape.height / 2.0f +
+        dimensions.neck.height / 2.0f,
+        0.0f
+    };
+}
+
+void Neck::ShutDown()
+{
+    
+}
+
+void Neck::Update(float dt)
+{
+    (void)dt;
+}
+
+void Neck::Draw()
+{
+    DrawModelEx(
+        assets.neck,
+        transform.position,
+        transform.rotationAxis,
+        transform.rotationAngle,
+        transform.scale,
+        WHITE
+    );
+
+    DrawModelWiresEx(
+        assets.neck,
+        transform.position,
+        transform.rotationAxis,
+        transform.rotationAngle,
+        transform.scale,
+        GREEN
+    );
+}
+
+void Neck::SetTransform(MyTransform3D parentTransform)
+{
+    MyTransform3D localTransform{};
+
+    localTransform.position = positionOffset;
+    localTransform.rotationAxis = {1.0f, 0.0f, 0.0f};
+    localTransform.rotationAngle = 0.0f;
+    localTransform.scale = {1.0f, 1.0f, 1.0f};
+
+    transform = MakeChildTransform(parentTransform, localTransform);
+    
+    transform.position = Vector3Add(parentTransform.position, positionOffset);
+}
+
+
+=====================================
+.\src\TingoBingo\Body\Pelvis.cpp
+=====================================
+
+#include "TingoBingo/Body/Pelvis.h"
+#include "raymath.h"
+
+Pelvis::Pelvis(TingoAssets& assets, TingoDimensions& dimensions) :
+    assets(assets),
+    dimensions(dimensions),
+    leftThigh(assets, dimensions, "left"),
+    rightThigh(assets, dimensions, "right")
+{}
+
+void Pelvis::Initialise()
+{
+    positionOffset = {
+        0.0f, 
+        -dimensions.bodyShape.height / 2.0f - 
+        dimensions.pelvis.height / 2.0f,
+        0.0f
+    };
+
+    leftThigh.Initialise();
+    rightThigh.Initialise();
+}
+
+void Pelvis::ShutDown()
+{
+    
+}
+
+void Pelvis::Update(float dt)
+{
+    (void)dt;
+}
+
+void Pelvis::Draw()
+{
+    DrawModelEx(
+        assets.pelvis,
+        transform.position,
+        transform.rotationAxis,
+        transform.rotationAngle,
+        transform.scale,
+        WHITE
+    );
+
+    DrawModelWiresEx(
+        assets.pelvis,
+        transform.position,
+        transform.rotationAxis,
+        transform.rotationAngle,
+        transform.scale,
+        GREEN
+    );
+
+    leftThigh.Draw();
+    rightThigh.Draw();  
+}
+
+void Pelvis::SetTransform(MyTransform3D parentTransform)
+{
+    transform = parentTransform;
+    transform.position = Vector3Add(parentTransform.position, positionOffset);
+    leftThigh.SetTransform(transform);
+    rightThigh.SetTransform(transform);
+}
+
+
+=====================================
+.\src\TingoBingo\Tingo.cpp
+=====================================
+
+#include "TingoBingo/Tingo.h"
+#include "raymath.h"
+
+#include <iostream>
+
+Tingo::Tingo(TingoAssets& assets, TingoDimensions& dimensions) :
+    assets(assets),
+    dimensions(dimensions),
+    body(assets, dimensions)
+{}
+
+void Tingo::Initialise()
+{
+    body.Initialise();
+}
+
+void Tingo::ShutDown()
+{
+    assets.ShutDown();
+    body.ShutDown();
+}
+
+void Tingo::Update(float dt)
+{
+    body.Update(dt);
+}
+
+void Tingo::Draw()
+{
+    body.Draw();
+}
+
+void Tingo::SetTransform(MyTransform3D initialTransform)
+{
+    transform = initialTransform;
+    body.SetTransform(transform);
+}
+
+
+=====================================
+.\src\TingoBingo\TingoAssets.cpp
+=====================================
+
+#include "TingoBingo/TingoAssets.h"
+#include "raymath.h"
+
+void TingoAssets::Initialise()
+{
+    bodyShape = LoadModel("assets/models/tingo/Body.glb");
+    pelvis = LoadModel("assets/models/tingo/Pelvis.glb");
+    thigh = LoadModel("assets/models/tingo/Thigh.glb");
+    knee = LoadModel("assets/models/tingo/Knee.glb");
+    shin = LoadModel("assets/models/tingo/Shin.glb");
+    foot = LoadModel("assets/models/tingo/Foot.glb");
+    neck = LoadModel("assets/models/tingo/Neck.glb");
+    shoulder = LoadModel("assets/models/tingo/Shoulder.glb");
+    head = LoadModel("assets/models/tingo/Head.glb");
+    upperArm = LoadModel("assets/models/tingo/UpperArm.glb");
+    elbow = LoadModel("assets/models/tingo/Elbow.glb");
+    foreArm = LoadModel("assets/models/tingo/ForeArm.glb");
+    hand = LoadModel("assets/models/tingo/Hand.glb");
+    finger = LoadModel("assets/models/tingo/Finger.glb");
+}
+
+Vector3 TingoAssets::GetBodyDimensions()
+{
+    BoundingBox bounds = GetModelBoundingBox(bodyShape);
+    Vector3 dimensions = Vector3Subtract(bounds.max, bounds.min);
+    return dimensions;
+}
+
+Vector3 TingoAssets::GetPelvisDimensions()
+{
+    BoundingBox bounds = GetModelBoundingBox(pelvis);
+    Vector3 dimensions = Vector3Subtract(bounds.max, bounds.min);
+    return dimensions;
+}
+
+Vector3 TingoAssets::GetThighDimensions()
+{
+    BoundingBox bounds = GetModelBoundingBox(thigh);
+    Vector3 dimensions = Vector3Subtract(bounds.max, bounds.min);
+    return dimensions;
+}
+
+Vector3 TingoAssets::GetKneeDimensions()
+{
+    BoundingBox bounds = GetModelBoundingBox(knee);
+    Vector3 dimensions = Vector3Subtract(bounds.max, bounds.min);
+    return dimensions;
+}
+
+Vector3 TingoAssets::GetShinDimensions()
+{
+    BoundingBox bounds = GetModelBoundingBox(shin);
+    Vector3 dimensions = Vector3Subtract(bounds.max, bounds.min);
+    return dimensions;
+}
+
+Vector3 TingoAssets::GetFootDimensions()
+{
+    BoundingBox bounds = GetModelBoundingBox(foot);
+    Vector3 dimensions = Vector3Subtract(bounds.max, bounds.min);
+    return dimensions;
+}
+
+Vector3 TingoAssets::GetNeckDimensions()
+{
+    BoundingBox bounds = GetModelBoundingBox(neck);
+    Vector3 dimensions = Vector3Subtract(bounds.max, bounds.min);
+    return dimensions;
+}
+
+Vector3 TingoAssets::GetShoulderDimensions()
+{
+    BoundingBox bounds = GetModelBoundingBox(shoulder);
+    Vector3 dimensions = Vector3Subtract(bounds.max, bounds.min);
+    return dimensions;
+}
+
+Vector3 TingoAssets::GetHeadDimensions()
+{
+    BoundingBox bounds = GetModelBoundingBox(head);
+    Vector3 dimensions = Vector3Subtract(bounds.max, bounds.min);
+    return dimensions;
+}
+
+Vector3 TingoAssets::GetUpperArmDimensions()
+{
+    BoundingBox bounds = GetModelBoundingBox(upperArm);
+    Vector3 dimensions = Vector3Subtract(bounds.max, bounds.min);
+    return dimensions;
+}
+
+Vector3 TingoAssets::GetForeArmDimensions()
+{
+    BoundingBox bounds = GetModelBoundingBox(foreArm);
+    Vector3 dimensions = Vector3Subtract(bounds.max, bounds.min);
+    return dimensions;
+}
+
+Vector3 TingoAssets::GetElbowDimensions()
+{
+    BoundingBox bounds = GetModelBoundingBox(elbow);
+    Vector3 dimensions = Vector3Subtract(bounds.max, bounds.min);
+    return dimensions;
+}
+
+Vector3 TingoAssets::GetHandDimensions()
+{
+    BoundingBox bounds = GetModelBoundingBox(hand);
+    Vector3 dimensions = Vector3Subtract(bounds.max, bounds.min);
+    return dimensions;
+}
+
+Vector3 TingoAssets::GetFingerDimensions()
+{
+    BoundingBox bounds = GetModelBoundingBox(finger);
+    Vector3 dimensions = Vector3Subtract(bounds.max, bounds.min);
+    return dimensions;
+}
+
+void TingoAssets::ShutDown()
+{
+    UnloadModel(bodyShape);
+    UnloadModel(pelvis);
+    UnloadModel(thigh);
+    UnloadModel(knee);
+    UnloadModel(shin);
+    UnloadModel(foot);
+    UnloadModel(neck);
+    UnloadModel(head);
+    UnloadModel(shoulder);
+    UnloadModel(upperArm);
+    UnloadModel(foreArm);
+    UnloadModel(elbow);
+    UnloadModel(hand);
+    UnloadModel(finger);
+}
+
+
+=====================================
+.\src\TingoBingo\TingoDimensions.cpp
+=====================================
+
+#include "TingoBingo/TingoDimensions.h"
+
+void TingoDimensions::Initialise
+(
+    Vector3 bodyDimensions,
+    Vector3 pelvisDimensions,
+    Vector3 thighDimensions,
+    Vector3 kneeDimensions,
+    Vector3 shinDimensions,
+    Vector3 footDimensions,
+    Vector3 neckDimensions,
+    Vector3 shoulderDimensions,
+    Vector3 headDimensions,
+    Vector3 upperArmDimensions,
+    Vector3 foreArmDimensions,
+    Vector3 elbowDimensions,
+    Vector3 handDimensions,
+    Vector3 fingerDimensions
+)
+{
+    bodyShape.width = bodyDimensions.x;
+    bodyShape.height = bodyDimensions.y;
+    bodyShape.length = bodyDimensions.z;
+
+    pelvis.width = pelvisDimensions.x;
+    pelvis.height = pelvisDimensions.y;
+    pelvis.length = pelvisDimensions.z;
+
+    thigh.width = thighDimensions.x;
+    thigh.height = thighDimensions.y;       
+    thigh.length = thighDimensions.z;
+
+    knee.width = kneeDimensions.x;
+    knee.height = kneeDimensions.y;
+    knee.length = kneeDimensions.z;
+
+    shin.width = shinDimensions.x;
+    shin.height = shinDimensions.y;
+    shin.length = shinDimensions.z;
+
+    foot.width = footDimensions.x;
+    foot.height = footDimensions.y; 
+    foot.length = footDimensions.z;
+
+    neck.width = neckDimensions.x;
+    neck.height = neckDimensions.y;
+    neck.length = neckDimensions.z;
+
+    shoulder.width = shoulderDimensions.x;
+    shoulder.height = shoulderDimensions.y;
+    shoulder.length = shoulderDimensions.z;
+
+    head.width = headDimensions.x;
+    head.height = headDimensions.y; 
+    head.length = headDimensions.z;
+
+    upperArm.width = upperArmDimensions.x;
+    upperArm.height = upperArmDimensions.y;
+    upperArm.length = upperArmDimensions.z;
+
+    foreArm.width = foreArmDimensions.x;
+    foreArm.height = foreArmDimensions.y;
+    foreArm.length = foreArmDimensions.z;
+
+    elbow.width = elbowDimensions.x;
+    elbow.height = elbowDimensions.y;
+    elbow.length = elbowDimensions.z;
+
+    hand.width = handDimensions.x;
+    hand.height = handDimensions.y;
+    hand.length = handDimensions.z;
+
+    finger.width = fingerDimensions.x;
+    finger.height = fingerDimensions.y;
+    finger.length = fingerDimensions.z;
+}
+
+
+=====================================
+.\utilities\projectDump.cpp
+=====================================
+
+//====================================================
+// ProjectDump.cpp
+//
+// Creates a text file containing the contents of all
+// C++ source and header files in the project.
+//
+// This utility is useful for creating a single file
+// that can be shared for code reviews or archived as
+// a snapshot of the project.
+//====================================================
+
+#include <filesystem>
+#include <fstream>
+#include <iostream>
+#include <string>
+
+namespace fs = std::filesystem;
+
+int main()
+{
+    // Create the output file.
+    std::ofstream out("ProjectDump.txt");
+
+    // Visit every file in the project directory.
+    for (const auto& entry : fs::recursive_directory_iterator("."))
+    {
+        // Ignore directories.
+        if (!entry.is_regular_file())
+            continue;
+
+        // Don't include the output file itself.
+        if (entry.path().filename() == "ProjectDump.txt")
+            continue;
+
+        // Skip generated build files.
+        if (entry.path().string().find("build") != std::string::npos)
+            continue;
+
+        std::string ext = entry.path().extension().string();
+
+        // Only include C++ source and header files.
+        if (ext == ".cpp" || ext == ".h")
+        {
+            // Write a heading for each file.
+            out << "=====================================\n";
+            out << entry.path().string() << "\n";
+            out << "=====================================\n\n";
+
+            std::ifstream in(entry.path());
+
+            std::string line;
+
+            // Copy the file into the output.
+            while (std::getline(in, line))
+            {
+                out << line << '\n';
+            }
+
+            out << "\n\n";
+        }
+    }
+
+    std::cout << "Finished!\n";
+
+    return 0;
+}
+
+

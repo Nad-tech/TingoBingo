@@ -57,8 +57,15 @@ void Pelvis::Draw()
 
 void Pelvis::SetTransform(MyTransform3D parentTransform)
 {
-    transform = parentTransform;
-    transform.position = Vector3Add(parentTransform.position, positionOffset);
+    MyTransform3D localTransform{};
+
+    localTransform.position = positionOffset;
+    localTransform.rotationAxis = {1.0f, 0.0f, 0.0f};
+    localTransform.rotationAngle = 0.0f;
+    localTransform.scale = {1.0f, 1.0f, 1.0f};
+
+    transform = MakeChildTransform(parentTransform, localTransform);
+
     leftThigh.SetTransform(transform);
     rightThigh.SetTransform(transform);
 }

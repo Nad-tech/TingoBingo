@@ -27,6 +27,8 @@ private:
     
     MyTransform3D transform;
 
+    Vector3 positionOffset;
+
     Pelvis pelvis;
     Neck neck;
     Shoulder leftShoulder;

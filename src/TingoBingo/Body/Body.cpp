@@ -12,6 +12,8 @@ Body::Body(TingoAssets& assets, TingoDimensions& dimensions) :
 
 void Body::Initialise()
 {
+    positionOffset = {0.0f, 0.0f, 0.0f};
+
     pelvis.Initialise();
     neck.Initialise();
     leftShoulder.Initialise();
@@ -57,8 +59,16 @@ void Body::Draw()
 }
 
 void Body::SetTransform(MyTransform3D parentTransform)
-{
-    transform = parentTransform;
+{   
+    MyTransform3D localTransform{};
+
+    localTransform.position = positionOffset;
+    localTransform.rotationAxis = {0.0f, 1.0f, 0.0f};
+    localTransform.rotationAngle = 0.0f;
+    localTransform.scale = {1.0f, 1.0f, 1.0f};
+
+    transform = MakeChildTransform(parentTransform, localTransform);
+    
     pelvis.SetTransform(transform);
     neck.SetTransform(transform);
     leftShoulder.SetTransform(transform);
