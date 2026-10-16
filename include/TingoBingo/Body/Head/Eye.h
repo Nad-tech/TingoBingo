@@ -3,9 +3,8 @@
 #include "MyTransform3D.h"
 #include "TingoBingo/TingoDimensions.h"
 #include "TingoBingo/TingoAssets.h"
-#include "TingoBingo/Body/Head/MouthDisplay.h"
 #include <string>
-
+#include "TingoBingo/Body/Head/Pupil.h"
 class Eye
 {
 public:
@@ -28,4 +27,6 @@ private:
     MyTransform3D transform;
 
     std::string side;
+
+    Pupil pupil;
 };

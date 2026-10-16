@@ -23,6 +23,7 @@ public:
     Vector3 GetFingerDimensions();
     Vector3 GetMouthDisplayDimensions();
     Vector3 GetEyeDimesnsions();
+    Vector3 GetPupilDimensions();
     
     Model body{};
     Model pelvis{};
@@ -40,4 +41,5 @@ public:
     Model finger{};
     Model mouthDisplay{};
     Model eye{};
+    Model pupil{};
 };

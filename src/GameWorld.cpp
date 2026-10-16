@@ -38,7 +38,8 @@ void GameWorld::Initialise(ScreenDimensions& screenDimensions)
         assets.GetHandDimensions(),
         assets.GetFingerDimensions(),
         assets.GetMouthDisplayDimensions(),
-        assets.GetEyeDimesnsions()
+        assets.GetEyeDimesnsions(),
+        assets.GetPupilDimensions()
     );
 
     initialTransform.position = {
@@ -52,7 +53,7 @@ void GameWorld::Initialise(ScreenDimensions& screenDimensions)
         0.0f
     };
 
-    initialTransform.rotationAxis = {0.0f, 1.0f, 0.0f};
+    initialTransform.rotationAxis = {1.0f, 1.0f, 1.0f};
     initialTransform.rotationAngle = 0.0f;
     initialTransform.scale = dimensions.scale;
 

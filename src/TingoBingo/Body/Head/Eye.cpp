@@ -4,7 +4,8 @@
 Eye::Eye(TingoAssets& assets, TingoDimensions& dimensions, std::string side) :
     assets(assets),
     dimensions(dimensions),
-    side(side)
+    side(side),
+    pupil(assets, dimensions)
 {}
 
 void Eye::Initialise()
@@ -28,6 +29,8 @@ void Eye::Initialise()
             dimensions.head.length / 2.0f        
         };
     }
+
+    pupil.Initialise();
 }
 
 void Eye::Update(float dt)
@@ -45,6 +48,8 @@ void Eye::Draw()
         transform.scale,
         WHITE
     );
+
+    pupil.Draw();
 }
 
 void Eye::SetTransform(MyTransform3D parentTransform)
@@ -57,4 +62,6 @@ void Eye::SetTransform(MyTransform3D parentTransform)
     localTransform.scale = {1.0f, 1.0f, 1.0f};
 
     transform = MakeChildTransform(parentTransform, localTransform);
+
+    pupil.SetTransform(transform);
 }

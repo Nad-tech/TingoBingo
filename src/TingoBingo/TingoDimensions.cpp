@@ -17,7 +17,8 @@ void TingoDimensions::Initialise
     Vector3 handDimensions,
     Vector3 fingerDimensions,
     Vector3 mouthDisplayDimensions,
-    Vector3 eyeDimensions
+    Vector3 eyeDimensions,
+    Vector3 pupilDimensions
 )
 {
     scale = {1.0f, 1.0f, 1.0f};
@@ -85,4 +86,8 @@ void TingoDimensions::Initialise
     eye.width = eyeDimensions.x;
     eye.height = eyeDimensions.y;
     eye.length = eyeDimensions.z;
+
+    pupil.width = pupilDimensions.x;
+    pupil.height = pupilDimensions.y;
+    pupil.length = pupilDimensions.z;
 }
