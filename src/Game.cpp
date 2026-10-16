@@ -31,7 +31,7 @@ void Game::Run()
 
         BeginDrawing();
 
-        ClearBackground(RAYWHITE);
+        ClearBackground(BLACK);
 
         world.Draw();
 

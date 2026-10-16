@@ -48,15 +48,6 @@ void Finger::Draw()
         transform.scale,
         WHITE
     );
-
-    DrawModelWiresEx(
-        assets.finger,
-        transform.position,
-        transform.rotationAxis,
-        transform.rotationAngle,
-        transform.scale,
-        GREEN
-    );
 }
 
 void Finger::SetTransform(MyTransform3D parentTransform)

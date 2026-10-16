@@ -42,15 +42,6 @@ void Hand::Draw()
         WHITE
     );
 
-    DrawModelWiresEx(
-        assets.hand,
-        transform.position,
-        transform.rotationAxis,
-        transform.rotationAngle,
-        transform.scale,
-        GREEN
-    );
-
     leftFinger.Draw();
     rightFinger.Draw();
 }

@@ -40,15 +40,6 @@ void Shin::Draw()
         WHITE
     );
 
-    DrawModelWiresEx(
-        assets.shin,
-        transform.position,
-        transform.rotationAxis,
-        transform.rotationAngle,
-        transform.scale,
-        GREEN
-    );
-
     foot.Draw();
 }
 

@@ -23,4 +23,5 @@ private:
     Tingo tingo;
     MyTransform3D initialTransform; 
     ScreenDimensions screenDimensions;
+    Texture2D spaceBackground{};
 };

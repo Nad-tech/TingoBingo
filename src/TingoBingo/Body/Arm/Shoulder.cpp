@@ -52,16 +52,7 @@ void Shoulder::Draw()
         transform.scale,
         WHITE
     );
-
-    DrawModelWiresEx(
-        assets.shoulder,
-        transform.position,
-        transform.rotationAxis,
-        transform.rotationAngle,
-        transform.scale,
-        GREEN
-    );
-
+    
     upperArm.Draw();
 }
 

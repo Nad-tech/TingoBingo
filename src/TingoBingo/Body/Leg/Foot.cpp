@@ -37,15 +37,6 @@ void Foot::Draw()
         transform.scale,
         WHITE
     );
-
-    DrawModelWiresEx(
-        assets.foot,
-        transform.position,
-        transform.rotationAxis,
-        transform.rotationAngle,
-        transform.scale,
-        GREEN
-    );
 }
 
 void Foot::SetTransform(MyTransform3D parentTransform)

@@ -53,15 +53,6 @@ void Thigh::Draw()
         WHITE
     );
 
-    DrawModelWiresEx(
-        assets.thigh,
-        transform.position,
-        transform.rotationAxis,
-        transform.rotationAngle,
-        transform.scale,
-        GREEN
-    );
-
     knee.Draw();
 }
 

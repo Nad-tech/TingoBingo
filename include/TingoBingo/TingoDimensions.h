@@ -28,7 +28,8 @@ public:
         Vector3 eyeDimensions,
         Vector3 pupilDimensions,
         Vector3 noseDimensions,
-        Vector3 eyeBrowDimensions
+        Vector3 eyeBrowDimensions,
+        Vector3 earDimensions
     );
 
     struct BodyShape {
@@ -166,4 +167,11 @@ public:
         float length;
     };
     EyeBrow eyeBrow;
+
+    struct Ear {
+        float width;
+        float height;
+        float length;
+    };
+    Ear ear;
 };

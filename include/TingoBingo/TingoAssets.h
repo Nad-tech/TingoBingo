@@ -26,6 +26,7 @@ public:
     Vector3 GetPupilDimensions();
     Vector3 GetNoseDimensions();
     Vector3 GetEyeBrowDimensions();
+    Vector3 GetEarDimensions();
 
     Model body{};
     Model pelvis{};
@@ -46,4 +47,16 @@ public:
     Model pupil{};
     Model nose{};
     Model eyeBrow{};
+    Model ear{};
+
+    // Shared lighting shader.
+    Shader lightingShader{};
+
+    // Shader uniform locations.
+    int lightDirectionLoc = -1;
+    int ambientLoc = -1;
+    int viewPositionLoc = -1;
+
+    // Update the lighting using the current camera position.
+    void UpdateLighting(Vector3 cameraPosition);
 };

@@ -29,6 +29,101 @@ void TingoAssets::Initialise()
     pupil = LoadModel("assets/models/tingo/Pupil.glb");
     nose = LoadModel("assets/models/tingo/Nose.glb");
     eyeBrow = LoadModel("assets/models/tingo/EyeBrow.glb");
+    ear = LoadModel("assets/models/tingo/Ear.glb");
+
+    // Load the lighting shaders.
+    lightingShader = LoadShader(
+        "assets/shaders/lighting.vs",
+        "assets/shaders/lighting.fs"
+    );
+
+    // Set the shader locations used by raylib.
+    lightingShader.locs[SHADER_LOC_VECTOR_VIEW] =
+        GetShaderLocation(lightingShader, "viewPos");
+
+    // Set our custom uniform locations.
+    lightDirectionLoc =
+        GetShaderLocation(lightingShader, "lightDirection");
+
+    ambientLoc =
+        GetShaderLocation(lightingShader, "ambient");
+
+    viewPositionLoc =
+        GetShaderLocation(lightingShader, "viewPos");
+
+    // Configure the directional light.
+    //
+    // The vector represents the direction in which light rays travel.
+    // The shader reverses this direction when calculating illumination.
+    float lightDirection[3] = {
+        0.5f,
+        -0.6f,
+        -1.0f
+    };
+
+    SetShaderValue(
+        lightingShader,
+        lightDirectionLoc,
+        lightDirection,
+        SHADER_UNIFORM_VEC3
+    );
+
+    // Low-level ambient illumination keeps shadows readable.
+    float ambient[3] = {
+        0.40f,
+        0.40f,
+        0.40f
+    };
+
+    SetShaderValue(
+        lightingShader,
+        ambientLoc,
+        ambient,
+        SHADER_UNIFORM_VEC3
+    );
+
+        // Collect all the models that should use the lighting shader.
+    Model* models[] = {
+        &body,
+        &pelvis,
+        &thigh,
+        &knee,
+        &shin,
+        &foot,
+        &neck,
+        &shoulder,
+        &head,
+        &upperArm,
+        &elbow,
+        &foreArm,
+        &hand,
+        &finger,
+        &mouthDisplay,
+        &eye,
+        &pupil,
+        &nose,
+        &eyeBrow,
+        &ear
+    };
+
+    // Assign the shader to every material in every model.
+    for (Model* model : models)
+    {
+        for (int i = 0; i < model->materialCount; i++)
+        {
+            model->materials[i].shader = lightingShader;
+        }
+    }
+}
+
+void TingoAssets::UpdateLighting(Vector3 cameraPosition)
+{
+    SetShaderValue(
+        lightingShader,
+        viewPositionLoc,
+        &cameraPosition,
+        SHADER_UNIFORM_VEC3
+    );
 }
 
 Vector3 TingoAssets::GetBodyDimensions()
@@ -127,6 +222,11 @@ Vector3 TingoAssets::GetEyeBrowDimensions()
     return GetDimensions(eyeBrow);
 }
 
+Vector3 TingoAssets::GetEarDimensions()
+{
+    return GetDimensions(ear);
+}
+
 void TingoAssets::ShutDown()
 {
     UnloadModel(body);
@@ -148,4 +248,7 @@ void TingoAssets::ShutDown()
     UnloadModel(pupil);
     UnloadModel(nose);
     UnloadModel(eyeBrow);
+    UnloadModel(ear);
+
+    UnloadShader(lightingShader);
 }

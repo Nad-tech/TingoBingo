@@ -40,15 +40,6 @@ void Knee::Draw()
         WHITE
     );
 
-    DrawModelWiresEx(
-        assets.knee,
-        transform.position,
-        transform.rotationAxis,
-        transform.rotationAngle,
-        transform.scale,
-        GREEN
-    );
-
     shin.Draw();
 }
 

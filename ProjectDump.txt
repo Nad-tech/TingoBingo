@@ -49,6 +49,7 @@ private:
     Tingo tingo;
     MyTransform3D initialTransform; 
     ScreenDimensions screenDimensions;
+    Texture2D spaceBackground{};
 };
 
 
@@ -337,6 +338,8 @@ private:
     MyTransform3D transform;
 
     UpperArm upperArm;
+
+    float localRotation = 0.0f;
 };
 
 
@@ -391,7 +394,6 @@ private:
 #include "TingoBingo/Body/Neck.h"
 #include "TingoBingo/Body/Pelvis.h"
 #include "TingoBingo/Body/Arm/Shoulder.h"
-#include "TingoBingo/Body/Head/Head.h"
 class Body
 {
 public:
@@ -417,7 +419,126 @@ private:
     Neck neck;
     Shoulder leftShoulder;
     Shoulder rightShoulder;
-    Head head;
+};
+
+
+=====================================
+.\include\TingoBingo\Body\Head\Ear.h
+=====================================
+
+#pragma once
+
+#include "MyTransform3D.h"
+#include "TingoBingo/TingoDimensions.h"
+#include "TingoBingo/TingoAssets.h"
+#include <string>
+
+class Ear
+{
+public:
+    Ear
+    (
+        TingoAssets& assets, 
+        TingoDimensions& dimensions, 
+        std::string side
+    );
+
+    void Initialise();
+    void ShutDown();
+    
+    void Update(float dt);
+    void Draw();
+
+    void SetTransform(MyTransform3D parentTransform);
+
+private:
+    TingoAssets& assets;
+    TingoDimensions& dimensions;
+
+    Vector3 positionOffset;
+    
+    MyTransform3D transform;
+
+    std::string side;
+};
+
+
+=====================================
+.\include\TingoBingo\Body\Head\Eye.h
+=====================================
+
+#pragma once
+
+#include "MyTransform3D.h"
+#include "TingoBingo/TingoDimensions.h"
+#include "TingoBingo/TingoAssets.h"
+#include <string>
+#include "TingoBingo/Body/Head/Pupil.h"
+class Eye
+{
+public:
+    Eye(TingoAssets& assets, TingoDimensions& dimensions, std::string side);
+
+    void Initialise();
+    void ShutDown();
+    
+    void Update(float dt);
+    void Draw();
+
+    void SetTransform(MyTransform3D parentTransform);
+
+private:
+    TingoAssets& assets;
+    TingoDimensions& dimensions;
+
+    Vector3 positionOffset;
+    
+    MyTransform3D transform;
+
+    std::string side;
+
+    Pupil pupil;
+};
+
+
+=====================================
+.\include\TingoBingo\Body\Head\EyeBrow.h
+=====================================
+
+#pragma once
+
+#include "MyTransform3D.h"
+#include "TingoBingo/TingoDimensions.h"
+#include "TingoBingo/TingoAssets.h"
+#include <string>
+
+class EyeBrow
+{
+public:
+    EyeBrow
+    (
+        TingoAssets& assets, 
+        TingoDimensions& dimensions, 
+        std::string side
+    );
+
+    void Initialise();
+    void ShutDown();
+    
+    void Update(float dt);
+    void Draw();
+
+    void SetTransform(MyTransform3D parentTransform);
+
+private:
+    TingoAssets& assets;
+    TingoDimensions& dimensions;
+
+    Vector3 positionOffset;
+    
+    MyTransform3D transform;
+
+    std::string side;
 };
 
 
@@ -430,6 +551,11 @@ private:
 #include "MyTransform3D.h"
 #include "TingoBingo/TingoDimensions.h"
 #include "TingoBingo/TingoAssets.h"
+#include "TingoBingo/Body/Head/MouthDisplay.h"
+#include "TingoBingo/Body/Head/Eye.h"
+#include "TingoBingo/Body/Head/Nose.h"
+#include "TingoBingo/Body/Head/EyeBrow.h"
+#include "TingoBingo/Body/Head/Ear.h"
 
 class Head
 {
@@ -437,7 +563,112 @@ public:
     Head(TingoAssets& assets, TingoDimensions& dimensions);
 
     void Initialise();
+    
+    void Update(float dt);
+    void Draw();
+
+    void SetTransform(MyTransform3D parentTransform);
+
+private:
+    TingoAssets& assets;
+    TingoDimensions& dimensions;
+
+    Vector3 positionOffset;
+    
+    MyTransform3D transform;
+
+    MouthDisplay mouthDisplay;
+    Eye leftEye;
+    Eye rightEye;
+    Nose nose;
+    EyeBrow leftEyeBrow;
+    EyeBrow rightEyeBrow;
+    Ear leftEar;
+    Ear rightEar;
+};
+
+
+=====================================
+.\include\TingoBingo\Body\Head\MouthDisplay.h
+=====================================
+
+#pragma once
+
+#include "MyTransform3D.h"
+#include "TingoBingo/TingoDimensions.h"
+#include "TingoBingo/TingoAssets.h"
+
+class MouthDisplay
+{
+public:
+    MouthDisplay(TingoAssets& assets, TingoDimensions& dimensions);
+
+    void Initialise();
     void ShutDown();
+    
+    void Update(float dt);
+    void Draw();
+
+    void SetTransform(MyTransform3D parentTransform);
+
+private:
+    TingoAssets& assets;
+    TingoDimensions& dimensions;
+
+    Vector3 positionOffset;
+    
+    MyTransform3D transform;
+};
+
+
+=====================================
+.\include\TingoBingo\Body\Head\Nose.h
+=====================================
+
+#pragma once
+
+#include "MyTransform3D.h"
+#include "TingoBingo/TingoDimensions.h"
+#include "TingoBingo/TingoAssets.h"
+
+class Nose
+{
+public:
+    Nose(TingoAssets& assets, TingoDimensions& dimensions);
+
+    void Initialise();
+    
+    void Update(float dt);
+    void Draw();
+
+    void SetTransform(MyTransform3D parentTransform);
+
+private:
+    TingoAssets& assets;
+    TingoDimensions& dimensions;
+
+    Vector3 positionOffset;
+    
+    MyTransform3D transform;
+};
+
+
+=====================================
+.\include\TingoBingo\Body\Head\Pupil.h
+=====================================
+
+#pragma once
+
+#include "MyTransform3D.h"
+#include "TingoBingo/TingoDimensions.h"
+#include "TingoBingo/TingoAssets.h"
+
+class Pupil
+{
+public:
+    Pupil(TingoAssets& assets, TingoDimensions& dimensions);
+
+    void Initialise();
     
     void Update(float dt);
     void Draw();
@@ -603,6 +834,7 @@ private:
 #include "MyTransform3D.h"
 #include "TingoBingo/TingoDimensions.h"
 #include "TingoBingo/TingoAssets.h"
+#include "TingoBingo/Body/Head/Head.h"
 
 class Neck
 {
@@ -623,6 +855,8 @@ private:
 
     MyTransform3D transform;
     Vector3 positionOffset;
+
+    Head head;
 };
 
 
@@ -721,8 +955,14 @@ public:
     Vector3 GetElbowDimensions();
     Vector3 GetHandDimensions();
     Vector3 GetFingerDimensions();
+    Vector3 GetMouthDisplayDimensions();
+    Vector3 GetEyeDimesnsions();
+    Vector3 GetPupilDimensions();
+    Vector3 GetNoseDimensions();
+    Vector3 GetEyeBrowDimensions();
+    Vector3 GetEarDimensions();
 
-    Model bodyShape{};
+    Model body{};
     Model pelvis{};
     Model thigh{};
     Model knee{};
@@ -736,7 +976,23 @@ public:
     Model foreArm{};
     Model hand{};
     Model finger{};
+    Model mouthDisplay{};
+    Model eye{};
+    Model pupil{};
+    Model nose{};
+    Model eyeBrow{};
+    Model ear{};
 
+    // Shared lighting shader.
+    Shader lightingShader{};
+
+    // Shader uniform locations.
+    int lightDirectionLoc = -1;
+    int ambientLoc = -1;
+    int viewPositionLoc = -1;
+
+    // Update the lighting using the current camera position.
+    void UpdateLighting(Vector3 cameraPosition);
 };
 
 
@@ -751,6 +1007,9 @@ public:
 class TingoDimensions 
 {
 public:
+
+    Vector3 scale;
+
     void Initialise
     (
         Vector3 bodyDimensions,
@@ -766,7 +1025,13 @@ public:
         Vector3 foreArmDimensions,
         Vector3 elbowDimensions,
         Vector3 handDimensions,
-        Vector3 fingerDimensions
+        Vector3 fingerDimensions,
+        Vector3 mouthDisplayDimensions,
+        Vector3 eyeDimensions,
+        Vector3 pupilDimensions,
+        Vector3 noseDimensions,
+        Vector3 eyeBrowDimensions,
+        Vector3 earDimensions
     );
 
     struct BodyShape {
@@ -866,6 +1131,51 @@ public:
         float length;
     };
     Finger finger;    
+    
+    struct MouthDisplay {
+        float width;
+        float height;
+        float length;
+    };
+    MouthDisplay mouthDisplay;
+
+    struct Eye {
+        float width;
+        float height;
+        float length;
+    };
+    Eye eye;
+
+    struct Pupil
+    {
+        float width;
+        float height;
+        float length;
+    };  
+    Pupil pupil;
+
+    struct Nose
+    {
+        float width;
+        float height;
+        float length;
+    };
+    Nose nose;
+
+    struct EyeBrow
+    {
+        float width;
+        float height;
+        float length;
+    };
+    EyeBrow eyeBrow;
+
+    struct Ear {
+        float width;
+        float height;
+        float length;
+    };
+    Ear ear;
 };
 
 
@@ -906,7 +1216,7 @@ void Game::Run()
 
         BeginDrawing();
 
-        ClearBackground(RAYWHITE);
+        ClearBackground(BLACK);
 
         world.Draw();
 
@@ -939,6 +1249,8 @@ inline bool dirFlag = true;
 
 void GameWorld::Initialise(ScreenDimensions& screenDimensions)
 {
+    spaceBackground = LoadTexture("assets/images/space.png");
+
     this->screenDimensions = screenDimensions;
 
     // Configure the 3D camera.
@@ -964,7 +1276,13 @@ void GameWorld::Initialise(ScreenDimensions& screenDimensions)
         assets.GetForeArmDimensions(),
         assets.GetElbowDimensions(),
         assets.GetHandDimensions(),
-        assets.GetFingerDimensions()
+        assets.GetFingerDimensions(),
+        assets.GetMouthDisplayDimensions(),
+        assets.GetEyeDimesnsions(),
+        assets.GetPupilDimensions(),
+        assets.GetNoseDimensions(),
+        assets.GetEyeBrowDimensions(),
+        assets.GetEarDimensions()   
     );
 
     initialTransform.position = {
@@ -978,9 +1296,9 @@ void GameWorld::Initialise(ScreenDimensions& screenDimensions)
         0.0f
     };
 
-    initialTransform.rotationAxis = {0.0f, 1.0f, 0.0f};
+    initialTransform.rotationAxis = {1.0f, 1.0f, 1.0f};
     initialTransform.rotationAngle = 0.0f;
-    initialTransform.scale = {1.0f, 1.0f, 1.0f};
+    initialTransform.scale = dimensions.scale;
 
     tingo.Initialise();
     tingo.SetTransform(initialTransform);
@@ -991,11 +1309,12 @@ void GameWorld::Update(float dt)
     // Allow free movement around the 3D world.
     UpdateCamera(&camera, CAMERA_FREE);
 
-    dirFlag ? initialTransform.rotationAngle += dt * 80 : initialTransform.rotationAngle -= dt * 80;
-     
+    assets.UpdateLighting(camera.position);
 
-    if(initialTransform.rotationAngle <= 0.0) dirFlag = true;
-    if(initialTransform.rotationAngle >= 720.0) dirFlag = false;    
+    // dirFlag ? initialTransform.rotationAngle += dt * 80 : initialTransform.rotationAngle -= dt * 80;
+     
+    // if(initialTransform.rotationAngle <= 0.0) dirFlag = true;
+    // if(initialTransform.rotationAngle >= 720.0) dirFlag = false;    
 
     tingo.SetTransform(initialTransform);
     tingo.Update(dt);
@@ -1078,6 +1397,19 @@ void GameWorld::DrawOrientationGizmo()
 
 void GameWorld::Draw()
 {
+    DrawTexturePro(
+        spaceBackground,
+        { 0.0f, 0.0f,
+        (float)spaceBackground.width,
+        (float)spaceBackground.height },
+        { 0.0f, 0.0f,
+        (float)GetScreenWidth(),
+        (float)GetScreenHeight() },
+        { 0.0f, 0.0f },
+        0.0f,
+        WHITE
+    );
+
     BeginMode3D(camera);
 
     // Room dimensions.
@@ -1205,15 +1537,6 @@ void Elbow::Draw()
         WHITE
     );
 
-    DrawModelWiresEx(
-        assets.elbow,
-        transform.position,
-        transform.rotationAxis,
-        transform.rotationAngle,
-        transform.scale,
-        GREEN
-    );
-
     foreArm.Draw();
 }
 
@@ -1286,15 +1609,6 @@ void Finger::Draw()
         transform.scale,
         WHITE
     );
-
-    DrawModelWiresEx(
-        assets.finger,
-        transform.position,
-        transform.rotationAxis,
-        transform.rotationAngle,
-        transform.scale,
-        GREEN
-    );
 }
 
 void Finger::SetTransform(MyTransform3D parentTransform)
@@ -1366,15 +1680,6 @@ void ForeArm::Draw()
         WHITE
     );
 
-    DrawModelWiresEx(
-        assets.foreArm,
-        transform.position,
-        transform.rotationAxis,
-        transform.rotationAngle,
-        transform.scale,
-        GREEN
-    );
-
     hand.Draw();
 }
 
@@ -1439,15 +1744,6 @@ void Hand::Draw()
         transform.rotationAngle,
         transform.scale,
         WHITE
-    );
-
-    DrawModelWiresEx(
-        assets.hand,
-        transform.position,
-        transform.rotationAxis,
-        transform.rotationAngle,
-        transform.scale,
-        GREEN
     );
 
     leftFinger.Draw();
@@ -1515,6 +1811,7 @@ void Shoulder::ShutDown()
 void Shoulder::Update(float dt)
 {
     (void)dt;
+    // localRotation += dt * 80;
 }
 
 void Shoulder::Draw()
@@ -1527,16 +1824,7 @@ void Shoulder::Draw()
         transform.scale,
         WHITE
     );
-
-    DrawModelWiresEx(
-        assets.shoulder,
-        transform.position,
-        transform.rotationAxis,
-        transform.rotationAngle,
-        transform.scale,
-        GREEN
-    );
-
+    
     upperArm.Draw();
 }
 
@@ -1546,7 +1834,7 @@ void Shoulder::SetTransform(MyTransform3D parentTransform)
 
     localTransform.position = positionOffset;
     localTransform.rotationAxis = {1.0f, 0.0f, 0.0f};
-    localTransform.rotationAngle = 0.0f;
+    localTransform.rotationAngle += localRotation;
     localTransform.scale = {1.0f, 1.0f, 1.0f};
 
     transform = MakeChildTransform(parentTransform, localTransform);
@@ -1601,15 +1889,6 @@ void UpperArm::Draw()
         WHITE
     );
 
-    DrawModelWiresEx(
-        assets.upperArm,
-        transform.position,
-        transform.rotationAxis,
-        transform.rotationAngle,
-        transform.scale,
-        GREEN
-    );
-
     elbow.Draw();
 }
 
@@ -1640,8 +1919,7 @@ Body::Body(TingoAssets& assets, TingoDimensions& dimensions) :
     pelvis(assets, dimensions),
     neck(assets, dimensions),
     leftShoulder(assets, dimensions, "left"),
-    rightShoulder(assets, dimensions, "right"),
-    head(assets, dimensions)
+    rightShoulder(assets, dimensions, "right")
 {}
 
 void Body::Initialise()
@@ -1652,7 +1930,6 @@ void Body::Initialise()
     neck.Initialise();
     leftShoulder.Initialise();
     rightShoulder.Initialise();
-    head.Initialise();
 }
 
 void Body::ShutDown()
@@ -1663,12 +1940,14 @@ void Body::Update(float dt)
 {
     pelvis.Update(dt);
     neck.Update(dt);
+    leftShoulder.Update(dt);
+    rightShoulder.Update(dt);
 }
 
 void Body::Draw()
 {
     DrawModelEx(
-        assets.bodyShape,
+        assets.body,
         transform.position,
         transform.rotationAxis,
         transform.rotationAngle,
@@ -1676,20 +1955,10 @@ void Body::Draw()
         WHITE
     );
 
-    DrawModelWiresEx(
-        assets.bodyShape,
-        transform.position,
-        transform.rotationAxis,
-        transform.rotationAngle,
-        transform.scale,
-        GREEN
-    );
-
     pelvis.Draw();
     neck.Draw();
     leftShoulder.Draw();
     rightShoulder.Draw();
-    head.Draw();
 }
 
 void Body::SetTransform(MyTransform3D parentTransform)
@@ -1707,7 +1976,223 @@ void Body::SetTransform(MyTransform3D parentTransform)
     neck.SetTransform(transform);
     leftShoulder.SetTransform(transform);
     rightShoulder.SetTransform(transform);
-    head.SetTransform(transform);
+}
+
+
+=====================================
+.\src\TingoBingo\Body\Head\Ear.cpp
+=====================================
+
+#include "TingoBingo/Body/Head/Ear.h"
+#include "raymath.h"
+
+Ear::Ear
+(
+    TingoAssets& assets, 
+    TingoDimensions& dimensions, 
+    std::string side
+) :
+    assets(assets),
+    dimensions(dimensions),
+    side(side)
+{}
+
+void Ear::Initialise()
+{
+    float Xoffset = dimensions.head.width /2.0f +
+                    dimensions.ear.width / 2.0f;
+
+    if(side == "left")
+    {
+        positionOffset = {
+            Xoffset,
+            0.0f,
+            0.0f        
+        };
+    }
+    else if(side == "right")
+    {
+        positionOffset = {
+            -Xoffset,
+            0.0f,
+            0.0f
+        };
+    }
+}
+
+void Ear::Update(float dt)
+{
+    (void)dt;
+}
+
+void Ear::Draw()
+{
+    DrawModelEx(
+        assets.ear,
+        transform.position,
+        transform.rotationAxis,
+        transform.rotationAngle,
+        transform.scale,
+        WHITE
+    );
+}
+
+void Ear::SetTransform(MyTransform3D parentTransform)
+{
+    MyTransform3D localTransform{};
+
+    localTransform.position = positionOffset;
+    localTransform.rotationAxis = {1.0f, 0.0f, 0.0f};
+    localTransform.rotationAngle = 0.0f;
+    localTransform.scale = {1.0f, 1.0f, 1.0f};
+
+    transform = MakeChildTransform(parentTransform, localTransform);
+}
+
+
+=====================================
+.\src\TingoBingo\Body\Head\Eye.cpp
+=====================================
+
+#include "TingoBingo/Body/Head/Eye.h"
+#include "raymath.h"
+
+Eye::Eye(TingoAssets& assets, TingoDimensions& dimensions, std::string side) :
+    assets(assets),
+    dimensions(dimensions),
+    side(side),
+    pupil(assets, dimensions)
+{}
+
+void Eye::Initialise()
+{
+    float Xoffset = 0.5f;
+    float Yoffset = 0.3f;
+
+    if(side == "left")
+    {
+        positionOffset = {
+            Xoffset,
+            Yoffset,
+            dimensions.head.length / 2.0f + dimensions.eye.length / 2.0f        
+        };
+    }
+    else if(side == "right")
+    {
+        positionOffset = {
+            -Xoffset,
+            Yoffset,
+            dimensions.head.length / 2.0f        
+        };
+    }
+
+    pupil.Initialise();
+}
+
+void Eye::Update(float dt)
+{
+    (void)dt;
+}
+
+void Eye::Draw()
+{
+    DrawModelEx(
+        assets.eye,
+        transform.position,
+        transform.rotationAxis,
+        transform.rotationAngle,
+        transform.scale,
+        WHITE
+    );
+
+    pupil.Draw();
+}
+
+void Eye::SetTransform(MyTransform3D parentTransform)
+{
+    MyTransform3D localTransform{};
+
+    localTransform.position = positionOffset;
+    localTransform.rotationAxis = {1.0f, 0.0f, 0.0f};
+    localTransform.rotationAngle = 0.0f;
+    localTransform.scale = {1.0f, 1.0f, 1.0f};
+
+    transform = MakeChildTransform(parentTransform, localTransform);
+
+    pupil.SetTransform(transform);
+}
+
+
+=====================================
+.\src\TingoBingo\Body\Head\EyeBrow.cpp
+=====================================
+
+#include "TingoBingo/Body/Head/EyeBrow.h"
+#include "raymath.h"
+
+EyeBrow::EyeBrow
+(
+    TingoAssets& assets, 
+    TingoDimensions& dimensions, 
+    std::string side
+) :
+    assets(assets),
+    dimensions(dimensions),
+    side(side)
+{}
+
+void EyeBrow::Initialise()
+{
+    float Xoffset = 0.5f;
+    float Yoffset = 0.7f;
+    float Zoffset = dimensions.head.length / 2.0f +
+                    dimensions.eyeBrow.length / 2.0f;
+                    
+    if(side == "left")
+    {
+        positionOffset = {
+            Xoffset,
+            Yoffset,
+            Zoffset        
+        };
+    }
+    else if(side == "right")
+    {
+        positionOffset = {
+            -Xoffset,
+            Yoffset,
+            Zoffset       
+        };
+    }
+}
+
+void EyeBrow::Update(float dt)
+{
+    (void)dt;
+}
+
+void EyeBrow::Draw()
+{
+    DrawModelEx(
+        assets.eyeBrow,
+        transform.position,
+        transform.rotationAxis,
+        transform.rotationAngle,
+        transform.scale,
+        WHITE
+    );
+}
+
+void EyeBrow::SetTransform(MyTransform3D parentTransform)
+{
+    MyTransform3D localTransform{};
+
+    localTransform.position = positionOffset;
+    localTransform.rotationAxis = {1.0f, 0.0f, 0.0f};
+    localTransform.rotationAngle = 0.0f;
+    localTransform.scale = {1.0f, 1.0f, 1.0f};
+
+    transform = MakeChildTransform(parentTransform, localTransform);
 }
 
 
@@ -1720,23 +2205,33 @@ void Body::SetTransform(MyTransform3D parentTransform)
 
 Head::Head(TingoAssets& assets, TingoDimensions& dimensions) :
     assets(assets),
-    dimensions(dimensions)
+    dimensions(dimensions),
+    mouthDisplay(assets, dimensions),
+    leftEye(assets, dimensions, "left"),
+    rightEye(assets, dimensions, "right"),
+    nose(assets, dimensions),
+    leftEyeBrow(assets, dimensions, "left"),
+    rightEyeBrow(assets, dimensions, "right"),
+    leftEar(assets, dimensions, "left"),
+    rightEar(assets, dimensions, "right")
 {}
 
 void Head::Initialise()
 {
     positionOffset = {
         0.0f,
-        dimensions.bodyShape.height / 2.0f +
-        dimensions.neck.height +
-        dimensions.head.height / 2.0f,
+        dimensions.neck.height / 2.0f + dimensions.head.height / 2.0f,
         0.0f        
     };
-}
 
-void Head::ShutDown()
-{
-    
+    mouthDisplay.Initialise();
+    leftEye.Initialise();
+    rightEye.Initialise();
+    nose.Initialise();
+    leftEyeBrow.Initialise();
+    rightEyeBrow.Initialise();
+    leftEar.Initialise();
+    rightEar.Initialise();
 }
 
 void Head::Update(float dt)
@@ -1755,17 +2250,179 @@ void Head::Draw()
         WHITE
     );
 
-    DrawModelWiresEx(
-        assets.head,
+    mouthDisplay.Draw();
+    leftEye.Draw();
+    rightEye.Draw();
+    nose.Draw();
+    leftEyeBrow.Draw();
+    rightEyeBrow.Draw();
+    leftEar.Draw();
+    rightEar.Draw();
+}
+
+void Head::SetTransform(MyTransform3D parentTransform)
+{
+    MyTransform3D localTransform{};
+
+    localTransform.position = positionOffset;
+    localTransform.rotationAxis = {1.0f, 0.0f, 0.0f};
+    localTransform.rotationAngle = 0.0f;
+    localTransform.scale = {1.0f, 1.0f, 1.0f};
+
+    transform = MakeChildTransform(parentTransform, localTransform);
+
+    mouthDisplay.SetTransform(transform);
+    leftEye.SetTransform(transform);
+    rightEye.SetTransform(transform);
+    nose.SetTransform(transform);
+    leftEyeBrow.SetTransform(transform);
+    rightEyeBrow.SetTransform(transform);
+    leftEar.SetTransform(transform);
+    rightEar.SetTransform(transform);
+}
+
+
+=====================================
+.\src\TingoBingo\Body\Head\MouthDisplay.cpp
+=====================================
+
+#include "TingoBingo/Body/Head/MouthDisplay.h"
+#include "raymath.h"
+
+MouthDisplay::MouthDisplay(TingoAssets& assets, TingoDimensions& dimensions) :
+    assets(assets),
+    dimensions(dimensions)
+{}
+
+void MouthDisplay::Initialise()
+{
+    float Yoffset = -dimensions.mouthDisplay.height / 2.0f - 0.2f;
+
+    positionOffset = {
+        0.0f,
+        Yoffset,
+        dimensions.head.length / 2.0f + dimensions.mouthDisplay.length / 2.0f        
+    };
+}
+
+void MouthDisplay::Update(float dt)
+{
+    (void)dt;
+}
+
+void MouthDisplay::Draw()
+{
+    DrawModelEx(
+        assets.mouthDisplay,
         transform.position,
         transform.rotationAxis,
         transform.rotationAngle,
         transform.scale,
-        GREEN
+        WHITE
     );
 }
 
-void Head::SetTransform(MyTransform3D parentTransform)
+void MouthDisplay::SetTransform(MyTransform3D parentTransform)
+{
+    MyTransform3D localTransform{};
+
+    localTransform.position = positionOffset;
+    localTransform.rotationAxis = {1.0f, 0.0f, 0.0f};
+    localTransform.rotationAngle = 0.0f;
+    localTransform.scale = dimensions.scale;
+
+    transform = MakeChildTransform(parentTransform, localTransform);
+}
+
+
+=====================================
+.\src\TingoBingo\Body\Head\Nose.cpp
+=====================================
+
+#include "TingoBingo/Body/Head/Nose.h"
+#include "raymath.h"
+
+Nose::Nose(TingoAssets& assets, TingoDimensions& dimensions) :
+    assets(assets),
+    dimensions(dimensions)
+{}
+
+void Nose::Initialise()
+{
+    positionOffset = {
+        0.0f, 0.0f, dimensions.head.length / 2.0f + dimensions.nose.length / 2.0f
+    };
+}
+
+void Nose::Update(float dt)
+{
+    (void)dt;
+}
+
+void Nose::Draw()
+{
+    DrawModelEx(
+        assets.nose,
+        transform.position,
+        transform.rotationAxis,
+        transform.rotationAngle,
+        transform.scale,
+        WHITE
+    );
+}
+
+void Nose::SetTransform(MyTransform3D parentTransform)
+{
+    MyTransform3D localTransform{};
+
+    localTransform.position = positionOffset;
+    localTransform.rotationAxis = {1.0f, 0.0f, 0.0f};
+    localTransform.rotationAngle = 0.0f;
+    localTransform.scale = {1.0f, 1.0f, 1.0f};
+
+    transform = MakeChildTransform(parentTransform, localTransform);
+}
+
+
+=====================================
+.\src\TingoBingo\Body\Head\Pupil.cpp
+=====================================
+
+#include "TingoBingo/Body/Head/Pupil.h"
+#include "raymath.h"
+
+Pupil::Pupil(TingoAssets& assets, TingoDimensions& dimensions) :
+    assets(assets),
+    dimensions(dimensions)
+{}
+
+void Pupil::Initialise()
+{
+    positionOffset = {
+        0.0f, 
+        0.0f, 
+        dimensions.eye.length / 2.0f + dimensions.pupil.length / 2.0f
+    };
+}
+
+void Pupil::Update(float dt)
+{
+    (void)dt;
+}
+
+void Pupil::Draw()
+{
+    DrawModelEx(
+        assets.pupil,
+        transform.position,
+        transform.rotationAxis,
+        transform.rotationAngle,
+        transform.scale,
+        WHITE
+    );
+}
+
+void Pupil::SetTransform(MyTransform3D parentTransform)
 {
     MyTransform3D localTransform{};
 
@@ -1820,15 +2477,6 @@ void Foot::Draw()
         transform.rotationAngle,
         transform.scale,
         WHITE
-    );
-
-    DrawModelWiresEx(
-        assets.foot,
-        transform.position,
-        transform.rotationAxis,
-        transform.rotationAngle,
-        transform.scale,
-        GREEN
     );
 }
 
@@ -1889,15 +2537,6 @@ void Knee::Draw()
         transform.rotationAngle,
         transform.scale,
         WHITE
-    );
-
-    DrawModelWiresEx(
-        assets.knee,
-        transform.position,
-        transform.rotationAxis,
-        transform.rotationAngle,
-        transform.scale,
-        GREEN
     );
 
     shin.Draw();
@@ -1962,15 +2601,6 @@ void Shin::Draw()
         transform.rotationAngle,
         transform.scale,
         WHITE
-    );
-
-    DrawModelWiresEx(
-        assets.shin,
-        transform.position,
-        transform.rotationAxis,
-        transform.rotationAngle,
-        transform.scale,
-        GREEN
     );
 
     foot.Draw();
@@ -2051,15 +2681,6 @@ void Thigh::Draw()
         WHITE
     );
 
-    DrawModelWiresEx(
-        assets.thigh,
-        transform.position,
-        transform.rotationAxis,
-        transform.rotationAngle,
-        transform.scale,
-        GREEN
-    );
-
     knee.Draw();
 }
 
@@ -2087,7 +2708,8 @@ void Thigh::SetTransform(MyTransform3D parentTransform)
 
 Neck::Neck(TingoAssets& assets, TingoDimensions& dimensions) :
     assets(assets),
-    dimensions(dimensions)
+    dimensions(dimensions),
+    head(assets, dimensions)
 {}
 
 void Neck::Initialise()
@@ -2098,6 +2720,10 @@ void Neck::Initialise()
         dimensions.neck.height / 2.0f,
         0.0f
     };
+
+    head.Initialise();
+
+    TraceLog(LOG_INFO, "Raylib version: %s", RAYLIB_VERSION);
 }
 
 void Neck::ShutDown()
@@ -2107,7 +2733,7 @@ void Neck::ShutDown()
 
 void Neck::Update(float dt)
 {
-    (void)dt;
+    head.Update(dt);
 }
 
 void Neck::Draw()
@@ -2121,14 +2747,7 @@ void Neck::Draw()
         WHITE
     );
 
-    DrawModelWiresEx(
-        assets.neck,
-        transform.position,
-        transform.rotationAxis,
-        transform.rotationAngle,
-        transform.scale,
-        GREEN
-    );
+    head.Draw();
 }
 
 void Neck::SetTransform(MyTransform3D parentTransform)
@@ -2141,6 +2760,8 @@ void Neck::SetTransform(MyTransform3D parentTransform)
     localTransform.scale = {1.0f, 1.0f, 1.0f};
 
     transform = MakeChildTransform(parentTransform, localTransform);
+
+    head.SetTransform(transform);
 }
 
 
@@ -2190,15 +2811,6 @@ void Pelvis::Draw()
         transform.rotationAngle,
         transform.scale,
         WHITE
-    );
-
-    DrawModelWiresEx(
-        assets.pelvis,
-        transform.position,
-        transform.rotationAxis,
-        transform.rotationAngle,
-        transform.scale,
-        GREEN
     );
 
     leftThigh.Draw();
@@ -2271,9 +2883,16 @@ void Tingo::SetTransform(MyTransform3D initialTransform)
 #include "TingoBingo/TingoAssets.h"
 #include "raymath.h"
 
+inline Vector3 GetDimensions(Model model)
+{
+    BoundingBox bounds = GetModelBoundingBox(model);
+    Vector3 dimensions = Vector3Subtract(bounds.max, bounds.min);
+    return dimensions;
+}
+
 void TingoAssets::Initialise()
 {
-    bodyShape = LoadModel("assets/models/tingo/Body.glb");
+    body = LoadModel("assets/models/tingo/Body.glb");
     pelvis = LoadModel("assets/models/tingo/Pelvis.glb");
     thigh = LoadModel("assets/models/tingo/Thigh.glb");
     knee = LoadModel("assets/models/tingo/Knee.glb");
@@ -2287,109 +2906,212 @@ void TingoAssets::Initialise()
     foreArm = LoadModel("assets/models/tingo/ForeArm.glb");
     hand = LoadModel("assets/models/tingo/Hand.glb");
     finger = LoadModel("assets/models/tingo/Finger.glb");
+    mouthDisplay = LoadModel("assets/models/tingo/MouthDisplay.glb");
+    eye = LoadModel("assets/models/tingo/Eye.glb");
+    pupil = LoadModel("assets/models/tingo/Pupil.glb");
+    nose = LoadModel("assets/models/tingo/Nose.glb");
+    eyeBrow = LoadModel("assets/models/tingo/EyeBrow.glb");
+    ear = LoadModel("assets/models/tingo/Ear.glb");
+
+    // Load the lighting shaders.
+    lightingShader = LoadShader(
+        "assets/shaders/lighting.vs",
+        "assets/shaders/lighting.fs"
+    );
+
+    // Set the shader locations used by raylib.
+    lightingShader.locs[SHADER_LOC_VECTOR_VIEW] =
+        GetShaderLocation(lightingShader, "viewPos");
+
+    // Set our custom uniform locations.
+    lightDirectionLoc =
+        GetShaderLocation(lightingShader, "lightDirection");
+
+    ambientLoc =
+        GetShaderLocation(lightingShader, "ambient");
+
+    viewPositionLoc =
+        GetShaderLocation(lightingShader, "viewPos");
+
+    // Configure the directional light.
+    //
+    // The vector represents the direction in which light rays travel.
+    // The shader reverses this direction when calculating illumination.
+    float lightDirection[3] = {
+        0.5f,
+        -0.6f,
+        -1.0f
+    };
+
+    SetShaderValue(
+        lightingShader,
+        lightDirectionLoc,
+        lightDirection,
+        SHADER_UNIFORM_VEC3
+    );
+
+    // Low-level ambient illumination keeps shadows readable.
+    float ambient[3] = {
+        0.40f,
+        0.40f,
+        0.40f
+    };
+
+    SetShaderValue(
+        lightingShader,
+        ambientLoc,
+        ambient,
+        SHADER_UNIFORM_VEC3
+    );
+
+        // Collect all the models that should use the lighting shader.
+    Model* models[] = {
+        &body,
+        &pelvis,
+        &thigh,
+        &knee,
+        &shin,
+        &foot,
+        &neck,
+        &shoulder,
+        &head,
+        &upperArm,
+        &elbow,
+        &foreArm,
+        &hand,
+        &finger,
+        &mouthDisplay,
+        &eye,
+        &pupil,
+        &nose,
+        &eyeBrow,
+        &ear
+    };
+
+    // Assign the shader to every material in every model.
+    for (Model* model : models)
+    {
+        for (int i = 0; i < model->materialCount; i++)
+        {
+            model->materials[i].shader = lightingShader;
+        }
+    }
+}
+
+void TingoAssets::UpdateLighting(Vector3 cameraPosition)
+{
+    SetShaderValue(
+        lightingShader,
+        viewPositionLoc,
+        &cameraPosition,
+        SHADER_UNIFORM_VEC3
+    );
 }
 
 Vector3 TingoAssets::GetBodyDimensions()
 {
-    BoundingBox bounds = GetModelBoundingBox(bodyShape);
-    Vector3 dimensions = Vector3Subtract(bounds.max, bounds.min);
-    return dimensions;
+    return GetDimensions(body);
 }
 
 Vector3 TingoAssets::GetPelvisDimensions()
 {
-    BoundingBox bounds = GetModelBoundingBox(pelvis);
-    Vector3 dimensions = Vector3Subtract(bounds.max, bounds.min);
-    return dimensions;
+    return GetDimensions(pelvis);
 }
 
 Vector3 TingoAssets::GetThighDimensions()
 {
-    BoundingBox bounds = GetModelBoundingBox(thigh);
-    Vector3 dimensions = Vector3Subtract(bounds.max, bounds.min);
-    return dimensions;
+    return GetDimensions(thigh);
 }
 
 Vector3 TingoAssets::GetKneeDimensions()
 {
-    BoundingBox bounds = GetModelBoundingBox(knee);
-    Vector3 dimensions = Vector3Subtract(bounds.max, bounds.min);
-    return dimensions;
+    return GetDimensions(knee);
 }
+
 
 Vector3 TingoAssets::GetShinDimensions()
 {
-    BoundingBox bounds = GetModelBoundingBox(shin);
-    Vector3 dimensions = Vector3Subtract(bounds.max, bounds.min);
-    return dimensions;
+    return GetDimensions(shin);
 }
 
 Vector3 TingoAssets::GetFootDimensions()
 {
-    BoundingBox bounds = GetModelBoundingBox(foot);
-    Vector3 dimensions = Vector3Subtract(bounds.max, bounds.min);
-    return dimensions;
+    return GetDimensions(foot);
 }
 
 Vector3 TingoAssets::GetNeckDimensions()
 {
-    BoundingBox bounds = GetModelBoundingBox(neck);
-    Vector3 dimensions = Vector3Subtract(bounds.max, bounds.min);
-    return dimensions;
+    return GetDimensions(neck);
 }
 
 Vector3 TingoAssets::GetShoulderDimensions()
 {
-    BoundingBox bounds = GetModelBoundingBox(shoulder);
-    Vector3 dimensions = Vector3Subtract(bounds.max, bounds.min);
-    return dimensions;
+    return GetDimensions(shoulder);
 }
 
 Vector3 TingoAssets::GetHeadDimensions()
 {
-    BoundingBox bounds = GetModelBoundingBox(head);
-    Vector3 dimensions = Vector3Subtract(bounds.max, bounds.min);
-    return dimensions;
+    return GetDimensions(head);
 }
 
 Vector3 TingoAssets::GetUpperArmDimensions()
 {
-    BoundingBox bounds = GetModelBoundingBox(upperArm);
-    Vector3 dimensions = Vector3Subtract(bounds.max, bounds.min);
-    return dimensions;
+    return GetDimensions(upperArm);
 }
 
 Vector3 TingoAssets::GetForeArmDimensions()
 {
-    BoundingBox bounds = GetModelBoundingBox(foreArm);
-    Vector3 dimensions = Vector3Subtract(bounds.max, bounds.min);
-    return dimensions;
+    return GetDimensions(foreArm);
 }
 
 Vector3 TingoAssets::GetElbowDimensions()
 {
-    BoundingBox bounds = GetModelBoundingBox(elbow);
-    Vector3 dimensions = Vector3Subtract(bounds.max, bounds.min);
-    return dimensions;
+    return GetDimensions(elbow);
 }
 
 Vector3 TingoAssets::GetHandDimensions()
 {
-    BoundingBox bounds = GetModelBoundingBox(hand);
-    Vector3 dimensions = Vector3Subtract(bounds.max, bounds.min);
-    return dimensions;
+    return GetDimensions(hand);
 }
 
 Vector3 TingoAssets::GetFingerDimensions()
 {
-    BoundingBox bounds = GetModelBoundingBox(finger);
-    Vector3 dimensions = Vector3Subtract(bounds.max, bounds.min);
-    return dimensions;
+    return GetDimensions(finger);
+}
+
+Vector3 TingoAssets::GetMouthDisplayDimensions()
+{
+    return GetDimensions(mouthDisplay);
+}
+
+Vector3 TingoAssets::GetEyeDimesnsions()
+{
+    return GetDimensions(eye);
+}
+
+Vector3 TingoAssets::GetPupilDimensions()
+{
+    return GetDimensions(pupil);
+}
+
+Vector3 TingoAssets::GetNoseDimensions()
+{
+    return GetDimensions(nose);
+}
+
+Vector3 TingoAssets::GetEyeBrowDimensions()
+{
+    return GetDimensions(eyeBrow);
+}
+
+Vector3 TingoAssets::GetEarDimensions()
+{
+    return GetDimensions(ear);
 }
 
 void TingoAssets::ShutDown()
 {
-    UnloadModel(bodyShape);
+    UnloadModel(body);
     UnloadModel(pelvis);
     UnloadModel(thigh);
     UnloadModel(knee);
@@ -2403,6 +3125,14 @@ void TingoAssets::ShutDown()
     UnloadModel(elbow);
     UnloadModel(hand);
     UnloadModel(finger);
+    UnloadModel(mouthDisplay);
+    UnloadModel(eye);
+    UnloadModel(pupil);
+    UnloadModel(nose);
+    UnloadModel(eyeBrow);
+    UnloadModel(ear);
+
+    UnloadShader(lightingShader);
 }
 
 
@@ -2427,9 +3157,17 @@ void TingoDimensions::Initialise
     Vector3 foreArmDimensions,
     Vector3 elbowDimensions,
     Vector3 handDimensions,
-    Vector3 fingerDimensions
+    Vector3 fingerDimensions,
+    Vector3 mouthDisplayDimensions,
+    Vector3 eyeDimensions,
+    Vector3 pupilDimensions,
+    Vector3 noseDimensions,
+    Vector3 eyeBrowDimensions,
+    Vector3 earDimensions
 )
 {
+    scale = {1.0f, 1.0f, 1.0f};
+
     bodyShape.width = bodyDimensions.x;
     bodyShape.height = bodyDimensions.y;
     bodyShape.length = bodyDimensions.z;
@@ -2485,6 +3223,30 @@ void TingoDimensions::Initialise
     finger.width = fingerDimensions.x;
     finger.height = fingerDimensions.y;
     finger.length = fingerDimensions.z;
+
+    mouthDisplay.width = mouthDisplayDimensions.x;
+    mouthDisplay.height = mouthDisplayDimensions.y;
+    mouthDisplay.length = mouthDisplayDimensions.z;
+
+    eye.width = eyeDimensions.x;
+    eye.height = eyeDimensions.y;
+    eye.length = eyeDimensions.z;
+
+    pupil.width = pupilDimensions.x;
+    pupil.height = pupilDimensions.y;
+    pupil.length = pupilDimensions.z;
+
+    nose.width = noseDimensions.x;
+    nose.height =noseDimensions.y;
+    nose.length =noseDimensions.z;
+
+    eyeBrow.width = eyeBrowDimensions.x;
+    eyeBrow.height = eyeBrowDimensions.y;
+    eyeBrow.length = eyeBrowDimensions.z;
+
+    ear.width = earDimensions.x;
+    ear.height = earDimensions.y;
+    ear.length = earDimensions.z;
 }
 
 
@@ -2555,6 +3317,105 @@ int main()
     }
 
     std::cout << "Finished!\n";
+
+    return 0;
+}
+
+
+=====================================
+.\utilities\projectTree.cpp
+=====================================
+
+//====================================================
+// ProjectTree.cpp
+//
+// Generates a text file showing the folder structure
+// of the current project.
+//
+// This utility demonstrates how to use
+// std::filesystem to recursively traverse directories
+// and produce a simple tree view.
+//====================================================
+
+// iostream provides std::cout for writing to the console.
+#include <iostream>
+
+// fstream provides file input and output.
+#include <fstream>
+
+// filesystem provides classes and functions for working
+// with files and directories.
+#include <filesystem>
+
+// Create a shorter alias so we can write "fs::"
+// instead of "std::filesystem::".
+namespace fs = std::filesystem;
+
+//===============================================================
+// PrintTree
+//
+// Recursively writes the contents of a directory to the
+// output file as a tree structure.
+//
+// Parameters:
+//   path  - The directory currently being scanned.
+//   out   - The output file.
+//   depth - The current directory depth, used to indent
+//           child files and folders.
+//===============================================================
+void PrintTree(const fs::path& path, std::ofstream& out, int depth = 0)
+{
+    // Visit every file and folder in the current directory.
+    for (const auto& entry : fs::directory_iterator(path))
+    {
+        // Skip the Git repository metadata.
+        if (entry.is_directory() && entry.path().filename() == ".git")
+            continue;
+
+        // Indent according to the current folder depth.
+        for (int i = 0; i < depth; i++)
+            out << "│   ";
+
+        // Write the file or directory name.
+        out << "├── " << entry.path().filename().string();
+
+        // Add a trailing '/' to make directories easy to identify.
+        if (entry.is_directory())
+            out << "/";
+
+        out << '\n';
+
+        // Recursively process child directories.
+        if (entry.is_directory())
+        {
+            PrintTree(entry.path(), out, depth + 1);
+        }
+    }
+}
+
+int main()
+{
+    // "." represents the current working directory.
+    fs::path root = ".";
+
+    // Create the output file.
+    std::ofstream out("FileStructure.txt");
+
+    // Stop if the file couldn't be created.
+    if (!out)
+    {
+        std::cout << "Couldn't create output file.\n";
+        return 1;
+    }
+
+    // Write the root folder name.
+    out << root.string() << '\n';
+
+    // Generate the directory tree.
+    PrintTree(root, out);
+
+    // Inform the user that the operation completed.
+    std::cout << "Done! Wrote FileStructure.txt\n";
 
     return 0;
 }

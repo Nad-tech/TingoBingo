@@ -40,15 +40,6 @@ void Elbow::Draw()
         WHITE
     );
 
-    DrawModelWiresEx(
-        assets.elbow,
-        transform.position,
-        transform.rotationAxis,
-        transform.rotationAngle,
-        transform.scale,
-        GREEN
-    );
-
     foreArm.Draw();
 }
 

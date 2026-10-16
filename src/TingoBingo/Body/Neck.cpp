@@ -17,6 +17,8 @@ void Neck::Initialise()
     };
 
     head.Initialise();
+
+    TraceLog(LOG_INFO, "Raylib version: %s", RAYLIB_VERSION);
 }
 
 void Neck::ShutDown()
@@ -38,15 +40,6 @@ void Neck::Draw()
         transform.rotationAngle,
         transform.scale,
         WHITE
-    );
-
-    DrawModelWiresEx(
-        assets.neck,
-        transform.position,
-        transform.rotationAxis,
-        transform.rotationAngle,
-        transform.scale,
-        GREEN
     );
 
     head.Draw();

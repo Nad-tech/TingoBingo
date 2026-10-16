@@ -40,15 +40,6 @@ void ForeArm::Draw()
         WHITE
     );
 
-    DrawModelWiresEx(
-        assets.foreArm,
-        transform.position,
-        transform.rotationAxis,
-        transform.rotationAngle,
-        transform.scale,
-        GREEN
-    );
-
     hand.Draw();
 }
 

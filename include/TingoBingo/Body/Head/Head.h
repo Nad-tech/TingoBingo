@@ -7,6 +7,7 @@
 #include "TingoBingo/Body/Head/Eye.h"
 #include "TingoBingo/Body/Head/Nose.h"
 #include "TingoBingo/Body/Head/EyeBrow.h"
+#include "TingoBingo/Body/Head/Ear.h"
 
 class Head
 {
@@ -34,4 +35,6 @@ private:
     Nose nose;
     EyeBrow leftEyeBrow;
     EyeBrow rightEyeBrow;
+    Ear leftEar;
+    Ear rightEar;
 };

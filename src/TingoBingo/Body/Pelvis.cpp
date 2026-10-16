@@ -42,15 +42,6 @@ void Pelvis::Draw()
         WHITE
     );
 
-    DrawModelWiresEx(
-        assets.pelvis,
-        transform.position,
-        transform.rotationAxis,
-        transform.rotationAngle,
-        transform.scale,
-        GREEN
-    );
-
     leftThigh.Draw();
     rightThigh.Draw();  
 }

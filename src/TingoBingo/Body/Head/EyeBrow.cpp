@@ -16,14 +16,15 @@ void EyeBrow::Initialise()
 {
     float Xoffset = 0.5f;
     float Yoffset = 0.7f;
-
+    float Zoffset = dimensions.head.length / 2.0f +
+                    dimensions.eyeBrow.length / 2.0f;
+                    
     if(side == "left")
     {
         positionOffset = {
             Xoffset,
             Yoffset,
-            dimensions.head.length / 2.0f + 
-            dimensions.eyeBrow.length / 2.0f        
+            Zoffset        
         };
     }
     else if(side == "right")
@@ -31,8 +32,7 @@ void EyeBrow::Initialise()
         positionOffset = {
             -Xoffset,
             Yoffset,
-            dimensions.head.length / 2.0f +
-            dimensions.eyeBrow.length / 2.0f       
+            Zoffset       
         };
     }
 }

@@ -40,15 +40,6 @@ void UpperArm::Draw()
         WHITE
     );
 
-    DrawModelWiresEx(
-        assets.upperArm,
-        transform.position,
-        transform.rotationAxis,
-        transform.rotationAngle,
-        transform.scale,
-        GREEN
-    );
-
     elbow.Draw();
 }
 

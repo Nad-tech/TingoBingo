@@ -11,6 +11,8 @@ inline bool dirFlag = true;
 
 void GameWorld::Initialise(ScreenDimensions& screenDimensions)
 {
+    spaceBackground = LoadTexture("assets/images/background/space.jpg");
+
     this->screenDimensions = screenDimensions;
 
     // Configure the 3D camera.
@@ -41,7 +43,8 @@ void GameWorld::Initialise(ScreenDimensions& screenDimensions)
         assets.GetEyeDimesnsions(),
         assets.GetPupilDimensions(),
         assets.GetNoseDimensions(),
-        assets.GetEyeBrowDimensions()   
+        assets.GetEyeBrowDimensions(),
+        assets.GetEarDimensions()   
     );
 
     initialTransform.position = {
@@ -67,6 +70,8 @@ void GameWorld::Update(float dt)
 {
     // Allow free movement around the 3D world.
     UpdateCamera(&camera, CAMERA_FREE);
+
+    assets.UpdateLighting(camera.position);
 
     // dirFlag ? initialTransform.rotationAngle += dt * 80 : initialTransform.rotationAngle -= dt * 80;
      
@@ -154,6 +159,19 @@ void GameWorld::DrawOrientationGizmo()
 
 void GameWorld::Draw()
 {
+    DrawTexturePro(
+        spaceBackground,
+        { 0.0f, 0.0f,
+        (float)spaceBackground.width,
+        (float)spaceBackground.height },
+        { 0.0f, 0.0f,
+        (float)GetScreenWidth(),
+        (float)GetScreenHeight() },
+        { 0.0f, 0.0f },
+        0.0f,
+        WHITE
+    );
+
     BeginMode3D(camera);
 
     // Room dimensions.
@@ -165,19 +183,19 @@ void GameWorld::Draw()
     const float halfWidth = roomWidth / 2.0f;
     const float halfDepth = roomDepth / 2.0f;
 
-    // Floor.
+    //Floor.
     DrawPlane(
         { 0.0f, 0.0f, 0.0f },
         { roomWidth, roomDepth },
         LIGHTGRAY
     );
 
-    // Front wall: positive Z.
-    /*DrawCube(
-        { 0.0f, roomHeight / 2.0f, halfDepth },
-        roomWidth, roomHeight, 0.2f,
-        GRAY
-    );*/
+    // // Front wall: positive Z.
+    // /*DrawCube(
+    //     { 0.0f, roomHeight / 2.0f, halfDepth },
+    //     roomWidth, roomHeight, 0.2f,
+    //     GRAY
+    // );*/
 
     // Back wall wall: negative Z.
     DrawCube(
