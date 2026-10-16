@@ -37,4 +37,6 @@ private:
     EyeBrow rightEyeBrow;
     Ear leftEar;
     Ear rightEar;
+
+    float localRotation = 0.0f;
 };

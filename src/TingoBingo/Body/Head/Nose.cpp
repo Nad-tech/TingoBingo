@@ -8,8 +8,14 @@ Nose::Nose(TingoAssets& assets, TingoDimensions& dimensions) :
 
 void Nose::Initialise()
 {
+    float Yoffset = dimensions.head.height / 2.0f;
+    float Zoffset = dimensions.head.length / 2.0f +
+                    dimensions.nose.length / 2.0f;
+
     positionOffset = {
-        0.0f, 0.0f, dimensions.head.length / 2.0f + dimensions.nose.length / 2.0f
+        0.0f, 
+        Yoffset, 
+        Zoffset
     };
 }
 

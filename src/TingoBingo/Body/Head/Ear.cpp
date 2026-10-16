@@ -17,11 +17,13 @@ void Ear::Initialise()
     float Xoffset = dimensions.head.width /2.0f +
                     dimensions.ear.width / 2.0f;
 
+    float Yoffset = dimensions.head.height / 2.0f;
+
     if(side == "left")
     {
         positionOffset = {
             Xoffset,
-            0.0f,
+            Yoffset,
             0.0f        
         };
     }
@@ -29,7 +31,7 @@ void Ear::Initialise()
     {
         positionOffset = {
             -Xoffset,
-            0.0f,
+            Yoffset,
             0.0f
         };
     }

@@ -8,7 +8,8 @@ MouthDisplay::MouthDisplay(TingoAssets& assets, TingoDimensions& dimensions) :
 
 void MouthDisplay::Initialise()
 {
-    float Yoffset = -dimensions.mouthDisplay.height / 2.0f - 0.2f;
+    float Yoffset = -dimensions.mouthDisplay.height / 2.0f - 
+                    0.2f + dimensions.head.height / 2.0f;
 
     positionOffset = {
         0.0f,

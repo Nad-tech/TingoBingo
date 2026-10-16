@@ -18,7 +18,7 @@ void Head::Initialise()
 {
     positionOffset = {
         0.0f,
-        dimensions.neck.height / 2.0f + dimensions.head.height / 2.0f,
+        dimensions.neck.height / 2.0f,
         0.0f        
     };
 
@@ -35,6 +35,8 @@ void Head::Initialise()
 void Head::Update(float dt)
 {
     (void)dt;
+
+    //localRotation += dt * 50;
 }
 
 void Head::Draw()
@@ -63,8 +65,8 @@ void Head::SetTransform(MyTransform3D parentTransform)
     MyTransform3D localTransform{};
 
     localTransform.position = positionOffset;
-    localTransform.rotationAxis = {1.0f, 0.0f, 0.0f};
-    localTransform.rotationAngle = 0.0f;
+    localTransform.rotationAxis = {0.0f, 1.0f, 0.0f};
+    localTransform.rotationAngle = localRotation;
     localTransform.scale = {1.0f, 1.0f, 1.0f};
 
     transform = MakeChildTransform(parentTransform, localTransform);

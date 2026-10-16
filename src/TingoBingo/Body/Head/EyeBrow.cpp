@@ -15,7 +15,7 @@ EyeBrow::EyeBrow
 void EyeBrow::Initialise()
 {
     float Xoffset = 0.5f;
-    float Yoffset = 0.7f;
+    float Yoffset = 0.7f + dimensions.head.height / 2.0f;
     float Zoffset = dimensions.head.length / 2.0f +
                     dimensions.eyeBrow.length / 2.0f;
                     

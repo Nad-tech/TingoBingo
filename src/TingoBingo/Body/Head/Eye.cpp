@@ -11,7 +11,7 @@ Eye::Eye(TingoAssets& assets, TingoDimensions& dimensions, std::string side) :
 void Eye::Initialise()
 {
     float Xoffset = 0.5f;
-    float Yoffset = 0.3f;
+    float Yoffset = 0.3f + dimensions.head.height / 2.0f;
 
     if(side == "left")
     {
