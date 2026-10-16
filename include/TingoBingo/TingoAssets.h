@@ -25,6 +25,7 @@ public:
     Vector3 GetEyeDimesnsions();
     Vector3 GetPupilDimensions();
     Vector3 GetNoseDimensions();
+    Vector3 GetEyeBrowDimensions();
 
     Model body{};
     Model pelvis{};
@@ -44,4 +45,5 @@ public:
     Model eye{};
     Model pupil{};
     Model nose{};
+    Model eyeBrow{};
 };

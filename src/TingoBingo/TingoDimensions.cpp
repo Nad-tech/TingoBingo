@@ -19,7 +19,8 @@ void TingoDimensions::Initialise
     Vector3 mouthDisplayDimensions,
     Vector3 eyeDimensions,
     Vector3 pupilDimensions,
-    Vector3 noseDimensions
+    Vector3 noseDimensions,
+    Vector3 eyeBrowDimensions
 )
 {
     scale = {1.0f, 1.0f, 1.0f};
@@ -95,4 +96,8 @@ void TingoDimensions::Initialise
     nose.width = noseDimensions.x;
     nose.height =noseDimensions.y;
     nose.length =noseDimensions.z;
+
+    eyeBrow.width = eyeBrowDimensions.x;
+    eyeBrow.height = eyeBrowDimensions.y;
+    eyeBrow.length = eyeBrowDimensions.z;
 }

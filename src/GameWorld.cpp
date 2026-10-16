@@ -40,7 +40,8 @@ void GameWorld::Initialise(ScreenDimensions& screenDimensions)
         assets.GetMouthDisplayDimensions(),
         assets.GetEyeDimesnsions(),
         assets.GetPupilDimensions(),
-        assets.GetNoseDimensions()   
+        assets.GetNoseDimensions(),
+        assets.GetEyeBrowDimensions()   
     );
 
     initialTransform.position = {
