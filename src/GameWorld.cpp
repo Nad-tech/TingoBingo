@@ -36,7 +36,8 @@ void GameWorld::Initialise(ScreenDimensions& screenDimensions)
         assets.GetForeArmDimensions(),
         assets.GetElbowDimensions(),
         assets.GetHandDimensions(),
-        assets.GetFingerDimensions()
+        assets.GetFingerDimensions(),
+        assets.GetMouthDisplayDimensions()
     );
 
     initialTransform.position = {
@@ -52,7 +53,7 @@ void GameWorld::Initialise(ScreenDimensions& screenDimensions)
 
     initialTransform.rotationAxis = {0.0f, 1.0f, 0.0f};
     initialTransform.rotationAngle = 0.0f;
-    initialTransform.scale = {1.0f, 1.0f, 1.0f};
+    initialTransform.scale = dimensions.scale;
 
     tingo.Initialise();
     tingo.SetTransform(initialTransform);
@@ -63,11 +64,10 @@ void GameWorld::Update(float dt)
     // Allow free movement around the 3D world.
     UpdateCamera(&camera, CAMERA_FREE);
 
-    dirFlag ? initialTransform.rotationAngle += dt * 80 : initialTransform.rotationAngle -= dt * 80;
+    // dirFlag ? initialTransform.rotationAngle += dt * 80 : initialTransform.rotationAngle -= dt * 80;
      
-
-    if(initialTransform.rotationAngle <= 0.0) dirFlag = true;
-    if(initialTransform.rotationAngle >= 720.0) dirFlag = false;    
+    // if(initialTransform.rotationAngle <= 0.0) dirFlag = true;
+    // if(initialTransform.rotationAngle >= 720.0) dirFlag = false;    
 
     tingo.SetTransform(initialTransform);
     tingo.Update(dt);

@@ -3,6 +3,7 @@
 #include "MyTransform3D.h"
 #include "TingoBingo/TingoDimensions.h"
 #include "TingoBingo/TingoAssets.h"
+#include "TingoBingo/Body/Head/Head.h"
 
 class Neck
 {
@@ -23,4 +24,6 @@ private:
 
     MyTransform3D transform;
     Vector3 positionOffset;
+
+    Head head;
 };

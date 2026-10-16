@@ -6,8 +6,7 @@ Body::Body(TingoAssets& assets, TingoDimensions& dimensions) :
     pelvis(assets, dimensions),
     neck(assets, dimensions),
     leftShoulder(assets, dimensions, "left"),
-    rightShoulder(assets, dimensions, "right"),
-    head(assets, dimensions)
+    rightShoulder(assets, dimensions, "right")
 {}
 
 void Body::Initialise()
@@ -18,7 +17,6 @@ void Body::Initialise()
     neck.Initialise();
     leftShoulder.Initialise();
     rightShoulder.Initialise();
-    head.Initialise();
 }
 
 void Body::ShutDown()
@@ -29,12 +27,14 @@ void Body::Update(float dt)
 {
     pelvis.Update(dt);
     neck.Update(dt);
+    leftShoulder.Update(dt);
+    rightShoulder.Update(dt);
 }
 
 void Body::Draw()
 {
     DrawModelEx(
-        assets.bodyShape,
+        assets.body,
         transform.position,
         transform.rotationAxis,
         transform.rotationAngle,
@@ -42,20 +42,10 @@ void Body::Draw()
         WHITE
     );
 
-    DrawModelWiresEx(
-        assets.bodyShape,
-        transform.position,
-        transform.rotationAxis,
-        transform.rotationAngle,
-        transform.scale,
-        GREEN
-    );
-
     pelvis.Draw();
     neck.Draw();
     leftShoulder.Draw();
     rightShoulder.Draw();
-    head.Draw();
 }
 
 void Body::SetTransform(MyTransform3D parentTransform)
@@ -73,5 +63,4 @@ void Body::SetTransform(MyTransform3D parentTransform)
     neck.SetTransform(transform);
     leftShoulder.SetTransform(transform);
     rightShoulder.SetTransform(transform);
-    head.SetTransform(transform);
 }

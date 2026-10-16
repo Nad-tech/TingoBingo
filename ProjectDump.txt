@@ -935,6 +935,8 @@ GameWorld::GameWorld() :
     tingo(assets, dimensions)
 {}
 
+inline bool dirFlag = true;
+
 void GameWorld::Initialise(ScreenDimensions& screenDimensions)
 {
     this->screenDimensions = screenDimensions;
@@ -975,11 +977,11 @@ void GameWorld::Initialise(ScreenDimensions& screenDimensions)
         dimensions.foot.height, 
         0.0f
     };
-    initialTransform.rotationAxis = {1.0f, 0.0f, 0.0f};
+
+    initialTransform.rotationAxis = {0.0f, 1.0f, 0.0f};
     initialTransform.rotationAngle = 0.0f;
     initialTransform.scale = {1.0f, 1.0f, 1.0f};
 
-    
     tingo.Initialise();
     tingo.SetTransform(initialTransform);
 }
@@ -989,7 +991,12 @@ void GameWorld::Update(float dt)
     // Allow free movement around the 3D world.
     UpdateCamera(&camera, CAMERA_FREE);
 
-    initialTransform.rotationAngle += dt * 30;
+    dirFlag ? initialTransform.rotationAngle += dt * 80 : initialTransform.rotationAngle -= dt * 80;
+     
+
+    if(initialTransform.rotationAngle <= 0.0) dirFlag = true;
+    if(initialTransform.rotationAngle >= 720.0) dirFlag = false;    
+
     tingo.SetTransform(initialTransform);
     tingo.Update(dt);
 }
@@ -1212,8 +1219,15 @@ void Elbow::Draw()
 
 void Elbow::SetTransform(MyTransform3D parentTransform)
 {
-    transform = parentTransform;
-    transform.position = Vector3Add(parentTransform.position, positionOffset);
+    MyTransform3D localTransform{};
+
+    localTransform.position = positionOffset;
+    localTransform.rotationAxis = {1.0f, 0.0f, 0.0f};
+    localTransform.rotationAngle = 0.0f;
+    localTransform.scale = {1.0f, 1.0f, 1.0f};
+
+    transform = MakeChildTransform(parentTransform, localTransform);
+    
     foreArm.SetTransform(transform);
 }
 
@@ -1285,19 +1299,24 @@ void Finger::Draw()
 
 void Finger::SetTransform(MyTransform3D parentTransform)
 {
-    transform = parentTransform;
+    MyTransform3D localTransform{};
+
+    localTransform.position = positionOffset;
     
     if(side == "left")
     {
-        transform.rotationAxis = {0.0f, 0.0f, 1.0f};
-        transform.rotationAngle = -15.0f;
+        localTransform.rotationAxis = {0.0f, 0.0f, 1.0f};
+        localTransform.rotationAngle = -15.0f;
     }
     else if(side == "right")
     {
-        transform.rotationAxis = {0.0f, 0.0f, 1.0f};
-        transform.rotationAngle = 15.0f;
+        localTransform.rotationAxis = {0.0f, 0.0f, 1.0f};
+        localTransform.rotationAngle = 15.0f;
     }
-    transform.position = Vector3Add(parentTransform.position, positionOffset);
+
+    localTransform.scale = {1.0f, 1.0f, 1.0f};
+
+    transform = MakeChildTransform(parentTransform, localTransform);
 }
 
 
@@ -1361,8 +1380,15 @@ void ForeArm::Draw()
 
 void ForeArm::SetTransform(MyTransform3D parentTransform)
 {
-    transform = parentTransform;
-    transform.position = Vector3Add(parentTransform.position, positionOffset);
+    MyTransform3D localTransform{};
+
+    localTransform.position = positionOffset;
+    localTransform.rotationAxis = {1.0f, 0.0f, 0.0f};
+    localTransform.rotationAngle = 0.0f;
+    localTransform.scale = {1.0f, 1.0f, 1.0f};
+
+    transform = MakeChildTransform(parentTransform, localTransform);
+    
     hand.SetTransform(transform);
 }
 
@@ -1430,8 +1456,15 @@ void Hand::Draw()
 
 void Hand::SetTransform(MyTransform3D parentTransform)
 {
-    transform = parentTransform;
-    transform.position = Vector3Add(parentTransform.position, positionOffset);
+    MyTransform3D localTransform{};
+
+    localTransform.position = positionOffset;
+    localTransform.rotationAxis = {1.0f, 0.0f, 0.0f};
+    localTransform.rotationAngle = 0.0f;
+    localTransform.scale = {1.0f, 1.0f, 1.0f};
+
+    transform = MakeChildTransform(parentTransform, localTransform);
+    
     leftFinger.SetTransform(transform);
     rightFinger.SetTransform(transform);
 }
@@ -1509,8 +1542,15 @@ void Shoulder::Draw()
 
 void Shoulder::SetTransform(MyTransform3D parentTransform)
 {
-    transform = parentTransform;
-    transform.position = Vector3Add(parentTransform.position, positionOffset);
+    MyTransform3D localTransform{};
+
+    localTransform.position = positionOffset;
+    localTransform.rotationAxis = {1.0f, 0.0f, 0.0f};
+    localTransform.rotationAngle = 0.0f;
+    localTransform.scale = {1.0f, 1.0f, 1.0f};
+
+    transform = MakeChildTransform(parentTransform, localTransform);
+    
     upperArm.SetTransform(transform);
 }
 
@@ -1575,8 +1615,15 @@ void UpperArm::Draw()
 
 void UpperArm::SetTransform(MyTransform3D parentTransform)
 {
-    transform = parentTransform;
-    transform.position = Vector3Add(parentTransform.position, positionOffset);
+    MyTransform3D localTransform{};
+
+    localTransform.position = positionOffset;
+    localTransform.rotationAxis = {1.0f, 0.0f, 0.0f};
+    localTransform.rotationAngle = 0.0f;
+    localTransform.scale = {1.0f, 1.0f, 1.0f};
+
+    transform = MakeChildTransform(parentTransform, localTransform);
+    
     elbow.SetTransform(transform);
 }
 
@@ -1720,8 +1767,14 @@ void Head::Draw()
 
 void Head::SetTransform(MyTransform3D parentTransform)
 {
-    transform = parentTransform;
-    transform.position = Vector3Add(parentTransform.position, positionOffset);
+    MyTransform3D localTransform{};
+
+    localTransform.position = positionOffset;
+    localTransform.rotationAxis = {1.0f, 0.0f, 0.0f};
+    localTransform.rotationAngle = 0.0f;
+    localTransform.scale = {1.0f, 1.0f, 1.0f};
+
+    transform = MakeChildTransform(parentTransform, localTransform);
 }
 
 
@@ -1781,8 +1834,14 @@ void Foot::Draw()
 
 void Foot::SetTransform(MyTransform3D parentTransform)
 {
-    transform = parentTransform;
-    transform.position = Vector3Add(parentTransform.position, positionOffset);
+    MyTransform3D localTransform{};
+
+    localTransform.position = positionOffset;
+    localTransform.rotationAxis = {1.0f, 0.0f, 0.0f};
+    localTransform.rotationAngle = 0.0f;
+    localTransform.scale = {1.0f, 1.0f, 1.0f};
+
+    transform = MakeChildTransform(parentTransform, localTransform);
 }
 
 
@@ -1846,8 +1905,15 @@ void Knee::Draw()
 
 void Knee::SetTransform(MyTransform3D parentTransform)
 {
-    transform = parentTransform;
-    transform.position = Vector3Add(parentTransform.position, positionOffset);
+    MyTransform3D localTransform{};
+
+    localTransform.position = positionOffset;
+    localTransform.rotationAxis = {1.0f, 0.0f, 0.0f};
+    localTransform.rotationAngle = 0.0f;
+    localTransform.scale = {1.0f, 1.0f, 1.0f};
+
+    transform = MakeChildTransform(parentTransform, localTransform);
+    
     shin.SetTransform(transform);
 }
 
@@ -1912,8 +1978,15 @@ void Shin::Draw()
 
 void Shin::SetTransform(MyTransform3D parentTransform)
 {
-    transform = parentTransform;
-    transform.position = Vector3Add(parentTransform.position, positionOffset);
+    MyTransform3D localTransform{};
+
+    localTransform.position = positionOffset;
+    localTransform.rotationAxis = {1.0f, 0.0f, 0.0f};
+    localTransform.rotationAngle = 0.0f;
+    localTransform.scale = {1.0f, 1.0f, 1.0f};
+
+    transform = MakeChildTransform(parentTransform, localTransform);
+    
     foot.SetTransform(transform);
 }
 
@@ -1992,8 +2065,15 @@ void Thigh::Draw()
 
 void Thigh::SetTransform(MyTransform3D parentTransform)
 {
-    transform = parentTransform;
-    transform.position = Vector3Add(parentTransform.position, positionOffset);
+    MyTransform3D localTransform{};
+
+    localTransform.position = positionOffset;
+    localTransform.rotationAxis = {1.0f, 0.0f, 0.0f};
+    localTransform.rotationAngle = 0.0f;
+    localTransform.scale = {1.0f, 1.0f, 1.0f};
+
+    transform = MakeChildTransform(parentTransform, localTransform);
+    
     knee.SetTransform(transform);
 }
 
@@ -2061,8 +2141,6 @@ void Neck::SetTransform(MyTransform3D parentTransform)
     localTransform.scale = {1.0f, 1.0f, 1.0f};
 
     transform = MakeChildTransform(parentTransform, localTransform);
-    
-    transform.position = Vector3Add(parentTransform.position, positionOffset);
 }
 
 
@@ -2129,8 +2207,15 @@ void Pelvis::Draw()
 
 void Pelvis::SetTransform(MyTransform3D parentTransform)
 {
-    transform = parentTransform;
-    transform.position = Vector3Add(parentTransform.position, positionOffset);
+    MyTransform3D localTransform{};
+
+    localTransform.position = positionOffset;
+    localTransform.rotationAxis = {1.0f, 0.0f, 0.0f};
+    localTransform.rotationAngle = 0.0f;
+    localTransform.scale = {1.0f, 1.0f, 1.0f};
+
+    transform = MakeChildTransform(parentTransform, localTransform);
+
     leftThigh.SetTransform(transform);
     rightThigh.SetTransform(transform);
 }

@@ -3,7 +3,8 @@
 
 Neck::Neck(TingoAssets& assets, TingoDimensions& dimensions) :
     assets(assets),
-    dimensions(dimensions)
+    dimensions(dimensions),
+    head(assets, dimensions)
 {}
 
 void Neck::Initialise()
@@ -14,6 +15,8 @@ void Neck::Initialise()
         dimensions.neck.height / 2.0f,
         0.0f
     };
+
+    head.Initialise();
 }
 
 void Neck::ShutDown()
@@ -23,7 +26,7 @@ void Neck::ShutDown()
 
 void Neck::Update(float dt)
 {
-    (void)dt;
+    head.Update(dt);
 }
 
 void Neck::Draw()
@@ -45,6 +48,8 @@ void Neck::Draw()
         transform.scale,
         GREEN
     );
+
+    head.Draw();
 }
 
 void Neck::SetTransform(MyTransform3D parentTransform)
@@ -57,4 +62,6 @@ void Neck::SetTransform(MyTransform3D parentTransform)
     localTransform.scale = {1.0f, 1.0f, 1.0f};
 
     transform = MakeChildTransform(parentTransform, localTransform);
+
+    head.SetTransform(transform);
 }

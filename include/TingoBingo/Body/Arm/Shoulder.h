@@ -30,4 +30,6 @@ private:
     MyTransform3D transform;
 
     UpperArm upperArm;
+
+    float localRotation = 0.0f;
 };

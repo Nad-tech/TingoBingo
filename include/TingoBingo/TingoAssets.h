@@ -21,8 +21,9 @@ public:
     Vector3 GetElbowDimensions();
     Vector3 GetHandDimensions();
     Vector3 GetFingerDimensions();
-
-    Model bodyShape{};
+    Vector3 GetMouthDisplayDimensions();
+    
+    Model body{};
     Model pelvis{};
     Model thigh{};
     Model knee{};
@@ -36,5 +37,5 @@ public:
     Model foreArm{};
     Model hand{};
     Model finger{};
-
+    Model mouthDisplay{};
 };

@@ -7,7 +7,6 @@
 #include "TingoBingo/Body/Neck.h"
 #include "TingoBingo/Body/Pelvis.h"
 #include "TingoBingo/Body/Arm/Shoulder.h"
-#include "TingoBingo/Body/Head/Head.h"
 class Body
 {
 public:
@@ -33,5 +32,4 @@ private:
     Neck neck;
     Shoulder leftShoulder;
     Shoulder rightShoulder;
-    Head head;
 };

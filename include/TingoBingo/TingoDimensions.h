@@ -5,6 +5,9 @@
 class TingoDimensions 
 {
 public:
+
+    Vector3 scale;
+
     void Initialise
     (
         Vector3 bodyDimensions,
@@ -20,7 +23,8 @@ public:
         Vector3 foreArmDimensions,
         Vector3 elbowDimensions,
         Vector3 handDimensions,
-        Vector3 fingerDimensions
+        Vector3 fingerDimensions,
+        Vector3 mouthDisplayDimensions
     );
 
     struct BodyShape {
@@ -120,4 +124,11 @@ public:
         float length;
     };
     Finger finger;    
+    
+    struct MouthDisplay {
+        float width;
+        float height;
+        float length;
+    };
+    MouthDisplay mouthDisplay;
 };

@@ -39,6 +39,7 @@ void Shoulder::ShutDown()
 void Shoulder::Update(float dt)
 {
     (void)dt;
+    // localRotation += dt * 80;
 }
 
 void Shoulder::Draw()
@@ -70,7 +71,7 @@ void Shoulder::SetTransform(MyTransform3D parentTransform)
 
     localTransform.position = positionOffset;
     localTransform.rotationAxis = {1.0f, 0.0f, 0.0f};
-    localTransform.rotationAngle = 0.0f;
+    localTransform.rotationAngle += localRotation;
     localTransform.scale = {1.0f, 1.0f, 1.0f};
 
     transform = MakeChildTransform(parentTransform, localTransform);

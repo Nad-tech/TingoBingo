@@ -3,6 +3,7 @@
 #include "MyTransform3D.h"
 #include "TingoBingo/TingoDimensions.h"
 #include "TingoBingo/TingoAssets.h"
+#include "TingoBingo/Body/Head/MouthDisplay.h"
 
 class Head
 {
@@ -24,4 +25,6 @@ private:
     Vector3 positionOffset;
     
     MyTransform3D transform;
+
+    MouthDisplay mouthDisplay;
 };

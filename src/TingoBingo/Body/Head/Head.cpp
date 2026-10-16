@@ -3,23 +3,19 @@
 
 Head::Head(TingoAssets& assets, TingoDimensions& dimensions) :
     assets(assets),
-    dimensions(dimensions)
+    dimensions(dimensions),
+    mouthDisplay(assets, dimensions)
 {}
 
 void Head::Initialise()
 {
     positionOffset = {
         0.0f,
-        dimensions.bodyShape.height / 2.0f +
-        dimensions.neck.height +
-        dimensions.head.height / 2.0f,
+        dimensions.neck.height / 2.0f + dimensions.head.height / 2.0f,
         0.0f        
     };
-}
 
-void Head::ShutDown()
-{
-    
+    mouthDisplay.Initialise();
 }
 
 void Head::Update(float dt)
@@ -38,14 +34,7 @@ void Head::Draw()
         WHITE
     );
 
-    DrawModelWiresEx(
-        assets.head,
-        transform.position,
-        transform.rotationAxis,
-        transform.rotationAngle,
-        transform.scale,
-        GREEN
-    );
+    mouthDisplay.Draw();
 }
 
 void Head::SetTransform(MyTransform3D parentTransform)
@@ -58,4 +47,6 @@ void Head::SetTransform(MyTransform3D parentTransform)
     localTransform.scale = {1.0f, 1.0f, 1.0f};
 
     transform = MakeChildTransform(parentTransform, localTransform);
+
+    mouthDisplay.SetTransform(transform);
 }

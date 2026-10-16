@@ -15,9 +15,12 @@ void TingoDimensions::Initialise
     Vector3 foreArmDimensions,
     Vector3 elbowDimensions,
     Vector3 handDimensions,
-    Vector3 fingerDimensions
+    Vector3 fingerDimensions,
+    Vector3 mouthDisplayDimensions
 )
 {
+    scale = {1.0f, 1.0f, 1.0f};
+
     bodyShape.width = bodyDimensions.x;
     bodyShape.height = bodyDimensions.y;
     bodyShape.length = bodyDimensions.z;
@@ -73,4 +76,8 @@ void TingoDimensions::Initialise
     finger.width = fingerDimensions.x;
     finger.height = fingerDimensions.y;
     finger.length = fingerDimensions.z;
+
+    mouthDisplay.width = mouthDisplayDimensions.x;
+    mouthDisplay.height = mouthDisplayDimensions.y;
+    mouthDisplay.length = mouthDisplayDimensions.z;
 }
