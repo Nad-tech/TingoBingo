@@ -1,0 +1,188 @@
+.
+├── .gitignore
+├── .vscode/
+│   ├── launch.json
+│   ├── tasks.json
+├── assets/
+│   ├── models/
+│   │   ├── tingo/
+│   │   │   ├── Blender/
+│   │   │   │   ├── Body.blend
+│   │   │   │   ├── Body.blend1
+│   │   │   │   ├── Elbow.blend
+│   │   │   │   ├── Elbow.blend1
+│   │   │   │   ├── Eye.blend
+│   │   │   │   ├── Eye.blend1
+│   │   │   │   ├── Finger.blend
+│   │   │   │   ├── Finger.blend1
+│   │   │   │   ├── Foot.blend
+│   │   │   │   ├── Foot.blend1
+│   │   │   │   ├── ForeArm.blend
+│   │   │   │   ├── ForeArm.blend1
+│   │   │   │   ├── Hand.blend
+│   │   │   │   ├── Head.blend
+│   │   │   │   ├── Knee.blend
+│   │   │   │   ├── Knee.blend1
+│   │   │   │   ├── Leg.blend
+│   │   │   │   ├── Leg.blend1
+│   │   │   │   ├── MouthDisplay.blend
+│   │   │   │   ├── MouthDisplay.blend1
+│   │   │   │   ├── Neck.blend
+│   │   │   │   ├── Neck.blend1
+│   │   │   │   ├── Pelvis.blend
+│   │   │   │   ├── Pupil.blend
+│   │   │   │   ├── Pupil.blend1
+│   │   │   │   ├── Shin.blend
+│   │   │   │   ├── Shoulder.blend
+│   │   │   │   ├── Shoulder.blend1
+│   │   │   │   ├── Thigh.blend
+│   │   │   │   ├── UpperArm.blend
+│   │   │   │   ├── UpperArm.blend1
+│   │   │   ├── Body.glb
+│   │   │   ├── Elbow.glb
+│   │   │   ├── Eye.glb
+│   │   │   ├── Finger.glb
+│   │   │   ├── Foot.glb
+│   │   │   ├── ForeArm.glb
+│   │   │   ├── Hand.glb
+│   │   │   ├── Head.glb
+│   │   │   ├── Knee.glb
+│   │   │   ├── MouthDisplay.glb
+│   │   │   ├── Neck.glb
+│   │   │   ├── Pelvis.glb
+│   │   │   ├── Pupil.glb
+│   │   │   ├── Shin.glb
+│   │   │   ├── Shoulder.glb
+│   │   │   ├── Thigh.glb
+│   │   │   ├── UpperArm.glb
+├── build/
+│   ├── Game.d
+│   ├── Game.o
+│   ├── GameWorld.d
+│   ├── GameWorld.o
+│   ├── glfw3.dll
+│   ├── libraylib.dll
+│   ├── main.d
+│   ├── main.o
+│   ├── TingoBingo/
+│   │   ├── Body/
+│   │   │   ├── Arm/
+│   │   │   │   ├── Elbow.d
+│   │   │   │   ├── Elbow.o
+│   │   │   │   ├── Finger.d
+│   │   │   │   ├── Finger.o
+│   │   │   │   ├── ForeArm.d
+│   │   │   │   ├── ForeArm.o
+│   │   │   │   ├── Hand.d
+│   │   │   │   ├── Hand.o
+│   │   │   │   ├── Shoulder.d
+│   │   │   │   ├── Shoulder.o
+│   │   │   │   ├── UpperArm.d
+│   │   │   │   ├── UpperArm.o
+│   │   │   ├── Body.d
+│   │   │   ├── Body.o
+│   │   │   ├── BodyShape.d
+│   │   │   ├── BodyShape.o
+│   │   │   ├── Head/
+│   │   │   │   ├── Eye.d
+│   │   │   │   ├── Eye.o
+│   │   │   │   ├── Head.d
+│   │   │   │   ├── Head.o
+│   │   │   │   ├── MouthDisplay.d
+│   │   │   │   ├── MouthDisplay.o
+│   │   │   │   ├── Pupil.d
+│   │   │   │   ├── Pupil.o
+│   │   │   ├── Leg/
+│   │   │   │   ├── Foot.d
+│   │   │   │   ├── Foot.o
+│   │   │   │   ├── Knee.d
+│   │   │   │   ├── Knee.o
+│   │   │   │   ├── Legs.d
+│   │   │   │   ├── Legs.o
+│   │   │   │   ├── Shin.d
+│   │   │   │   ├── Shin.o
+│   │   │   │   ├── Thigh.d
+│   │   │   │   ├── Thigh.o
+│   │   │   ├── Neck.d
+│   │   │   ├── Neck.o
+│   │   │   ├── Pelvis.d
+│   │   │   ├── Pelvis.o
+│   │   ├── Tingo.d
+│   │   ├── Tingo.o
+│   │   ├── TingoAssets.d
+│   │   ├── TingoAssets.o
+│   │   ├── TingoDimensions.d
+│   │   ├── TingoDimensions.o
+│   ├── TingoBingo_3D_V1.exe
+├── Build.sh
+├── FileStructure.txt
+├── include/
+│   ├── Game.h
+│   ├── GameWorld.h
+│   ├── MyTransform3D.h
+│   ├── ScreenDimensions.h
+│   ├── TingoBingo/
+│   │   ├── Body/
+│   │   │   ├── Arm/
+│   │   │   │   ├── Elbow.h
+│   │   │   │   ├── Finger.h
+│   │   │   │   ├── ForeArm.h
+│   │   │   │   ├── Hand.h
+│   │   │   │   ├── Shoulder.h
+│   │   │   │   ├── UpperArm.h
+│   │   │   ├── Body.h
+│   │   │   ├── Head/
+│   │   │   │   ├── Eye.h
+│   │   │   │   ├── Head.h
+│   │   │   │   ├── MouthDisplay.h
+│   │   │   │   ├── Pupil.h
+│   │   │   ├── Leg/
+│   │   │   │   ├── Foot.h
+│   │   │   │   ├── Knee.h
+│   │   │   │   ├── Shin.h
+│   │   │   │   ├── Thigh.h
+│   │   │   ├── Neck.h
+│   │   │   ├── Pelvis.h
+│   │   ├── Tingo.h
+│   │   ├── TingoAssets.h
+│   │   ├── TingoDimensions.h
+├── Makefile
+├── ProjectDump.txt
+├── scripts/
+│   ├── build.sh
+│   ├── buildProjectDump.sh
+│   ├── buildProjectTree.sh
+├── src/
+│   ├── Game.cpp
+│   ├── GameWorld.cpp
+│   ├── main.cpp
+│   ├── TingoBingo/
+│   │   ├── Body/
+│   │   │   ├── Arm/
+│   │   │   │   ├── Elbow.cpp
+│   │   │   │   ├── Finger.cpp
+│   │   │   │   ├── ForeArm.cpp
+│   │   │   │   ├── Hand.cpp
+│   │   │   │   ├── Shoulder.cpp
+│   │   │   │   ├── UpperArm.cpp
+│   │   │   ├── Body.cpp
+│   │   │   ├── Head/
+│   │   │   │   ├── Eye.cpp
+│   │   │   │   ├── Head.cpp
+│   │   │   │   ├── MouthDisplay.cpp
+│   │   │   │   ├── Pupil.cpp
+│   │   │   ├── Leg/
+│   │   │   │   ├── Foot.cpp
+│   │   │   │   ├── Knee.cpp
+│   │   │   │   ├── Shin.cpp
+│   │   │   │   ├── Thigh.cpp
+│   │   │   ├── Neck.cpp
+│   │   │   ├── Pelvis.cpp
+│   │   ├── Tingo.cpp
+│   │   ├── TingoAssets.cpp
+│   │   ├── TingoDimensions.cpp
+├── utilities/
+│   ├── projectDump.cpp
+│   ├── projectDump.exe
+│   ├── projectTree.cpp
+│   ├── projectTree.exe

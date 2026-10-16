@@ -18,7 +18,7 @@ void Eye::Initialise()
         positionOffset = {
             Xoffset,
             Yoffset,
-            dimensions.head.length / 2.0f        
+            dimensions.head.length / 2.0f + dimensions.eye.length / 2.0f        
         };
     }
     else if(side == "right")

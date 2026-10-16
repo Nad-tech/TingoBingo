@@ -9,7 +9,9 @@ Pupil::Pupil(TingoAssets& assets, TingoDimensions& dimensions) :
 void Pupil::Initialise()
 {
     positionOffset = {
-        0.0f, 0.0f, dimensions.eye.length / 2.0f
+        0.0f, 
+        0.0f, 
+        dimensions.eye.length / 2.0f + dimensions.pupil.length / 2.0f
     };
 }
 

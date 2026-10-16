@@ -6,7 +6,8 @@ Head::Head(TingoAssets& assets, TingoDimensions& dimensions) :
     dimensions(dimensions),
     mouthDisplay(assets, dimensions),
     leftEye(assets, dimensions, "left"),
-    rightEye(assets, dimensions, "right")
+    rightEye(assets, dimensions, "right"),
+    nose(assets, dimensions)
 {}
 
 void Head::Initialise()
@@ -20,6 +21,7 @@ void Head::Initialise()
     mouthDisplay.Initialise();
     leftEye.Initialise();
     rightEye.Initialise();
+    nose.Initialise();
 }
 
 void Head::Update(float dt)
@@ -41,6 +43,7 @@ void Head::Draw()
     mouthDisplay.Draw();
     leftEye.Draw();
     rightEye.Draw();
+    nose.Draw();
 }
 
 void Head::SetTransform(MyTransform3D parentTransform)
@@ -57,4 +60,5 @@ void Head::SetTransform(MyTransform3D parentTransform)
     mouthDisplay.SetTransform(transform);
     leftEye.SetTransform(transform);
     rightEye.SetTransform(transform);
+    nose.SetTransform(transform);
 }

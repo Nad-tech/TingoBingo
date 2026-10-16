@@ -27,6 +27,7 @@ void TingoAssets::Initialise()
     mouthDisplay = LoadModel("assets/models/tingo/MouthDisplay.glb");
     eye = LoadModel("assets/models/tingo/Eye.glb");
     pupil = LoadModel("assets/models/tingo/Pupil.glb");
+    nose = LoadModel("assets/models/tingo/Nose.glb");
 }
 
 Vector3 TingoAssets::GetBodyDimensions()
@@ -115,6 +116,11 @@ Vector3 TingoAssets::GetPupilDimensions()
     return GetDimensions(pupil);
 }
 
+Vector3 TingoAssets::GetNoseDimensions()
+{
+    return GetDimensions(nose);
+}
+
 void TingoAssets::ShutDown()
 {
     UnloadModel(body);
@@ -134,4 +140,5 @@ void TingoAssets::ShutDown()
     UnloadModel(mouthDisplay);
     UnloadModel(eye);
     UnloadModel(pupil);
+    UnloadModel(nose);
 }

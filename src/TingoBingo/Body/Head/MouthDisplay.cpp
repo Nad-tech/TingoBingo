@@ -13,7 +13,7 @@ void MouthDisplay::Initialise()
     positionOffset = {
         0.0f,
         Yoffset,
-        dimensions.head.length / 2.0f        
+        dimensions.head.length / 2.0f + dimensions.mouthDisplay.length / 2.0f        
     };
 }
 

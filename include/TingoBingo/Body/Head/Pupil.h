@@ -3,7 +3,6 @@
 #include "MyTransform3D.h"
 #include "TingoBingo/TingoDimensions.h"
 #include "TingoBingo/TingoAssets.h"
-#include <string>
 
 class Pupil
 {
