@@ -25,6 +25,7 @@ void TingoAssets::Initialise()
     hand = LoadModel("assets/models/tingo/Hand.glb");
     finger = LoadModel("assets/models/tingo/Finger.glb");
     mouthDisplay = LoadModel("assets/models/tingo/MouthDisplay.glb");
+    eye = LoadModel("assets/models/tingo/Eye.glb");
 }
 
 Vector3 TingoAssets::GetBodyDimensions()
@@ -103,6 +104,11 @@ Vector3 TingoAssets::GetMouthDisplayDimensions()
     return GetDimensions(mouthDisplay);
 }
 
+Vector3 TingoAssets::GetEyeDimesnsions()
+{
+    return GetDimensions(eye);
+}
+
 void TingoAssets::ShutDown()
 {
     UnloadModel(body);
@@ -119,4 +125,6 @@ void TingoAssets::ShutDown()
     UnloadModel(elbow);
     UnloadModel(hand);
     UnloadModel(finger);
+    UnloadModel(mouthDisplay);
+    UnloadModel(eye);
 }

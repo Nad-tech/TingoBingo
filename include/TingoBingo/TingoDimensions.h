@@ -24,7 +24,8 @@ public:
         Vector3 elbowDimensions,
         Vector3 handDimensions,
         Vector3 fingerDimensions,
-        Vector3 mouthDisplayDimensions
+        Vector3 mouthDisplayDimensions,
+        Vector3 eyeDimensions
     );
 
     struct BodyShape {
@@ -131,4 +132,11 @@ public:
         float length;
     };
     MouthDisplay mouthDisplay;
+
+    struct Eye {
+        float width;
+        float height;
+        float length;
+    };
+    Eye eye;
 };

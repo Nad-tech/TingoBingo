@@ -4,6 +4,7 @@
 #include "TingoBingo/TingoDimensions.h"
 #include "TingoBingo/TingoAssets.h"
 #include "TingoBingo/Body/Head/MouthDisplay.h"
+#include "TingoBingo/Body/Head/Eye.h"
 
 class Head
 {
@@ -11,7 +12,6 @@ public:
     Head(TingoAssets& assets, TingoDimensions& dimensions);
 
     void Initialise();
-    void ShutDown();
     
     void Update(float dt);
     void Draw();
@@ -27,4 +27,6 @@ private:
     MyTransform3D transform;
 
     MouthDisplay mouthDisplay;
+    Eye leftEye;
+    Eye rightEye;
 };
