@@ -17,7 +17,6 @@ void Tingo::Initialise()
 void Tingo::ShutDown()
 {
     assets.ShutDown();
-    body.ShutDown();
 }
 
 void Tingo::Update(float dt)

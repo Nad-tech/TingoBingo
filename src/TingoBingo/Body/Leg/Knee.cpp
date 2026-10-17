@@ -19,11 +19,6 @@ void Knee::Initialise()
     shin.Initialise();
 }
 
-void Knee::ShutDown()
-{
-    
-}
-
 void Knee::Update(float dt)
 {
     (void)dt;

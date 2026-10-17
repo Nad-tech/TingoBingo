@@ -31,11 +31,6 @@ void Shoulder::Initialise()
     upperArm.Initialise();
 }
 
-void Shoulder::ShutDown()
-{
-    
-}
-
 void Shoulder::Update(float dt)
 {
     (void)dt;

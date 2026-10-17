@@ -21,11 +21,6 @@ void Hand::Initialise()
     rightFinger.Initialise();
 }
 
-void Hand::ShutDown()
-{
-
-}
-
 void Hand::Update(float dt)
 {
     (void)dt;

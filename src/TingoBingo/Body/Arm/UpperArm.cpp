@@ -19,11 +19,6 @@ void UpperArm::Initialise()
     elbow.Initialise();
 }
 
-void UpperArm::ShutDown()
-{
-    
-}
-
 void UpperArm::Update(float dt)
 {
     (void)dt;

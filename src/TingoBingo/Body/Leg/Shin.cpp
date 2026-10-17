@@ -19,11 +19,6 @@ void Shin::Initialise()
     foot.Initialise();
 }
 
-void Shin::ShutDown()
-{
-    
-}
-
 void Shin::Update(float dt)
 {
     (void)dt;

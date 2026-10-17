@@ -21,11 +21,6 @@ void Pelvis::Initialise()
     rightThigh.Initialise();
 }
 
-void Pelvis::ShutDown()
-{
-    
-}
-
 void Pelvis::Update(float dt)
 {
     (void)dt;

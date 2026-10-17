@@ -19,11 +19,6 @@ void ForeArm::Initialise()
     hand.Initialise();
 }
 
-void ForeArm::ShutDown()
-{
-
-}
-
 void ForeArm::Update(float dt)
 {
     (void)dt;

@@ -9,10 +9,14 @@
 class Shoulder
 {
 public:
-    Shoulder(TingoAssets& assets, TingoDimensions& dimensions, std::string side);
+    Shoulder
+    (
+        TingoAssets& assets, 
+        TingoDimensions& dimensions, 
+        std::string side
+    );
 
     void Initialise();
-    void ShutDown();
     
     void Update(float dt);
     void Draw();

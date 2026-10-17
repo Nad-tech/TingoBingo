@@ -19,10 +19,6 @@ void Body::Initialise()
     rightShoulder.Initialise();
 }
 
-void Body::ShutDown()
-{
-}
-
 void Body::Update(float dt)
 {
     pelvis.Update(dt);

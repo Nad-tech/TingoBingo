@@ -8,10 +8,14 @@
 class Finger
 {
 public:
-    Finger(TingoAssets& assets, TingoDimensions& dimensions, std::string side);
+    Finger
+    (
+        TingoAssets& assets, 
+        TingoDimensions& dimensions, 
+        std::string side
+    );
 
     void Initialise();
-    void ShutDown();
     
     void Update(float dt);
     void Draw();

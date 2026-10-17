@@ -28,11 +28,6 @@ void Finger::Initialise()
     }
 }
 
-void Finger::ShutDown()
-{
-    
-}
-
 void Finger::Update(float dt)
 {
     (void)dt;

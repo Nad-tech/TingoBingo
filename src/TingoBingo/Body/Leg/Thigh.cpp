@@ -32,11 +32,6 @@ void Thigh::Initialise()
     knee.Initialise();
 }
 
-void Thigh::ShutDown()
-{
-    
-}
-
 void Thigh::Update(float dt)
 {
     (void)dt;

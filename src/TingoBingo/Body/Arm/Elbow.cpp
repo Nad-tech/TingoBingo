@@ -19,11 +19,6 @@ void Elbow::Initialise()
     foreArm.Initialise();
 }
 
-void Elbow::ShutDown()
-{
-    
-}
-
 void Elbow::Update(float dt)
 {
     (void)dt;

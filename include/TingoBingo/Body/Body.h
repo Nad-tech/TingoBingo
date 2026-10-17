@@ -7,13 +7,13 @@
 #include "TingoBingo/Body/Neck.h"
 #include "TingoBingo/Body/Pelvis.h"
 #include "TingoBingo/Body/Arm/Shoulder.h"
+
 class Body
 {
 public:
     Body(TingoAssets& assets, TingoDimensions& dimensions);
 
     void Initialise();
-    void ShutDown();
     
     void Update(float dt);
     void Draw();

@@ -8,10 +8,14 @@
 class Eye
 {
 public:
-    Eye(TingoAssets& assets, TingoDimensions& dimensions, std::string side);
+    Eye
+    (
+        TingoAssets& assets, 
+        TingoDimensions& dimensions, 
+        std::string side
+    );
 
     void Initialise();
-    void ShutDown();
     
     void Update(float dt);
     void Draw();

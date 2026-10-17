@@ -10,7 +10,6 @@ public:
     Foot(TingoAssets& assets,TingoDimensions& dimensions);
 
     void Initialise();
-    void ShutDown();
     
     void Update(float dt);
     void Draw();

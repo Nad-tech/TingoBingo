@@ -9,10 +9,14 @@
 class Thigh
 {
 public:
-    Thigh(TingoAssets& assets, TingoDimensions& dimensions, std::string side);
+    Thigh
+    (
+        TingoAssets& assets,
+        TingoDimensions& dimensions, 
+        std::string side
+    );
 
     void Initialise();
-    void ShutDown();
     
     void Update(float dt);
     void Draw();

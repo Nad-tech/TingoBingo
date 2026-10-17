@@ -21,11 +21,6 @@ void Neck::Initialise()
     TraceLog(LOG_INFO, "Raylib version: %s", RAYLIB_VERSION);
 }
 
-void Neck::ShutDown()
-{
-    
-}
-
 void Neck::Update(float dt)
 {
     head.Update(dt);

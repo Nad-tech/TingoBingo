@@ -17,11 +17,6 @@ void Foot::Initialise()
     };
 }
 
-void Foot::ShutDown()
-{
-    
-}
-
 void Foot::Update(float dt)
 {
     (void)dt;
