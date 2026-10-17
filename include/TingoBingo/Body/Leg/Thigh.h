@@ -33,4 +33,8 @@ private:
     std::string side;
 
     Knee knee;
+
+    float localRotation = 0.0f;
+    MyTransform3D tempParentTransform;
+    bool dirFlag = false;
 };

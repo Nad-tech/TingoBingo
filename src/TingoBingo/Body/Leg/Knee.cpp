@@ -12,7 +12,7 @@ void Knee::Initialise()
     positionOffset = {
         0.0f,
         -dimensions.knee.height / 2.0f
-        -dimensions.shin.height / 2.0f,
+        -dimensions.thigh.height,
         0.0f
     };
 

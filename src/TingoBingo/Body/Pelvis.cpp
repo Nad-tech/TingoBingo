@@ -12,8 +12,7 @@ void Pelvis::Initialise()
 {
     positionOffset = {
         0.0f, 
-        -dimensions.bodyShape.height / 2.0f - 
-        dimensions.pelvis.height / 2.0f,
+        -dimensions.bodyShape.height / 2.0f,
         0.0f
     };
 
@@ -23,7 +22,15 @@ void Pelvis::Initialise()
 
 void Pelvis::Update(float dt)
 {
-    (void)dt;
+    //dirFlag ? localRotation += dt * 80 : localRotation -= dt * 80;
+
+    if(localRotation <= -45) dirFlag = true;
+    if(localRotation >= 45) dirFlag = false;
+
+    SetTransform(tempParentTransform);
+
+    leftThigh.Update(dt);
+    rightThigh.Update(dt);
 }
 
 void Pelvis::Draw()
@@ -43,11 +50,13 @@ void Pelvis::Draw()
 
 void Pelvis::SetTransform(MyTransform3D parentTransform)
 {
+    tempParentTransform = parentTransform;
+
     MyTransform3D localTransform{};
 
     localTransform.position = positionOffset;
-    localTransform.rotationAxis = {1.0f, 0.0f, 0.0f};
-    localTransform.rotationAngle = 0.0f;
+    localTransform.rotationAxis = {0.0f, 1.0f, 0.0f};
+    localTransform.rotationAngle += localRotation;
     localTransform.scale = {1.0f, 1.0f, 1.0f};
 
     transform = MakeChildTransform(parentTransform, localTransform);
