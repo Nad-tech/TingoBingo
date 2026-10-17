@@ -11,7 +11,8 @@ Head::Head(TingoAssets& assets, TingoDimensions& dimensions) :
     leftEyeBrow(assets, dimensions, "left"),
     rightEyeBrow(assets, dimensions, "right"),
     leftEar(assets, dimensions, "left"),
-    rightEar(assets, dimensions, "right")
+    rightEar(assets, dimensions, "right"),
+    antenna(assets, dimensions)
 {}
 
 void Head::Initialise()
@@ -30,11 +31,12 @@ void Head::Initialise()
     rightEyeBrow.Initialise();
     leftEar.Initialise();
     rightEar.Initialise();
+    antenna.Initialise();
 }
 
 void Head::Update(float dt)
 {
-    (void)dt;
+    mouthDisplay.Update(dt);
 
     //localRotation += dt * 50;
 }
@@ -58,6 +60,7 @@ void Head::Draw()
     rightEyeBrow.Draw();
     leftEar.Draw();
     rightEar.Draw();
+    antenna.Draw();
 }
 
 void Head::SetTransform(MyTransform3D parentTransform)
@@ -79,4 +82,5 @@ void Head::SetTransform(MyTransform3D parentTransform)
     rightEyeBrow.SetTransform(transform);
     leftEar.SetTransform(transform);
     rightEar.SetTransform(transform);
+    antenna.SetTransform(transform);
 }

@@ -1,6 +1,7 @@
 #pragma once
 
 #include "raylib.h"
+#include "Vector4Int.h"
 
 class TingoDimensions 
 {
@@ -29,7 +30,9 @@ public:
         Vector3 pupilDimensions,
         Vector3 noseDimensions,
         Vector3 eyeBrowDimensions,
-        Vector3 earDimensions
+        Vector3 earDimensions,
+        Vector3 antennaDimensions,
+        Vector4Int mouthSpriteSheetDimensions
     );
 
     struct BodyShape {
@@ -174,4 +177,19 @@ public:
         float length;
     };
     Ear ear;
+
+    struct Antenna {
+        float width;
+        float height;
+        float length;
+    };
+    Antenna antenna;
+
+    struct MouthSpriteSheet {
+        int width;
+        int height;
+        int rows;
+        int cols;
+    };
+    MouthSpriteSheet mouthSpriteSheet;
 };

@@ -1,6 +1,7 @@
 #pragma once
 
 #include "raylib.h"
+#include "Vector4Int.h"
 
 class TingoAssets {
 public:
@@ -27,6 +28,8 @@ public:
     Vector3 GetNoseDimensions();
     Vector3 GetEyeBrowDimensions();
     Vector3 GetEarDimensions();
+    Vector3 GetAntennaDimensions();
+    Vector4Int GetSpriteSheetDimensions();
 
     Model body{};
     Model pelvis{};
@@ -48,6 +51,9 @@ public:
     Model nose{};
     Model eyeBrow{};
     Model ear{};
+    Model antenna{};
+
+    Texture2D mouthSpriteSheet;
 
     // Shared lighting shader.
     Shader lightingShader{};

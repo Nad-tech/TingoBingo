@@ -21,7 +21,9 @@ void TingoDimensions::Initialise
     Vector3 pupilDimensions,
     Vector3 noseDimensions,
     Vector3 eyeBrowDimensions,
-    Vector3 earDimensions
+    Vector3 earDimensions,
+    Vector3 antennaDimensions,
+    Vector4Int mouthSpriteSheetDimensions
 )
 {
     scale = {1.0f, 1.0f, 1.0f};
@@ -105,4 +107,13 @@ void TingoDimensions::Initialise
     ear.width = earDimensions.x;
     ear.height = earDimensions.y;
     ear.length = earDimensions.z;
+
+    antenna.width = antennaDimensions.x;
+    antenna.height = antennaDimensions.y;
+    antenna.length = antennaDimensions.z;
+
+    mouthSpriteSheet.width = mouthSpriteSheetDimensions.w;
+    mouthSpriteSheet.height = mouthSpriteSheetDimensions.x;
+    mouthSpriteSheet.rows = mouthSpriteSheetDimensions.y;
+    mouthSpriteSheet.cols = mouthSpriteSheetDimensions.z;
 }

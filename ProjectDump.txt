@@ -1,4 +1,169 @@
 =====================================
+.\include\Animation.h
+=====================================
+
+#pragma once
+
+#include "raylib.h"
+
+
+//====================================================
+// AnimationPriority
+//
+// Determines which animations are allowed to control
+// the Animation object when another animation is
+// already playing.
+//
+// Idle animations are low priority and can be
+// interrupted by higher-priority animations such as
+// emotions.
+//====================================================
+
+enum class AnimationPriority
+{
+    Idle,
+    Emotion
+};
+
+
+//====================================================
+// Animation
+//
+// Controls sprite-sheet animation.
+//
+// Animation tracks the current frame, timing,
+// animation range and playback state.
+//
+// Individual sprites such as the eyes and mouth use
+// this class to control their own animations.
+//====================================================
+
+class Animation
+{
+public:
+
+    // Create an animation with its default state.
+    Animation();
+
+
+    //================================================
+    // Initialisation
+    //================================================
+
+    // Configure the animation using the dimensions
+    // and layout of the sprite sheet.
+    void Initialise
+    (
+        int frameWidth,
+        int frameHeight,
+        int totalFrames,
+        int columns,
+        float frameDuration
+    );
+
+
+    //================================================
+    // Playback
+    //================================================
+
+    // Advance the animation based on elapsed time.
+    void Update(float dt);
+
+    // Return the source rectangle for the current
+    // frame of the sprite sheet.
+    Rectangle GetSourceRectangle() const;
+
+
+    // Return the dimensions of an individual frame.
+    int GetFrameWidth() const;
+    int GetFrameHeight() const;
+
+
+    //================================================
+    // Frame Control
+    //================================================
+
+    // Set the current animation frame directly.
+    void SetFrame(int newFrame);
+
+    // Return the current animation frame.
+    int GetFrame() const;
+
+    // Return the total number of frames in the
+    // sprite sheet.
+    int GetTotalFrames() const;
+
+    // Reset the animation back to its initial state.
+    void Reset();
+
+    // Move one frame backwards or forwards.
+    void PreviousFrame();
+    void NextFrame();
+
+
+    //================================================
+    // Animation Sequences
+    //================================================
+
+    // Play a range of frames using the supplied
+    // animation priority.
+    //
+    // Higher-priority animations can interrupt
+    // lower-priority animations.
+    void Play(
+        int startFrame,
+        int endFrame,
+        AnimationPriority priority
+    );
+
+    // Return true while an animation sequence is playing.
+    bool IsPlaying() const;
+
+    // Stop the current animation.
+    void Stop();
+
+
+private:
+
+    // Current frame being displayed.
+    int frame;
+
+
+    // Dimensions of an individual sprite frame.
+    int frameWidth;
+    int frameHeight;
+
+
+    // Total number of frames in the sprite sheet
+    // and number of columns used by the sheet.
+    int totalFrames;
+    int columns;
+
+
+    // Tracks elapsed time for the current frame.
+    // frameDuration determines how long each frame
+    // remains visible.
+    float frameTimer;
+    float frameDuration;
+
+
+    // True while an animation sequence is active.
+    bool playing;
+
+
+    // First and last frames of the current animation
+    // sequence.
+    int startFrame;
+    int endFrame;
+
+
+    // Priority of the animation currently controlling
+    // this Animation object.
+    AnimationPriority priority;
+};
+
+
+=====================================
 .\include\Game.h
 =====================================
 
@@ -172,7 +337,6 @@ public:
     Elbow(TingoAssets& assets, TingoDimensions& dimensions);
 
     void Initialise();
-    void ShutDown();
     
     void Update(float dt);
     void Draw();
@@ -205,10 +369,14 @@ private:
 class Finger
 {
 public:
-    Finger(TingoAssets& assets, TingoDimensions& dimensions, std::string side);
+    Finger
+    (
+        TingoAssets& assets, 
+        TingoDimensions& dimensions, 
+        std::string side
+    );
 
     void Initialise();
-    void ShutDown();
     
     void Update(float dt);
     void Draw();
@@ -244,7 +412,6 @@ public:
     ForeArm(TingoAssets& assets, TingoDimensions& dimensions);
 
     void Initialise();
-    void ShutDown();
     
     void Update(float dt);
     void Draw();
@@ -282,7 +449,6 @@ public:
     Hand(TingoAssets& assets, TingoDimensions& dimensions);
 
     void Initialise();
-    void ShutDown();
     
     void Update(float dt);
     void Draw();
@@ -317,10 +483,14 @@ private:
 class Shoulder
 {
 public:
-    Shoulder(TingoAssets& assets, TingoDimensions& dimensions, std::string side);
+    Shoulder
+    (
+        TingoAssets& assets, 
+        TingoDimensions& dimensions, 
+        std::string side
+    );
 
     void Initialise();
-    void ShutDown();
     
     void Update(float dt);
     void Draw();
@@ -360,7 +530,6 @@ public:
     UpperArm(TingoAssets& assets, TingoDimensions& dimensions);
 
     void Initialise();
-    void ShutDown();
     
     void Update(float dt);
     void Draw();
@@ -394,13 +563,13 @@ private:
 #include "TingoBingo/Body/Neck.h"
 #include "TingoBingo/Body/Pelvis.h"
 #include "TingoBingo/Body/Arm/Shoulder.h"
+
 class Body
 {
 public:
     Body(TingoAssets& assets, TingoDimensions& dimensions);
 
     void Initialise();
-    void ShutDown();
     
     void Update(float dt);
     void Draw();
@@ -419,6 +588,38 @@ private:
     Neck neck;
     Shoulder leftShoulder;
     Shoulder rightShoulder;
+};
+
+
+=====================================
+.\include\TingoBingo\Body\Head\Antenna.h
+=====================================
+
+#pragma once
+
+#include "MyTransform3D.h"
+#include "TingoBingo/TingoDimensions.h"
+#include "TingoBingo/TingoAssets.h"
+
+class Antenna
+{
+public:
+    Antenna(TingoAssets& assets, TingoDimensions& dimensions);
+
+    void Initialise();
+    
+    void Update(float dt);
+    void Draw();
+
+    void SetTransform(MyTransform3D parentTransform);
+
+private:
+    TingoAssets& assets;
+    TingoDimensions& dimensions;
+
+    Vector3 positionOffset;
+    
+    MyTransform3D transform;
 };
 
 
@@ -444,7 +645,6 @@ public:
     );
 
     void Initialise();
-    void ShutDown();
     
     void Update(float dt);
     void Draw();
@@ -477,10 +677,14 @@ private:
 class Eye
 {
 public:
-    Eye(TingoAssets& assets, TingoDimensions& dimensions, std::string side);
+    Eye
+    (
+        TingoAssets& assets, 
+        TingoDimensions& dimensions, 
+        std::string side
+    );
 
     void Initialise();
-    void ShutDown();
     
     void Update(float dt);
     void Draw();
@@ -523,7 +727,6 @@ public:
     );
 
     void Initialise();
-    void ShutDown();
     
     void Update(float dt);
     void Draw();
@@ -556,6 +759,7 @@ private:
 #include "TingoBingo/Body/Head/Nose.h"
 #include "TingoBingo/Body/Head/EyeBrow.h"
 #include "TingoBingo/Body/Head/Ear.h"
+#include "TingoBingo/Body/Head/Antenna.h"
 
 class Head
 {
@@ -585,6 +789,9 @@ private:
     EyeBrow rightEyeBrow;
     Ear leftEar;
     Ear rightEar;
+    Antenna antenna;
+
+    float localRotation = 0.0f;
 };
 
 
@@ -597,6 +804,7 @@ private:
 #include "MyTransform3D.h"
 #include "TingoBingo/TingoDimensions.h"
 #include "TingoBingo/TingoAssets.h"
+#include "Animation.h"
 
 class MouthDisplay
 {
@@ -604,13 +812,15 @@ public:
     MouthDisplay(TingoAssets& assets, TingoDimensions& dimensions);
 
     void Initialise();
-    void ShutDown();
     
     void Update(float dt);
     void Draw();
 
     void SetTransform(MyTransform3D parentTransform);
 
+    void SetMouthFrame(int frame);
+
+    void ShutDown();
 private:
     TingoAssets& assets;
     TingoDimensions& dimensions;
@@ -618,6 +828,11 @@ private:
     Vector3 positionOffset;
     
     MyTransform3D transform;
+
+    Animation animation;
+
+    Model mouthPlane{};
+    MyTransform3D mouthPlaneTransform{};
 };
 
 
@@ -701,7 +916,6 @@ public:
     Foot(TingoAssets& assets,TingoDimensions& dimensions);
 
     void Initialise();
-    void ShutDown();
     
     void Update(float dt);
     void Draw();
@@ -734,7 +948,6 @@ public:
     Knee(TingoAssets& assets,TingoDimensions& dimensions);
 
     void Initialise();
-    void ShutDown();
     
     void Update(float dt);
     void Draw();
@@ -769,7 +982,6 @@ public:
     Shin(TingoAssets& assets,TingoDimensions& dimensions);
 
     void Initialise();
-    void ShutDown();
     
     void Update(float dt);
     void Draw();
@@ -802,10 +1014,14 @@ private:
 class Thigh
 {
 public:
-    Thigh(TingoAssets& assets, TingoDimensions& dimensions, std::string side);
+    Thigh
+    (
+        TingoAssets& assets,
+        TingoDimensions& dimensions, 
+        std::string side
+    );
 
     void Initialise();
-    void ShutDown();
     
     void Update(float dt);
     void Draw();
@@ -842,7 +1058,6 @@ public:
     Neck(TingoAssets& assets,TingoDimensions& dimensions);
 
     void Initialise();
-    void ShutDown();
     
     void Update(float dt);
     void Draw();
@@ -877,7 +1092,6 @@ public:
     Pelvis(TingoAssets& assets, TingoDimensions& dimensions);
 
     void Initialise();
-    void ShutDown();
     
     void Update(float dt);
     void Draw();
@@ -935,6 +1149,7 @@ private:
 #pragma once
 
 #include "raylib.h"
+#include "Vector4Int.h"
 
 class TingoAssets {
 public:
@@ -961,6 +1176,8 @@ public:
     Vector3 GetNoseDimensions();
     Vector3 GetEyeBrowDimensions();
     Vector3 GetEarDimensions();
+    Vector3 GetAntennaDimensions();
+    Vector4Int GetSpriteSheetDimensions();
 
     Model body{};
     Model pelvis{};
@@ -982,6 +1199,9 @@ public:
     Model nose{};
     Model eyeBrow{};
     Model ear{};
+    Model antenna{};
+
+    Texture2D mouthSpriteSheet;
 
     // Shared lighting shader.
     Shader lightingShader{};
@@ -1003,6 +1223,7 @@ public:
 #pragma once
 
 #include "raylib.h"
+#include "Vector4Int.h"
 
 class TingoDimensions 
 {
@@ -1031,7 +1252,9 @@ public:
         Vector3 pupilDimensions,
         Vector3 noseDimensions,
         Vector3 eyeBrowDimensions,
-        Vector3 earDimensions
+        Vector3 earDimensions,
+        Vector3 antennaDimensions,
+        Vector4Int mouthSpriteSheetDimensions
     );
 
     struct BodyShape {
@@ -1176,7 +1399,221 @@ public:
         float length;
     };
     Ear ear;
+
+    struct Antenna {
+        float width;
+        float height;
+        float length;
+    };
+    Antenna antenna;
+
+    struct MouthSpriteSheet {
+        int width;
+        int height;
+        int rows;
+        int cols;
+    };
+    MouthSpriteSheet mouthSpriteSheet;
 };
+
+
+=====================================
+.\include\Vector4Int.h
+=====================================
+
+#pragma once
+
+struct Vector4Int {
+    int w;
+    int x;
+    int y;
+    int z;
+};
+
+
+=====================================
+.\src\Animation.cpp
+=====================================
+
+//====================================================
+// Animation.cpp
+//
+// Manages sprite sheet animations.
+//
+// The Animation class tracks the current frame,
+// advances animations over time and calculates the
+// correct source rectangle for rendering.
+//====================================================
+
+#include "Animation.h"
+
+// Initialise the animation with default values.
+Animation::Animation()
+{
+    frame = 0;
+
+    frameWidth = 0;
+    frameHeight = 0;
+
+    totalFrames = 1;
+    columns = 1;
+
+    frameTimer = 0.0f;
+    frameDuration = 0.1f;
+
+    playing = false;
+
+    startFrame = 0;
+    endFrame = 0;
+}
+
+// Configure the animation using information from
+// the sprite sheet.
+void Animation::Initialise(
+    int width,
+    int height,
+    int frames,
+    int cols,
+    float duration)
+{
+    frameWidth = width;
+    frameHeight = height;
+
+    totalFrames = frames;
+    columns = cols;
+
+    frameDuration = duration;
+
+    // Reset the animation.
+    frame = 0;
+    frameTimer = 0.0f;
+}
+
+// Advance the animation based on elapsed time.
+void Animation::Update(float dt)
+{
+    // Do nothing if the animation isn't currently playing.
+    if (!playing)
+        return;
+
+    // Count the elapsed time since the last frame.
+    frameTimer += dt;
+
+    // Wait until enough time has passed.
+    if (frameTimer < frameDuration)
+        return;
+
+    // Remove one frame's worth of elapsed time.
+    // Keeping any leftover time prevents the animation
+    // from slowing down if frame times vary.
+    frameTimer -= frameDuration;
+
+    // Advance to the next frame.
+    frame++;
+
+    // Stop once the animation reaches the end frame.
+    if (frame > endFrame)
+    {
+        frame = startFrame;
+        playing = false;
+    }
+}
+
+// Return the source rectangle for the current frame
+// within the sprite sheet.
+Rectangle Animation::GetSourceRectangle() const
+{
+    int column = frame % columns;
+    int row = frame / columns;
+
+    return
+    {
+        (float)(column * frameWidth),
+        (float)(row * frameHeight),
+        (float)frameWidth,
+        (float)frameHeight
+    };
+}
+
+// Reset the animation to the first frame.
+void Animation::Reset()
+{
+    frame = 0;
+    frameTimer = 0.0f;
+}
+
+// Set the current animation frame.
+void Animation::SetFrame(int newFrame)
+{
+    frame = newFrame % totalFrames;
+}
+
+// Move to the previous frame.
+void Animation::PreviousFrame()
+{
+    frame--;
+
+    // Wrap around to the last frame.
+    if (frame < 0)
+        frame = totalFrames - 1;
+}
+
+// Move to the next frame.
+void Animation::NextFrame()
+{
+    // Wrap around to the first frame.
+    frame = (frame + 1) % totalFrames;
+}
+
+int Animation::GetFrameWidth() const
+{
+    return frameWidth;
+}
+
+int Animation::GetFrameHeight() const
+{
+    return frameHeight;
+}
+
+int Animation::GetFrame() const
+{
+    return frame;
+}
+
+int Animation::GetTotalFrames() const
+{
+    return totalFrames;
+}
+
+// Play a section of the sprite sheet once.
+void Animation::Play(int start, int end, AnimationPriority newPriority)
+{
+    // Don't interrupt an animation with an equal
+    // or higher priority.
+    if (playing && static_cast<int>(newPriority) <= static_cast<int>(priority))
+        return;
+
+    startFrame = start;
+    endFrame = end;
+
+    // Start playback from the first frame.
+    frame = startFrame;
+    frameTimer = 0.0f;
+
+    priority = newPriority;
+    playing = true;
+}
+
+// Returns true while an animation is playing.
+bool Animation::IsPlaying() const
+{
+    return playing;
+}
+
+void Animation::Stop()
+{
+    playing = false;
+}
 
 
 =====================================
@@ -1249,7 +1686,7 @@ inline bool dirFlag = true;
 
 void GameWorld::Initialise(ScreenDimensions& screenDimensions)
 {
-    spaceBackground = LoadTexture("assets/images/space.png");
+    spaceBackground = LoadTexture("assets/images/background/space.jpg");
 
     this->screenDimensions = screenDimensions;
 
@@ -1282,7 +1719,9 @@ void GameWorld::Initialise(ScreenDimensions& screenDimensions)
         assets.GetPupilDimensions(),
         assets.GetNoseDimensions(),
         assets.GetEyeBrowDimensions(),
-        assets.GetEarDimensions()   
+        assets.GetEarDimensions(),
+        assets.GetAntennaDimensions(),
+        assets.GetSpriteSheetDimensions()   
     );
 
     initialTransform.position = {
@@ -1421,19 +1860,19 @@ void GameWorld::Draw()
     const float halfWidth = roomWidth / 2.0f;
     const float halfDepth = roomDepth / 2.0f;
 
-    // Floor.
+    //Floor.
     DrawPlane(
         { 0.0f, 0.0f, 0.0f },
         { roomWidth, roomDepth },
         LIGHTGRAY
     );
 
-    // Front wall: positive Z.
-    /*DrawCube(
-        { 0.0f, roomHeight / 2.0f, halfDepth },
-        roomWidth, roomHeight, 0.2f,
-        GRAY
-    );*/
+    // // Front wall: positive Z.
+    // /*DrawCube(
+    //     { 0.0f, roomHeight / 2.0f, halfDepth },
+    //     roomWidth, roomHeight, 0.2f,
+    //     GRAY
+    // );*/
 
     // Back wall wall: negative Z.
     DrawCube(
@@ -1516,11 +1955,6 @@ void Elbow::Initialise()
     foreArm.Initialise();
 }
 
-void Elbow::ShutDown()
-{
-    
-}
-
 void Elbow::Update(float dt)
 {
     (void)dt;
@@ -1589,11 +2023,6 @@ void Finger::Initialise()
     }
 }
 
-void Finger::ShutDown()
-{
-    
-}
-
 void Finger::Update(float dt)
 {
     (void)dt;
@@ -1659,11 +2088,6 @@ void ForeArm::Initialise()
     hand.Initialise();
 }
 
-void ForeArm::ShutDown()
-{
-
-}
-
 void ForeArm::Update(float dt)
 {
     (void)dt;
@@ -1723,11 +2147,6 @@ void Hand::Initialise()
 
     leftFinger.Initialise();
     rightFinger.Initialise();
-}
-
-void Hand::ShutDown()
-{
-
 }
 
 void Hand::Update(float dt)
@@ -1803,11 +2222,6 @@ void Shoulder::Initialise()
     upperArm.Initialise();
 }
 
-void Shoulder::ShutDown()
-{
-    
-}
-
 void Shoulder::Update(float dt)
 {
     (void)dt;
@@ -1866,11 +2280,6 @@ void UpperArm::Initialise()
     };
     
     elbow.Initialise();
-}
-
-void UpperArm::ShutDown()
-{
-    
 }
 
 void UpperArm::Update(float dt)
@@ -1932,10 +2341,6 @@ void Body::Initialise()
     rightShoulder.Initialise();
 }
 
-void Body::ShutDown()
-{
-}
-
 void Body::Update(float dt)
 {
     pelvis.Update(dt);
@@ -1980,6 +2385,61 @@ void Body::SetTransform(MyTransform3D parentTransform)
 
 
 =====================================
+.\src\TingoBingo\Body\Head\Antenna.cpp
+=====================================
+
+#include "TingoBingo/Body/Head/Antenna.h"
+#include "raymath.h"
+
+Antenna::Antenna(TingoAssets& assets, TingoDimensions& dimensions) :
+    assets(assets),
+    dimensions(dimensions)
+{}
+
+void Antenna::Initialise()
+{
+    float Xoffset = -0.4;
+    float Yoffset = dimensions.head.height;
+    float Zoffset = -0.4f;
+
+    positionOffset = {
+        Xoffset, 
+        Yoffset, 
+        Zoffset
+    };
+}
+
+void Antenna::Update(float dt)
+{
+    (void)dt;
+}
+
+void Antenna::Draw()
+{
+    DrawModelEx(
+        assets.antenna,
+        transform.position,
+        transform.rotationAxis,
+        transform.rotationAngle,
+        transform.scale,
+        WHITE
+    );
+}
+
+void Antenna::SetTransform(MyTransform3D parentTransform)
+{
+    MyTransform3D localTransform{};
+
+    localTransform.position = positionOffset;
+    localTransform.rotationAxis = {1.0f, 0.0f, 0.0f};
+    localTransform.rotationAngle = 0.0f;
+    localTransform.scale = {1.0f, 1.0f, 1.0f};
+
+    transform = MakeChildTransform(parentTransform, localTransform);
+}
+
+
+=====================================
 .\src\TingoBingo\Body\Head\Ear.cpp
 =====================================
 
@@ -2002,11 +2462,13 @@ void Ear::Initialise()
     float Xoffset = dimensions.head.width /2.0f +
                     dimensions.ear.width / 2.0f;
 
+    float Yoffset = dimensions.head.height / 2.0f;
+
     if(side == "left")
     {
         positionOffset = {
             Xoffset,
-            0.0f,
+            Yoffset,
             0.0f        
         };
     }
@@ -2014,7 +2476,7 @@ void Ear::Initialise()
     {
         positionOffset = {
             -Xoffset,
-            0.0f,
+            Yoffset,
             0.0f
         };
     }
@@ -2067,7 +2529,7 @@ Eye::Eye(TingoAssets& assets, TingoDimensions& dimensions, std::string side) :
 void Eye::Initialise()
 {
     float Xoffset = 0.5f;
-    float Yoffset = 0.3f;
+    float Yoffset = 0.3f + dimensions.head.height / 2.0f;
 
     if(side == "left")
     {
@@ -2144,7 +2606,7 @@ EyeBrow::EyeBrow
 void EyeBrow::Initialise()
 {
     float Xoffset = 0.5f;
-    float Yoffset = 0.7f;
+    float Yoffset = 0.7f + dimensions.head.height / 2.0f;
     float Zoffset = dimensions.head.length / 2.0f +
                     dimensions.eyeBrow.length / 2.0f;
                     
@@ -2213,14 +2675,15 @@ Head::Head(TingoAssets& assets, TingoDimensions& dimensions) :
     leftEyeBrow(assets, dimensions, "left"),
     rightEyeBrow(assets, dimensions, "right"),
     leftEar(assets, dimensions, "left"),
-    rightEar(assets, dimensions, "right")
+    rightEar(assets, dimensions, "right"),
+    antenna(assets, dimensions)
 {}
 
 void Head::Initialise()
 {
     positionOffset = {
         0.0f,
-        dimensions.neck.height / 2.0f + dimensions.head.height / 2.0f,
+        dimensions.neck.height / 2.0f,
         0.0f        
     };
 
@@ -2232,11 +2695,14 @@ void Head::Initialise()
     rightEyeBrow.Initialise();
     leftEar.Initialise();
     rightEar.Initialise();
+    antenna.Initialise();
 }
 
 void Head::Update(float dt)
 {
-    (void)dt;
+    mouthDisplay.Update(dt);
+
+    //localRotation += dt * 50;
 }
 
 void Head::Draw()
@@ -2258,6 +2724,7 @@ void Head::Draw()
     rightEyeBrow.Draw();
     leftEar.Draw();
     rightEar.Draw();
+    antenna.Draw();
 }
 
 void Head::SetTransform(MyTransform3D parentTransform)
@@ -2265,8 +2732,8 @@ void Head::SetTransform(MyTransform3D parentTransform)
     MyTransform3D localTransform{};
 
     localTransform.position = positionOffset;
-    localTransform.rotationAxis = {1.0f, 0.0f, 0.0f};
-    localTransform.rotationAngle = 0.0f;
+    localTransform.rotationAxis = {0.0f, 1.0f, 0.0f};
+    localTransform.rotationAngle = localRotation;
     localTransform.scale = {1.0f, 1.0f, 1.0f};
 
     transform = MakeChildTransform(parentTransform, localTransform);
@@ -2279,6 +2746,7 @@ void Head::SetTransform(MyTransform3D parentTransform)
     rightEyeBrow.SetTransform(transform);
     leftEar.SetTransform(transform);
     rightEar.SetTransform(transform);
+    antenna.SetTransform(transform);
 }
 
 
@@ -2296,28 +2764,87 @@ MouthDisplay::MouthDisplay(TingoAssets& assets, TingoDimensions& dimensions) :
 
 void MouthDisplay::Initialise()
 {
-    float Yoffset = -dimensions.mouthDisplay.height / 2.0f - 0.2f;
+    float Yoffset = -dimensions.mouthDisplay.height / 2.0f - 
+                    0.2f + dimensions.head.height / 2.0f;
 
     positionOffset = {
         0.0f,
         Yoffset,
         dimensions.head.length / 2.0f + dimensions.mouthDisplay.length / 2.0f        
     };
+
+    int frameWidth = 
+        dimensions.mouthSpriteSheet.width / 
+        dimensions.mouthSpriteSheet.cols;
+
+    int frameHeight = 
+        dimensions.mouthSpriteSheet.height /
+        dimensions.mouthSpriteSheet.rows;
+    
+    int totalFrames = 
+        dimensions.mouthSpriteSheet.rows *
+        dimensions.mouthSpriteSheet.cols;
+    
+    float frameDuration = 0.1f;
+
+        animation.Initialise
+    (
+        frameWidth, 
+        frameHeight, 
+        totalFrames, 
+        dimensions.mouthSpriteSheet.cols, 
+        frameDuration
+    );
+
+    // Generate a flat rectangular mesh for the mouth using 
+    //the specified width and height.
+    //The final two arguments (1, 1) specify one subdivision 
+    //along the length and width.
+    // LoadModelFromMesh() converts the generated mesh 
+    //into a Model that Raylib can render.
+    // The resulting model is stored in mouthPlane for
+    //later positioning, texturing, and drawing.
+    mouthPlane = LoadModelFromMesh(GenMeshPlane(
+        dimensions.mouthDisplay.width,  // Width of the mouth plane
+        dimensions.mouthDisplay.height, // Height of the mouth plane
+        1,                               // Number of subdivisions along the width
+        1                                // Number of subdivisions along the length
+    ));
+
+    // Assign the mouth sprite sheet image as the diffuse texture
+    // for the first material on the mouth plane.
+    // The diffuse texture determines the image displayed on the surface
+    // of the 3D model, allowing us to display Tingo's mouth sprites.
+    mouthPlane.materials[0].maps[MATERIAL_MAP_DIFFUSE].texture =
+        assets.mouthSpriteSheet;
+
+    SetMouthFrame(0);
 }
 
 void MouthDisplay::Update(float dt)
 {
-    (void)dt;
+    animation.Update(dt);
 }
 
 void MouthDisplay::Draw()
 {
+   // Rectangle source = animation.GetSourceRectangle();
+
     DrawModelEx(
         assets.mouthDisplay,
         transform.position,
         transform.rotationAxis,
         transform.rotationAngle,
         transform.scale,
+        WHITE
+    );
+
+    DrawModelEx(
+        mouthPlane,
+        mouthPlaneTransform.position,
+        mouthPlaneTransform.rotationAxis,
+        mouthPlaneTransform.rotationAngle,
+        mouthPlaneTransform.scale,
         WHITE
     );
 }
@@ -2332,6 +2859,65 @@ void MouthDisplay::SetTransform(MyTransform3D parentTransform)
     localTransform.scale = dimensions.scale;
 
     transform = MakeChildTransform(parentTransform, localTransform);
+
+    mouthPlaneTransform = transform;
+    mouthPlaneTransform.rotationAxis = {1.0f, 0.0f, 0.0f};
+    mouthPlaneTransform.rotationAngle = 90.0f;
+    mouthPlaneTransform.position.z += 0.06f;
+}
+
+void MouthDisplay::SetMouthFrame(int frame)
+{
+    animation.SetFrame(frame);
+
+    int col = frame % dimensions.mouthSpriteSheet.cols;
+    int row = frame / dimensions.mouthSpriteSheet.cols;
+
+    float frameWidth =
+    1.0f / dimensions.mouthSpriteSheet.cols;
+
+    float frameHeight =
+        1.0f / dimensions.mouthSpriteSheet.rows;
+
+    float u0 = col * frameWidth;
+    float u1 = u0 + frameWidth;
+
+    float v0 = row * frameHeight;
+    float v1 = v0 + frameHeight;
+
+    float* texcoords = mouthPlane.meshes[0].texcoords;
+
+    texcoords[0] = u0;
+    texcoords[1] = v0;
+
+    texcoords[2] = u1;
+    texcoords[3] = v0;
+
+    texcoords[4] = u0;
+    texcoords[5] = v1;
+
+    texcoords[6] = u1;
+    texcoords[7] = v1;
+
+    // Update the GPU's texture-coordinate buffer for the mouth mesh.
+    // mouthPlane.meshes[0] selects the first mesh in the mouth model.
+    // 1 identifies the texture-coordinate (UV) buffer.
+    // texcoords contains the updated UV coordinates.
+    // 8 * sizeof(float) specifies the number of bytes to upload
+    // (8 floats, representing UV coordinates for 4 vertices).
+    // 0 specifies the starting offset in the buffer.
+    UpdateMeshBuffer(
+        mouthPlane.meshes[0],
+        1,
+        texcoords,
+        8 * sizeof(float),
+        0
+    );
+}
+
+void MouthDisplay::ShutDown()
+{
+    UnloadModel(mouthPlane);
 }
 
 
@@ -2349,8 +2935,14 @@ Nose::Nose(TingoAssets& assets, TingoDimensions& dimensions) :
 
 void Nose::Initialise()
 {
+    float Yoffset = dimensions.head.height / 2.0f;
+    float Zoffset = dimensions.head.length / 2.0f +
+                    dimensions.nose.length / 2.0f;
+
     positionOffset = {
-        0.0f, 0.0f, dimensions.head.length / 2.0f + dimensions.nose.length / 2.0f
+        0.0f, 
+        Yoffset, 
+        Zoffset
     };
 }
 
@@ -2458,11 +3050,6 @@ void Foot::Initialise()
     };
 }
 
-void Foot::ShutDown()
-{
-    
-}
-
 void Foot::Update(float dt)
 {
     (void)dt;
@@ -2516,11 +3103,6 @@ void Knee::Initialise()
     };
 
     shin.Initialise();
-}
-
-void Knee::ShutDown()
-{
-    
 }
 
 void Knee::Update(float dt)
@@ -2580,11 +3162,6 @@ void Shin::Initialise()
     };
 
     foot.Initialise();
-}
-
-void Shin::ShutDown()
-{
-    
 }
 
 void Shin::Update(float dt)
@@ -2660,11 +3237,6 @@ void Thigh::Initialise()
     knee.Initialise();
 }
 
-void Thigh::ShutDown()
-{
-    
-}
-
 void Thigh::Update(float dt)
 {
     (void)dt;
@@ -2724,11 +3296,6 @@ void Neck::Initialise()
     head.Initialise();
 
     TraceLog(LOG_INFO, "Raylib version: %s", RAYLIB_VERSION);
-}
-
-void Neck::ShutDown()
-{
-    
 }
 
 void Neck::Update(float dt)
@@ -2792,11 +3359,6 @@ void Pelvis::Initialise()
     rightThigh.Initialise();
 }
 
-void Pelvis::ShutDown()
-{
-    
-}
-
 void Pelvis::Update(float dt)
 {
     (void)dt;
@@ -2856,7 +3418,6 @@ void Tingo::Initialise()
 void Tingo::ShutDown()
 {
     assets.ShutDown();
-    body.ShutDown();
 }
 
 void Tingo::Update(float dt)
@@ -2912,6 +3473,8 @@ void TingoAssets::Initialise()
     nose = LoadModel("assets/models/tingo/Nose.glb");
     eyeBrow = LoadModel("assets/models/tingo/EyeBrow.glb");
     ear = LoadModel("assets/models/tingo/Ear.glb");
+    antenna = LoadModel("assets/models/tingo/Antenna.glb");
+    mouthSpriteSheet = LoadTexture("assets/images/tingo/mouthSpriteSheet.png");
 
     // Load the lighting shaders.
     lightingShader = LoadShader(
@@ -2985,7 +3548,8 @@ void TingoAssets::Initialise()
         &pupil,
         &nose,
         &eyeBrow,
-        &ear
+        &ear,
+        &antenna
     };
 
     // Assign the shader to every material in every model.
@@ -3109,6 +3673,21 @@ Vector3 TingoAssets::GetEarDimensions()
     return GetDimensions(ear);
 }
 
+Vector3 TingoAssets::GetAntennaDimensions()
+{
+    return GetDimensions(antenna);
+}
+
+Vector4Int TingoAssets::GetSpriteSheetDimensions()
+{
+    int width = mouthSpriteSheet.width;
+    int height = mouthSpriteSheet.height;
+    int rows = 1;
+    int cols = 4;
+
+    return {width, height, rows, cols};
+}
+
 void TingoAssets::ShutDown()
 {
     UnloadModel(body);
@@ -3131,8 +3710,11 @@ void TingoAssets::ShutDown()
     UnloadModel(nose);
     UnloadModel(eyeBrow);
     UnloadModel(ear);
+    UnloadModel(antenna);
 
     UnloadShader(lightingShader);
+
+    UnloadTexture(mouthSpriteSheet);
 }
 
 
@@ -3163,7 +3745,9 @@ void TingoDimensions::Initialise
     Vector3 pupilDimensions,
     Vector3 noseDimensions,
     Vector3 eyeBrowDimensions,
-    Vector3 earDimensions
+    Vector3 earDimensions,
+    Vector3 antennaDimensions,
+    Vector4Int mouthSpriteSheetDimensions
 )
 {
     scale = {1.0f, 1.0f, 1.0f};
@@ -3247,6 +3831,15 @@ void TingoDimensions::Initialise
     ear.width = earDimensions.x;
     ear.height = earDimensions.y;
     ear.length = earDimensions.z;
+
+    antenna.width = antennaDimensions.x;
+    antenna.height = antennaDimensions.y;
+    antenna.length = antennaDimensions.z;
+
+    mouthSpriteSheet.width = mouthSpriteSheetDimensions.w;
+    mouthSpriteSheet.height = mouthSpriteSheetDimensions.x;
+    mouthSpriteSheet.rows = mouthSpriteSheetDimensions.y;
+    mouthSpriteSheet.cols = mouthSpriteSheetDimensions.z;
 }
 
 

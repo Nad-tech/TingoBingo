@@ -8,6 +8,7 @@
 #include "TingoBingo/Body/Head/Nose.h"
 #include "TingoBingo/Body/Head/EyeBrow.h"
 #include "TingoBingo/Body/Head/Ear.h"
+#include "TingoBingo/Body/Head/Antenna.h"
 
 class Head
 {
@@ -37,6 +38,7 @@ private:
     EyeBrow rightEyeBrow;
     Ear leftEar;
     Ear rightEar;
+    Antenna antenna;
 
     float localRotation = 0.0f;
 };

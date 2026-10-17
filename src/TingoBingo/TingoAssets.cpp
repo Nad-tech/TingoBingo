@@ -30,6 +30,8 @@ void TingoAssets::Initialise()
     nose = LoadModel("assets/models/tingo/Nose.glb");
     eyeBrow = LoadModel("assets/models/tingo/EyeBrow.glb");
     ear = LoadModel("assets/models/tingo/Ear.glb");
+    antenna = LoadModel("assets/models/tingo/Antenna.glb");
+    mouthSpriteSheet = LoadTexture("assets/images/tingo/mouthSpriteSheet.png");
 
     // Load the lighting shaders.
     lightingShader = LoadShader(
@@ -103,7 +105,8 @@ void TingoAssets::Initialise()
         &pupil,
         &nose,
         &eyeBrow,
-        &ear
+        &ear,
+        &antenna
     };
 
     // Assign the shader to every material in every model.
@@ -227,6 +230,21 @@ Vector3 TingoAssets::GetEarDimensions()
     return GetDimensions(ear);
 }
 
+Vector3 TingoAssets::GetAntennaDimensions()
+{
+    return GetDimensions(antenna);
+}
+
+Vector4Int TingoAssets::GetSpriteSheetDimensions()
+{
+    int width = mouthSpriteSheet.width;
+    int height = mouthSpriteSheet.height;
+    int rows = 1;
+    int cols = 4;
+
+    return {width, height, rows, cols};
+}
+
 void TingoAssets::ShutDown()
 {
     UnloadModel(body);
@@ -249,6 +267,9 @@ void TingoAssets::ShutDown()
     UnloadModel(nose);
     UnloadModel(eyeBrow);
     UnloadModel(ear);
+    UnloadModel(antenna);
 
     UnloadShader(lightingShader);
+
+    UnloadTexture(mouthSpriteSheet);
 }

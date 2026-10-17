@@ -3,6 +3,7 @@
 #include "MyTransform3D.h"
 #include "TingoBingo/TingoDimensions.h"
 #include "TingoBingo/TingoAssets.h"
+#include "Animation.h"
 
 class MouthDisplay
 {
@@ -16,6 +17,9 @@ public:
 
     void SetTransform(MyTransform3D parentTransform);
 
+    void SetMouthFrame(int frame);
+
+    void ShutDown();
 private:
     TingoAssets& assets;
     TingoDimensions& dimensions;
@@ -23,4 +27,10 @@ private:
     Vector3 positionOffset;
     
     MyTransform3D transform;
+
+    Animation animation;
+
+    Model mouthPlane{};
+    MyTransform3D mouthPlaneTransform{};
+    Vector3 mouthPlaneOffset;
 };
