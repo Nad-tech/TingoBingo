@@ -12,7 +12,7 @@ void Elbow::Initialise()
 {
     positionOffset = {
         0.0f,
-        -dimensions.upperArm.height / 2.0f - dimensions.elbow.height / 2.0f, 
+        -dimensions.upperArm.height - dimensions.elbow.height / 2.0f, 
         0.0f
     };
 
@@ -22,6 +22,8 @@ void Elbow::Initialise()
 void Elbow::Update(float dt)
 {
     (void)dt;
+
+    foreArm.Update(dt);
 }
 
 void Elbow::Draw()

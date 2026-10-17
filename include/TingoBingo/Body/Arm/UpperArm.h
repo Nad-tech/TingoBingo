@@ -28,4 +28,8 @@ private:
     MyTransform3D transform;
 
     Elbow elbow;
+
+    float localRotation = 0.0f;
+    MyTransform3D tempParentTransform;
+    bool dirFlag = false;
 };

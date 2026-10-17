@@ -27,4 +27,8 @@ private:
 
     Finger leftFinger;
     Finger rightFinger;
+
+    float localRotation = 0.0f;
+    MyTransform3D tempParentTransform;
+    bool dirFlag = false;
 };

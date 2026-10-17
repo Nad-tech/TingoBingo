@@ -13,7 +13,7 @@ void Hand::Initialise()
 {
     positionOffset = {
         0.0f,
-        -dimensions.foreArm.height / 2.0f - dimensions.hand.height / 2.0f,
+        -dimensions.foreArm.height,
         0.0f
     };
 
@@ -24,6 +24,13 @@ void Hand::Initialise()
 void Hand::Update(float dt)
 {
     (void)dt;
+
+    //dirFlag ? localRotation += dt * 80 : localRotation -= dt * 80;
+    
+    if(localRotation <= -45) dirFlag = true;
+    if(localRotation >= 45) dirFlag = false;
+
+    SetTransform(tempParentTransform);
 }
 
 void Hand::Draw()
@@ -43,11 +50,13 @@ void Hand::Draw()
 
 void Hand::SetTransform(MyTransform3D parentTransform)
 {
+    tempParentTransform = parentTransform;
+
     MyTransform3D localTransform{};
 
     localTransform.position = positionOffset;
-    localTransform.rotationAxis = {1.0f, 0.0f, 0.0f};
-    localTransform.rotationAngle = 0.0f;
+    localTransform.rotationAxis = {0.0f, 1.0f, 0.0f};
+    localTransform.rotationAngle += localRotation;
     localTransform.scale = {1.0f, 1.0f, 1.0f};
 
     transform = MakeChildTransform(parentTransform, localTransform);

@@ -12,7 +12,7 @@ void ForeArm::Initialise()
 {
     positionOffset = {
         0.0f,
-        -dimensions.elbow.height / 2.0f - dimensions.foreArm.height / 2.0f,
+        -dimensions.elbow.height / 2.0f,
         0.0f
     };
 
@@ -22,6 +22,15 @@ void ForeArm::Initialise()
 void ForeArm::Update(float dt)
 {
     (void)dt;
+
+    //dirFlag ? localRotation += dt * 80 : localRotation -= dt * 80;
+
+    if(localRotation <= -45) dirFlag = true;
+    if(localRotation >= 45) dirFlag = false;
+
+    SetTransform(tempParentTransform);
+
+    hand.Update(dt);
 }
 
 void ForeArm::Draw()
@@ -40,11 +49,13 @@ void ForeArm::Draw()
 
 void ForeArm::SetTransform(MyTransform3D parentTransform)
 {
+    tempParentTransform = parentTransform;
+
     MyTransform3D localTransform{};
 
     localTransform.position = positionOffset;
     localTransform.rotationAxis = {1.0f, 0.0f, 0.0f};
-    localTransform.rotationAngle = 0.0f;
+    localTransform.rotationAngle += localRotation;
     localTransform.scale = {1.0f, 1.0f, 1.0f};
 
     transform = MakeChildTransform(parentTransform, localTransform);

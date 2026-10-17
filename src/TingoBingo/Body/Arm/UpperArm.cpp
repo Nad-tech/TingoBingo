@@ -12,7 +12,7 @@ void UpperArm::Initialise()
 {
     positionOffset = {
         0.0f,
-        -dimensions.upperArm.height / 2.0f - dimensions.shoulder.height / 2.0f,
+        -dimensions.shoulder.height / 2.0f,
         0.0f
     };
     
@@ -22,6 +22,15 @@ void UpperArm::Initialise()
 void UpperArm::Update(float dt)
 {
     (void)dt;
+
+    //dirFlag ? localRotation += dt * 80 : localRotation -= dt * 80;
+    
+    if(localRotation <= -45) dirFlag = true;
+    if(localRotation >= 45) dirFlag = false;
+
+    SetTransform(tempParentTransform);
+
+    elbow.Update(dt);
 }
 
 void UpperArm::Draw()
@@ -40,11 +49,13 @@ void UpperArm::Draw()
 
 void UpperArm::SetTransform(MyTransform3D parentTransform)
 {
+    tempParentTransform = parentTransform;
+
     MyTransform3D localTransform{};
 
     localTransform.position = positionOffset;
     localTransform.rotationAxis = {1.0f, 0.0f, 0.0f};
-    localTransform.rotationAngle = 0.0f;
+    localTransform.rotationAngle += localRotation;
     localTransform.scale = {1.0f, 1.0f, 1.0f};
 
     transform = MakeChildTransform(parentTransform, localTransform);

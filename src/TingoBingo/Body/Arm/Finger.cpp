@@ -13,16 +13,18 @@ void Finger::Initialise()
     if(side == "left")
     {
         positionOffset = {
-            dimensions.hand.width / 2.0f - dimensions.finger.width / 2.0f,
-            -dimensions.hand.height / 2.0f,
+            dimensions.hand.width / 2.0f - 
+            dimensions.finger.width / 2.0f,
+            -dimensions.hand.height,
             0.0f
         };
     }
     else if (side == "right")
     {
         positionOffset = {
-            -dimensions.hand.width / 2.0f + dimensions.finger.width / 2.0f,
-            -dimensions.hand.height / 2.0f,
+            -dimensions.hand.width / 2.0f + 
+            dimensions.finger.width / 2.0f,
+            -dimensions.hand.height,
             0.0f
         };
     }
@@ -53,7 +55,7 @@ void Finger::SetTransform(MyTransform3D parentTransform)
     
     if(side == "left")
     {
-        localTransform.rotationAxis = {0.0f, 0.0f, 1.0f};
+        localTransform.rotationAxis = {1.0f, 0.0f, 1.0f};
         localTransform.rotationAngle = -15.0f;
     }
     else if(side == "right")

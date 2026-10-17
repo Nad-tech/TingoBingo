@@ -16,8 +16,8 @@ void GameWorld::Initialise(ScreenDimensions& screenDimensions)
     this->screenDimensions = screenDimensions;
 
     // Configure the 3D camera.
-    camera.position = { -5.0, 10.0f, 20.0f };  // Move camera further away and higher // Camera's position in the 3D world (X, Y, Z)
-    camera.target = { 0.0f, 0.0f, 0.0f };  // Point the camera looks at
+    camera.position = { -6.0, 10.0f, 15.0f };  // Move camera further away and higher // Camera's position in the 3D world (X, Y, Z)
+    camera.target = { 0.0f, 5.0f, 0.0f };  // Point the camera looks at
     camera.up = { 0.0f, 1.0f, 0.0f };      // Defines the upward direction (positive Y)
     camera.fovy = 45.0f;                   // Vertical field of view in degrees
     camera.projection = CAMERA_PERSPECTIVE;// Objects farther away appear smaller

@@ -50,13 +50,16 @@ void MouthDisplay::Initialise()
     //into a Model that Raylib can render.
     // The resulting model is stored in mouthPlane for
     //later positioning, texturing, and drawing.
+    
+    //- 0.05 is so plane is slightly smaller than display so weirdness
+    //doesnt happen at edges
     mouthPlane = LoadModelFromMesh(GenMeshPlane(
-        dimensions.mouthDisplay.width,  // Width of the mouth plane
-        dimensions.mouthDisplay.height, // Height of the mouth plane
-        1,                               // Number of subdivisions along the width
-        1                                // Number of subdivisions along the length
+        dimensions.mouthDisplay.width - 0.05,  // Width of the mouth plane
+        dimensions.mouthDisplay.height - 0.05, // Height of the mouth plane
+        1,                                     // Number of subdivisions along the width
+        1                                      // Number of subdivisions along the length
     ));
-
+    
     // Assign the mouth sprite sheet image as the diffuse texture
     // for the first material on the mouth plane.
     // The diffuse texture determines the image displayed on the surface

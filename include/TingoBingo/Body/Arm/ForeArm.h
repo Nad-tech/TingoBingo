@@ -28,4 +28,8 @@ private:
     MyTransform3D transform;
 
     Hand hand;
+
+    float localRotation = 0.0f;
+    bool dirFlag = false;
+    MyTransform3D tempParentTransform;
 };

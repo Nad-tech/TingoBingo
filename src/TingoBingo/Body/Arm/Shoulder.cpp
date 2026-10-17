@@ -34,7 +34,12 @@ void Shoulder::Initialise()
 void Shoulder::Update(float dt)
 {
     (void)dt;
-    // localRotation += dt * 80;
+    //dirFlag ? localRotation += dt * 80 : localRotation -= dt * 80;
+    
+    if(localRotation <= -45) dirFlag = true;
+    if(localRotation >= 45) dirFlag = false;
+
+    upperArm.Update(dt);
 }
 
 void Shoulder::Draw()
