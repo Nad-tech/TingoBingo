@@ -4,6 +4,8 @@
 #include "TingoBingo/Body/Body.h"
 #include "TingoDimensions.h"
 #include "TingoAssets.h"
+#include "TingoBingo/TingoState.h"
+#include "TingoBingo/TingoBrain.h"
 
 class Tingo
 {
@@ -18,9 +20,13 @@ public:
 
     void SetTransform(MyTransform3D initialTransform);
 
+    TingoState& GetState();
+
 private:
     MyTransform3D transform;
     TingoAssets &assets;
     TingoDimensions& dimensions;
+    TingoState state;
     Body body;
+    TingoBrain tingoBrain;
 };

@@ -5,6 +5,7 @@
 #include "TingoBingo/TingoAssets.h"
 #include <string>
 #include "TingoBingo/Body/Arm/UpperArm.h"
+#include "TingoBingo/TingoState.h"
 
 class Shoulder
 {
@@ -13,7 +14,9 @@ public:
     (
         TingoAssets& assets, 
         TingoDimensions& dimensions, 
+        TingoState& state,
         std::string side
+        
     );
 
     void Initialise();
@@ -23,16 +26,18 @@ public:
 
     void SetTransform(MyTransform3D parentTransform);
 
+    void Wave();
+
 private:
     TingoAssets& assets;
     TingoDimensions& dimensions;
-
-    Vector3 positionOffset;
+    TingoState& state;
     
     std::string side;
     
     MyTransform3D transform;
-
+    Vector3 positionOffset;
+    
     UpperArm upperArm;
 
     float localRotation = 0.0f;

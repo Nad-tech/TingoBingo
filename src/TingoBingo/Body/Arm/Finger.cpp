@@ -1,9 +1,16 @@
 #include "TingoBingo/Body/Arm/Finger.h"
 #include "raymath.h"
 
-Finger::Finger(TingoAssets& assets, TingoDimensions& dimensions, std::string side) :
+Finger::Finger
+(
+    TingoAssets& assets, 
+    TingoDimensions& dimensions, 
+    TingoState& state,
+    std::string side
+) :
     assets(assets),
     dimensions(dimensions),
+    state(state),
     side(side)
 {}
 
@@ -55,7 +62,7 @@ void Finger::SetTransform(MyTransform3D parentTransform)
     
     if(side == "left")
     {
-        localTransform.rotationAxis = {1.0f, 0.0f, 1.0f};
+        localTransform.rotationAxis = {0.0f, 0.0f, 1.0f};
         localTransform.rotationAngle = -15.0f;
     }
     else if(side == "right")

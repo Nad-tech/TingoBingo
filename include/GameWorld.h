@@ -5,18 +5,24 @@
 #include "TingoBingo/TingoDimensions.h"
 #include "TingoBingo/TingoAssets.h"
 #include "ScreenDimensions.h"
+#include "TingoBingo/TingoState.h"
+#include "DebugPanel.h"
 
 class GameWorld
 {
 public:
     GameWorld();
+    
     void Initialise(ScreenDimensions& screenDimensions);
+    
     void Update(float dt);
     void Draw();
+    
     void Shutdown();
 
+    void ToggleGesture(std::string gesture);
+
 private:
-    void DrawOrientationGizmo();
     Camera3D camera{};
     TingoAssets assets;
     TingoDimensions dimensions;
@@ -24,4 +30,7 @@ private:
     MyTransform3D initialTransform; 
     ScreenDimensions screenDimensions;
     Texture2D spaceBackground{};
+
+    void DrawOrientationGizmo();
+    void DrawGesturesState();
 };

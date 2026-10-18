@@ -13,6 +13,12 @@
 class Head
 {
 public:
+    enum class BlinkState
+    {
+        None,
+        Blinking
+    };
+
     Head(TingoAssets& assets, TingoDimensions& dimensions);
 
     void Initialise();
@@ -21,6 +27,8 @@ public:
     void Draw();
 
     void SetTransform(MyTransform3D parentTransform);
+
+    void Blink(float dt);
 
 private:
     TingoAssets& assets;
@@ -41,4 +49,8 @@ private:
     Antenna antenna;
 
     float localRotation = 0.0f;
+
+    BlinkState blinkState;
+    float blinkTimer = 0.0f;
+    float nextBlink = 0.0f;
 };

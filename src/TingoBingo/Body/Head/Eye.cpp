@@ -1,5 +1,7 @@
 #include "TingoBingo/Body/Head/Eye.h"
 #include "raymath.h"
+#include <iostream>
+#include "DebugPanel.h"
 
 Eye::Eye(TingoAssets& assets, TingoDimensions& dimensions, std::string side) :
     assets(assets),
@@ -30,12 +32,18 @@ void Eye::Initialise()
         };
     }
 
+    localScale = {1.0f, 1.0f, 1.0f};
+    blinkSpeed = 10.0f;
+    blinkState = BlinkState::None;
+
     pupil.Initialise();
 }
 
 void Eye::Update(float dt)
 {
-    (void)dt;
+    AdvanceBlink(dt);
+
+    std::string state = "NULL";
 }
 
 void Eye::Draw()
@@ -54,14 +62,59 @@ void Eye::Draw()
 
 void Eye::SetTransform(MyTransform3D parentTransform)
 {
+    tempParentTransform = parentTransform;
+
     MyTransform3D localTransform{};
 
     localTransform.position = positionOffset;
     localTransform.rotationAxis = {1.0f, 0.0f, 0.0f};
     localTransform.rotationAngle = 0.0f;
-    localTransform.scale = {1.0f, 1.0f, 1.0f};
+    localTransform.scale = localScale;
 
     transform = MakeChildTransform(parentTransform, localTransform);
 
     pupil.SetTransform(transform);
+}
+
+void Eye::Blink()
+{
+    if (blinkState == BlinkState::None)
+    {
+        blinkState = BlinkState::Closing;
+    }
+}
+
+void Eye::AdvanceBlink(float dt)
+{
+    switch (blinkState)
+    {
+        case BlinkState::Closing:
+
+            localScale.y -= blinkSpeed * dt;
+
+            if (localScale.y <= 0.0f)
+            {
+                localScale.y = 0.0f;
+                blinkState = BlinkState::Opening;
+            }
+
+            break;
+
+        case BlinkState::Opening:
+
+            localScale.y += blinkSpeed * dt;
+
+            if (localScale.y >= 1.0f)
+            {
+                localScale.y = 1.0f;
+                blinkState = BlinkState::None;
+            }
+
+            break;
+
+        case BlinkState::None:
+            break;
+    }
+
+    SetTransform(tempParentTransform);
 }

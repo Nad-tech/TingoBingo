@@ -1,13 +1,19 @@
 #include "TingoBingo/Body/Arm/Shoulder.h"
 #include "raymath.h"
 
-Shoulder::Shoulder(TingoAssets& assets, TingoDimensions& dimensions, std::string side) :
+Shoulder::Shoulder
+(
+    TingoAssets& assets, 
+    TingoDimensions& dimensions,
+    TingoState& state,
+    std::string side
+) :
     assets(assets),
     dimensions(dimensions),
+    state(state),
     side(side),
-    upperArm(assets, dimensions)
+    upperArm(assets, dimensions, state, side)
 {}
-
 
 void Shoulder::Initialise()
 {
@@ -68,4 +74,9 @@ void Shoulder::SetTransform(MyTransform3D parentTransform)
     transform = MakeChildTransform(parentTransform, localTransform);
     
     upperArm.SetTransform(transform);
+}
+
+void Shoulder::Wave() 
+{
+    upperArm.Wave();
 }

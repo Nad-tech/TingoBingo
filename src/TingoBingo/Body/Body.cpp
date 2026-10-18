@@ -1,12 +1,18 @@
 #include "TingoBingo/Body/Body.h"
 
-Body::Body(TingoAssets& assets, TingoDimensions& dimensions) :
+Body::Body
+(
+    TingoAssets& assets, 
+    TingoDimensions& dimensions, 
+    TingoState& state
+) :
     assets(assets),
     dimensions(dimensions),
+    state(state),
     pelvis(assets, dimensions),
     neck(assets, dimensions),
-    leftShoulder(assets, dimensions, "left"),
-    rightShoulder(assets, dimensions, "right")
+    leftShoulder(assets, dimensions, state, "left"),
+    rightShoulder(assets, dimensions, state, "right")
 {}
 
 void Body::Initialise()
@@ -21,6 +27,8 @@ void Body::Initialise()
 
 void Body::Update(float dt)
 {
+    Wave();
+
     pelvis.Update(dt);
     neck.Update(dt);
     leftShoulder.Update(dt);
@@ -59,4 +67,10 @@ void Body::SetTransform(MyTransform3D parentTransform)
     neck.SetTransform(transform);
     leftShoulder.SetTransform(transform);
     rightShoulder.SetTransform(transform);
+}
+
+void Body::Wave()
+{
+    if(state.gestures.waveRight) rightShoulder.Wave();
+    if(state.gestures.waveLeft) leftShoulder.Wave();
 }

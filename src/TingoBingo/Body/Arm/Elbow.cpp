@@ -1,12 +1,19 @@
 #include "TingoBingo/Body/Arm/Elbow.h"
 #include "raymath.h"
 
-Elbow::Elbow(TingoAssets& assets, TingoDimensions& dimensions) :
+Elbow::Elbow
+(
+    TingoAssets& assets, 
+    TingoDimensions& dimensions,
+    TingoState& state,
+    std::string side
+) :
     assets(assets),
     dimensions(dimensions),
-    foreArm(assets, dimensions)
+    state(state),
+    side(side),
+    foreArm(assets, dimensions, state, side)
 {}
-
 
 void Elbow::Initialise()
 {
@@ -52,4 +59,9 @@ void Elbow::SetTransform(MyTransform3D parentTransform)
     transform = MakeChildTransform(parentTransform, localTransform);
     
     foreArm.SetTransform(transform);
+}
+
+void Elbow::Wave()
+{
+    foreArm.Wave();
 }

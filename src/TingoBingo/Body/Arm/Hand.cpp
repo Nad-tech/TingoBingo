@@ -1,11 +1,17 @@
 #include "TingoBingo/Body/Arm/Hand.h"
 #include "raymath.h"
 
-Hand::Hand(TingoAssets& assets, TingoDimensions& dimensions) :
+Hand::Hand
+(
+    TingoAssets& assets, 
+    TingoDimensions& dimensions,
+    TingoState& state
+) :
     assets(assets),
     dimensions(dimensions),
-    leftFinger(assets, dimensions, "left"),
-    rightFinger(assets, dimensions, "right")
+    state(state),
+    leftFinger(assets, dimensions, state, "left"),
+    rightFinger(assets, dimensions, state, "right")
 {}
 
 

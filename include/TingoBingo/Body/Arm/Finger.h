@@ -4,14 +4,15 @@
 #include "TingoBingo/TingoDimensions.h"
 #include "TingoBingo/TingoAssets.h"
 #include <string>
-
+#include "TingoBingo/TingoState.h"
 class Finger
 {
 public:
     Finger
     (
         TingoAssets& assets, 
-        TingoDimensions& dimensions, 
+        TingoDimensions& dimensions,
+        TingoState& state,
         std::string side
     );
 
@@ -25,10 +26,11 @@ public:
 private:
     TingoAssets& assets;
     TingoDimensions& dimensions;
+    TingoState& state;
 
-    Vector3 positionOffset;
-    
     std::string side;
     
+
+    Vector3 positionOffset;
     MyTransform3D transform;
 };

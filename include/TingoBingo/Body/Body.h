@@ -8,10 +8,17 @@
 #include "TingoBingo/Body/Pelvis.h"
 #include "TingoBingo/Body/Arm/Shoulder.h"
 
+#include "TingoBingo/TingoState.h"
+
 class Body
 {
 public:
-    Body(TingoAssets& assets, TingoDimensions& dimensions);
+    Body
+    (
+        TingoAssets& assets, 
+        TingoDimensions& dimensions,
+        TingoState& state
+    );
 
     void Initialise();
     
@@ -20,10 +27,13 @@ public:
 
     void SetTransform(MyTransform3D parentTransform);
 
+    void Wave();
+
 private:
     TingoAssets& assets;
     TingoDimensions& dimensions;
-    
+    TingoState& state;
+
     MyTransform3D transform;
 
     Vector3 positionOffset;

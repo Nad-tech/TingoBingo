@@ -164,6 +164,111 @@ private:
 
 
 =====================================
+.\include\DebugPanel.h
+=====================================
+
+#pragma once
+
+#include "raylib.h"
+
+#include <string>
+#include <vector>
+
+// A world-space debug panel for Raylib 3D scenes.
+//
+// Usage:
+//   DebugPanel::Instance().Initialise();
+//   DebugPanel::Instance().SetPosition({0.0f, 4.0f, 0.0f});
+//   DebugPanel::Instance().Print("Blinking", true);
+//   DebugPanel::Instance().Print("Eye scale", 0.42f);
+//   ...
+//   DebugPanel::Instance().Draw3D(camera); // inside BeginMode3D()/EndMode3D()
+//   DebugPanel::Instance().Shutdown();     // before closing the window
+//
+// The panel uses a RenderTexture2D to draw normal 2D text, then displays
+// that texture on a camera-facing 3D quad. Print() updates an existing label
+// rather than adding duplicate rows.
+
+class DebugPanel
+{
+public:
+    // Returns the one shared DebugPanel instance. Any class can use this
+    // without receiving a DebugPanel reference through its constructor.
+    static DebugPanel& Instance();
+
+    ~DebugPanel();
+
+    // This is a singleton: prevent accidental copies or extra instances.
+    DebugPanel(const DebugPanel&) = delete;
+    DebugPanel& operator=(const DebugPanel&) = delete;
+    DebugPanel(DebugPanel&&) = delete;
+    DebugPanel& operator=(DebugPanel&&) = delete;
+
+    // Call after InitWindow(), before using Print() or Draw3D().
+    void Initialise();
+    void Shutdown();
+
+    void SetPosition(Vector3 position);
+    Vector3 GetPosition() const;
+
+    void SetWorldSize(float width, float height);
+    void SetTextStyle(int fontSize, int lineSpacing, Color textColour);
+
+    void SetVisible(bool visible);
+    bool IsVisible() const;
+
+    // Set or update a row. Supported types: string, const char*, float,
+    // double, int, unsigned int, bool, Vector2, and Vector3.
+    void Print(const std::string& label, const std::string& value);
+    void Print(const std::string& label, const char* value);
+    void Print(const std::string& label, float value);
+    void Print(const std::string& label, double value);
+    void Print(const std::string& label, int value);
+    void Print(const std::string& label, unsigned int value);
+    void Print(const std::string& label, bool value);
+    void Print(const std::string& label, Vector2 value);
+    void Print(const std::string& label, Vector3 value);
+
+    void Clear();
+
+    // Call inside BeginMode3D(camera) / EndMode3D().
+    void Draw3D(const Camera3D& camera);
+
+private:
+    DebugPanel() = default;
+
+    struct Entry
+    {
+        std::string label;
+        std::string value;
+    };
+
+    std::vector<Entry> entries;
+
+    RenderTexture2D renderTexture{};
+    bool initialised = false;
+    bool visible = true;
+
+    Vector3 position = { 0.0f, 3.0f, 0.0f };
+    float worldWidth = 2.8f;
+    float worldHeight = 1.6f;
+
+    int textureWidth = 1024;
+    int textureHeight = 512;
+    int fontSize = 28;
+    int lineSpacing = 36;
+    int padding = 18;
+
+    Color textColour = LIME;
+    Color panelColour = { 12, 18, 24, 220 };
+    Color borderColour = { 90, 180, 130, 255 };
+
+    void SetValue(const std::string& label, const std::string& value);
+    void RefreshTexture();
+};
+
+
+=====================================
 .\include\Game.h
 =====================================
 
@@ -182,6 +287,9 @@ public:
 private:
     GameWorld world;
     ScreenDimensions screenDimensions;
+
+    void HandleInput();
+    void DrawLegend();
 };
 
 
@@ -196,18 +304,24 @@ private:
 #include "TingoBingo/TingoDimensions.h"
 #include "TingoBingo/TingoAssets.h"
 #include "ScreenDimensions.h"
+#include "TingoBingo/TingoState.h"
+#include "DebugPanel.h"
 
 class GameWorld
 {
 public:
     GameWorld();
+    
     void Initialise(ScreenDimensions& screenDimensions);
+    
     void Update(float dt);
     void Draw();
+    
     void Shutdown();
 
+    void ToggleGesture(std::string gesture);
+
 private:
-    void DrawOrientationGizmo();
     Camera3D camera{};
     TingoAssets assets;
     TingoDimensions dimensions;
@@ -215,6 +329,9 @@ private:
     MyTransform3D initialTransform; 
     ScreenDimensions screenDimensions;
     Texture2D spaceBackground{};
+
+    void DrawOrientationGizmo();
+    void DrawGesturesState();
 };
 
 
@@ -330,11 +447,17 @@ struct ScreenDimensions
 #include "TingoBingo/TingoDimensions.h"
 #include "TingoBingo/TingoAssets.h"
 #include "TingoBingo/Body/Arm/ForeArm.h"
-
+#include "TingoBingo/TingoState.h"
 class Elbow
 {
 public:
-    Elbow(TingoAssets& assets, TingoDimensions& dimensions);
+    Elbow
+    (
+        TingoAssets& assets, 
+        TingoDimensions& dimensions,
+        TingoState& state,
+        std::string side
+    );
 
     void Initialise();
     
@@ -343,12 +466,16 @@ public:
 
     void SetTransform(MyTransform3D parentTransform);
 
+    void Wave();
+
 private:
     TingoAssets& assets;
     TingoDimensions& dimensions;
+    TingoState& state;
+
+    std::string side;
 
     Vector3 positionOffset;
-    
     MyTransform3D transform;
 
     ForeArm foreArm;
@@ -365,14 +492,15 @@ private:
 #include "TingoBingo/TingoDimensions.h"
 #include "TingoBingo/TingoAssets.h"
 #include <string>
-
+#include "TingoBingo/TingoState.h"
 class Finger
 {
 public:
     Finger
     (
         TingoAssets& assets, 
-        TingoDimensions& dimensions, 
+        TingoDimensions& dimensions,
+        TingoState& state,
         std::string side
     );
 
@@ -386,11 +514,12 @@ public:
 private:
     TingoAssets& assets;
     TingoDimensions& dimensions;
+    TingoState& state;
 
-    Vector3 positionOffset;
-    
     std::string side;
     
+
+    Vector3 positionOffset;
     MyTransform3D transform;
 };
 
@@ -405,11 +534,25 @@ private:
 #include "TingoBingo/TingoDimensions.h"
 #include "TingoBingo/TingoAssets.h"
 #include "Hand.h"
+#include "TingoBingo/TingoState.h"
 
 class ForeArm
 {
 public:
-    ForeArm(TingoAssets& assets, TingoDimensions& dimensions);
+    enum class WaveState
+    {
+        None,
+        Raising,
+        Lowering
+    };
+
+    ForeArm
+    (
+        TingoAssets& assets, 
+        TingoDimensions& dimensions,
+        TingoState& state,
+        std::string side
+    );
 
     void Initialise();
     
@@ -418,14 +561,16 @@ public:
 
     void SetTransform(MyTransform3D parentTransform);
 
+    void Wave();
+
 private:
     TingoAssets& assets;
     TingoDimensions& dimensions;
+    TingoState& state;
+
+    std::string side;
 
     Vector3 positionOffset;
-    
-    std::string side;
-    
     MyTransform3D transform;
 
     Hand hand;
@@ -433,6 +578,9 @@ private:
     float localRotation = 0.0f;
     bool dirFlag = false;
     MyTransform3D tempParentTransform;
+
+    void AdvanceWave(float dt);
+    WaveState waveState;
 };
 
 
@@ -446,11 +594,16 @@ private:
 #include "TingoBingo/TingoDimensions.h"
 #include "TingoBingo/TingoAssets.h"
 #include "Finger.h"
-
+#include "TingoBingo/TingoState.h"
 class Hand
 {
 public:
-    Hand(TingoAssets& assets, TingoDimensions& dimensions);
+    Hand
+    (
+        TingoAssets& assets, 
+        TingoDimensions& dimensions,
+        TingoState& state
+    );
 
     void Initialise();
     
@@ -462,9 +615,9 @@ public:
 private:
     TingoAssets& assets;
     TingoDimensions& dimensions;
+    TingoState& state;
 
     Vector3 positionOffset;
-    
     MyTransform3D transform;
 
     Finger leftFinger;
@@ -487,6 +640,7 @@ private:
 #include "TingoBingo/TingoAssets.h"
 #include <string>
 #include "TingoBingo/Body/Arm/UpperArm.h"
+#include "TingoBingo/TingoState.h"
 
 class Shoulder
 {
@@ -495,7 +649,9 @@ public:
     (
         TingoAssets& assets, 
         TingoDimensions& dimensions, 
+        TingoState& state,
         std::string side
+        
     );
 
     void Initialise();
@@ -505,16 +661,18 @@ public:
 
     void SetTransform(MyTransform3D parentTransform);
 
+    void Wave();
+
 private:
     TingoAssets& assets;
     TingoDimensions& dimensions;
-
-    Vector3 positionOffset;
+    TingoState& state;
     
     std::string side;
     
     MyTransform3D transform;
-
+    Vector3 positionOffset;
+    
     UpperArm upperArm;
 
     float localRotation = 0.0f;
@@ -532,11 +690,25 @@ private:
 #include "TingoBingo/TingoDimensions.h"
 #include "TingoBingo/TingoAssets.h"
 #include "Elbow.h"
-
+#include "TingoBingo/TingoState.h"
 class UpperArm
 {
 public:
-    UpperArm(TingoAssets& assets, TingoDimensions& dimensions);
+    enum class WaveState
+    {
+        None,
+        Raising,
+        Lowering,
+        Waving
+    };
+
+    UpperArm
+    (
+        TingoAssets& assets, 
+        TingoDimensions& dimensions,
+        TingoState& state,
+        std::string side
+    );
 
     void Initialise();
     
@@ -545,21 +717,25 @@ public:
 
     void SetTransform(MyTransform3D parentTransform);
 
+    void Wave();
+
 private:
     TingoAssets& assets;
     TingoDimensions& dimensions;
+    TingoState& state;
 
+    std::string side;
+
+    MyTransform3D transform;
     Vector3 positionOffset;
     
-    std::string side;
-    
-    MyTransform3D transform;
-
     Elbow elbow;
 
     float localRotation = 0.0f;
     MyTransform3D tempParentTransform;
-    bool dirFlag = false;
+
+    WaveState waveState;
+    void AdvanceWave(float dt);
 };
 
 
@@ -577,10 +753,17 @@ private:
 #include "TingoBingo/Body/Pelvis.h"
 #include "TingoBingo/Body/Arm/Shoulder.h"
 
+#include "TingoBingo/TingoState.h"
+
 class Body
 {
 public:
-    Body(TingoAssets& assets, TingoDimensions& dimensions);
+    Body
+    (
+        TingoAssets& assets, 
+        TingoDimensions& dimensions,
+        TingoState& state
+    );
 
     void Initialise();
     
@@ -589,10 +772,13 @@ public:
 
     void SetTransform(MyTransform3D parentTransform);
 
+    void Wave();
+
 private:
     TingoAssets& assets;
     TingoDimensions& dimensions;
-    
+    TingoState& state;
+
     MyTransform3D transform;
 
     Vector3 positionOffset;
@@ -690,6 +876,13 @@ private:
 class Eye
 {
 public:
+    enum class BlinkState
+    {
+        None,
+        Closing,
+        Opening
+    };
+
     Eye
     (
         TingoAssets& assets, 
@@ -704,6 +897,8 @@ public:
 
     void SetTransform(MyTransform3D parentTransform);
 
+    void Blink();
+
 private:
     TingoAssets& assets;
     TingoDimensions& dimensions;
@@ -715,6 +910,14 @@ private:
     std::string side;
 
     Pupil pupil;
+
+    MyTransform3D tempParentTransform;
+
+    BlinkState blinkState;
+    Vector3 localScale;
+    float blinkSpeed;
+
+    void AdvanceBlink(float dt);
 };
 
 
@@ -777,6 +980,12 @@ private:
 class Head
 {
 public:
+    enum class BlinkState
+    {
+        None,
+        Blinking
+    };
+
     Head(TingoAssets& assets, TingoDimensions& dimensions);
 
     void Initialise();
@@ -785,6 +994,8 @@ public:
     void Draw();
 
     void SetTransform(MyTransform3D parentTransform);
+
+    void Blink(float dt);
 
 private:
     TingoAssets& assets;
@@ -805,6 +1016,10 @@ private:
     Antenna antenna;
 
     float localRotation = 0.0f;
+
+    BlinkState blinkState;
+    float blinkTimer = 0.0f;
+    float nextBlink = 0.0f;
 };
 
 
@@ -1151,6 +1366,7 @@ private:
 #include "TingoBingo/Body/Body.h"
 #include "TingoDimensions.h"
 #include "TingoAssets.h"
+#include "TingoBingo/TingoState.h"
 
 class Tingo
 {
@@ -1165,10 +1381,13 @@ public:
 
     void SetTransform(MyTransform3D initialTransform);
 
+    TingoState& GetState();
+
 private:
     MyTransform3D transform;
     TingoAssets &assets;
     TingoDimensions& dimensions;
+    TingoState state;
     Body body;
 };
 
@@ -1260,7 +1479,7 @@ class TingoDimensions
 {
 public:
 
-    Vector3 scale;
+    Vector3 globalScale;
 
     void Initialise
     (
@@ -1445,6 +1664,26 @@ public:
         int cols;
     };
     MouthSpriteSheet mouthSpriteSheet;
+};
+
+
+=====================================
+.\include\TingoBingo\TingoState.h
+=====================================
+
+#pragma once
+
+class TingoState
+{
+public:
+    bool speaking = false;
+
+    struct Gestures
+    {
+        bool waveRight = false;
+        bool waveLeft = false;
+    };
+    Gestures gestures;
 };
 
 
@@ -1648,6 +1887,270 @@ void Animation::Stop()
 
 
 =====================================
+.\src\DebugPanel.cpp
+=====================================
+
+#include "DebugPanel.h"
+
+#include "raymath.h"
+#include "rlgl.h"
+
+#include <iomanip>
+#include <sstream>
+
+DebugPanel& DebugPanel::Instance()
+{
+    // Created on first use and shared by every caller.
+    static DebugPanel instance;
+    return instance;
+}
+
+DebugPanel::~DebugPanel()
+{
+    // Raylib resources should be released while the Raylib window/context
+    // still exists. Prefer calling Shutdown() explicitly before CloseWindow().
+    // The destructor is a convenience for normal object lifetime ordering.
+    Shutdown();
+}
+
+void DebugPanel::Initialise()
+{
+    if (initialised || !IsWindowReady())
+        return;
+
+    renderTexture = LoadRenderTexture(textureWidth, textureHeight);
+    SetTextureFilter(renderTexture.texture, TEXTURE_FILTER_BILINEAR);
+
+    initialised = renderTexture.id != 0;
+
+    if (initialised)
+        RefreshTexture();
+}
+
+void DebugPanel::Shutdown()
+{
+    if (initialised)
+    {
+        UnloadRenderTexture(renderTexture);
+        renderTexture = {};
+        initialised = false;
+    }
+}
+
+void DebugPanel::SetPosition(Vector3 newPosition)
+{
+    position = newPosition;
+}
+
+Vector3 DebugPanel::GetPosition() const
+{
+    return position;
+}
+
+void DebugPanel::SetWorldSize(float width, float height)
+{
+    worldWidth = width;
+    worldHeight = height;
+}
+
+void DebugPanel::SetTextStyle(int newFontSize, int newLineSpacing, Color newTextColour)
+{
+    fontSize = newFontSize > 0 ? newFontSize : 1;
+    lineSpacing = newLineSpacing > 0 ? newLineSpacing : 1;
+    textColour = newTextColour;
+    RefreshTexture();
+}
+
+void DebugPanel::SetVisible(bool newVisible)
+{
+    visible = newVisible;
+}
+
+bool DebugPanel::IsVisible() const
+{
+    return visible;
+}
+
+void DebugPanel::SetValue(const std::string& label, const std::string& value)
+{
+    for (Entry& entry : entries)
+    {
+        if (entry.label == label)
+        {
+            if (entry.value != value)
+            {
+                entry.value = value;
+                RefreshTexture();
+            }
+            return;
+        }
+    }
+
+    entries.push_back({ label, value });
+    RefreshTexture();
+}
+
+void DebugPanel::Print(const std::string& label, const std::string& value)
+{
+    SetValue(label, value);
+}
+
+void DebugPanel::Print(const std::string& label, const char* value)
+{
+    SetValue(label, value ? value : "(null)");
+}
+
+void DebugPanel::Print(const std::string& label, float value)
+{
+    std::ostringstream stream;
+    stream << std::fixed << std::setprecision(2) << value;
+    SetValue(label, stream.str());
+}
+
+void DebugPanel::Print(const std::string& label, double value)
+{
+    std::ostringstream stream;
+    stream << std::fixed << std::setprecision(2) << value;
+    SetValue(label, stream.str());
+}
+
+void DebugPanel::Print(const std::string& label, int value)
+{
+    SetValue(label, std::to_string(value));
+}
+
+void DebugPanel::Print(const std::string& label, unsigned int value)
+{
+    SetValue(label, std::to_string(value));
+}
+
+void DebugPanel::Print(const std::string& label, bool value)
+{
+    SetValue(label, value ? "true" : "false");
+}
+
+void DebugPanel::Print(const std::string& label, Vector2 value)
+{
+    std::ostringstream stream;
+    stream << std::fixed << std::setprecision(2)
+           << "(" << value.x << ", " << value.y << ")";
+    SetValue(label, stream.str());
+}
+
+void DebugPanel::Print(const std::string& label, Vector3 value)
+{
+    std::ostringstream stream;
+    stream << std::fixed << std::setprecision(2)
+           << "(" << value.x << ", " << value.y << ", " << value.z << ")";
+    SetValue(label, stream.str());
+}
+
+void DebugPanel::Clear()
+{
+    entries.clear();
+    RefreshTexture();
+}
+
+void DebugPanel::RefreshTexture()
+{
+    if (!initialised)
+        return;
+
+    BeginTextureMode(renderTexture);
+    ClearBackground(panelColour);
+
+    // Simple border around the panel.
+    DrawRectangleLinesEx(
+        { 1.0f, 1.0f, static_cast<float>(textureWidth - 2),
+          static_cast<float>(textureHeight - 2) },
+        3.0f,
+        borderColour
+    );
+
+    int y = padding;
+    const int availableBottom = textureHeight - padding;
+
+    for (const Entry& entry : entries)
+    {
+        if (y + fontSize > availableBottom)
+            break;
+
+        const std::string output = entry.label + ": " + entry.value;
+
+        DrawText(
+            output.c_str(),
+            padding,
+            y,
+            fontSize,
+            textColour
+        );
+
+        y += lineSpacing;
+    }
+
+    EndTextureMode();
+}
+
+void DebugPanel::Draw3D(const Camera3D& camera)
+{
+    if (!visible || !initialised)
+        return;
+
+    // Build a quad perpendicular to the direction from the panel to camera.
+    // This makes the panel readable while orbiting around Tingo.
+    Vector3 toCamera = Vector3Subtract(camera.position, position);
+
+    if (Vector3Length(toCamera) < 0.0001f)
+        return;
+
+    toCamera = Vector3Normalize(toCamera);
+
+    Vector3 worldUp = { 0.0f, 1.0f, 0.0f };
+    Vector3 right = Vector3CrossProduct(worldUp, toCamera);
+
+    // If the camera direction is almost vertical, use another reference axis.
+    if (Vector3Length(right) < 0.0001f)
+    {
+        worldUp = { 0.0f, 0.0f, 1.0f };
+        right = Vector3CrossProduct(worldUp, toCamera);
+    }
+
+    right = Vector3Normalize(right);
+    const Vector3 up = Vector3Normalize(Vector3CrossProduct(toCamera, right));
+
+    const Vector3 halfRight = Vector3Scale(right, worldWidth * 0.5f);
+    const Vector3 halfUp = Vector3Scale(up, worldHeight * 0.5f);
+
+    const Vector3 topLeft = Vector3Add(position, Vector3Add(Vector3Scale(halfRight, -1.0f), halfUp));
+    const Vector3 topRight = Vector3Add(position, Vector3Add(halfRight, halfUp));
+    const Vector3 bottomRight = Vector3Add(position, Vector3Subtract(halfRight, halfUp));
+    const Vector3 bottomLeft = Vector3Subtract(position, Vector3Add(halfRight, halfUp));
+
+    // Texture coordinates are flipped vertically because RenderTexture2D
+    // textures are vertically inverted in Raylib.
+    const float u0 = 0.0f;
+    const float u1 = 1.0f;
+    const float vTop = 1.0f;
+    const float vBottom = 0.0f;
+
+    rlDisableBackfaceCulling();
+    rlSetTexture(renderTexture.texture.id);
+
+    rlBegin(RL_QUADS);
+        rlColor4ub(255, 255, 255, 255);
+
+        rlTexCoord2f(u0, vTop);    rlVertex3f(topLeft.x, topLeft.y, topLeft.z);
+        rlTexCoord2f(u1, vTop);    rlVertex3f(topRight.x, topRight.y, topRight.z);
+        rlTexCoord2f(u1, vBottom); rlVertex3f(bottomRight.x, bottomRight.y, bottomRight.z);
+        rlTexCoord2f(u0, vBottom); rlVertex3f(bottomLeft.x, bottomLeft.y, bottomLeft.z);
+    rlEnd();
+
+    rlSetTexture(0);
+    rlEnableBackfaceCulling();
+}
+
+
+=====================================
 .\src\Game.cpp
 =====================================
 
@@ -1678,6 +2181,8 @@ void Game::Run()
 {
     while (!WindowShouldClose())
     {
+        HandleInput();
+
         float dt = GetFrameTime();
 
         world.Update(dt);
@@ -1687,6 +2192,8 @@ void Game::Run()
         ClearBackground(BLACK);
 
         world.Draw();
+
+        DrawLegend();
 
         EndDrawing();
     }
@@ -1698,6 +2205,40 @@ void Game::Shutdown()
 
     CloseWindow();
 }
+
+void Game::DrawLegend()
+{
+    const int legendX = screenDimensions.screenWidth - 350;
+	const int legendY = 150;
+	const int legendWidth = 335;
+	const int legendHeight = 310;
+	const int lineHeight = 20;
+    const int columnWidth = 160;
+	int textY = legendY + 10;
+    int textX = legendX + 10;
+
+	DrawRectangle(
+		legendX,
+		legendY,
+		legendWidth,
+		legendHeight,
+		Fade(BLACK, 0.75f)
+	);
+	DrawRectangleLines(legendX, legendY, legendWidth, legendHeight, Fade(RAYWHITE, 0.5f));
+
+	DrawText("KEY BINDINGS", textX, textY, 18, YELLOW);
+	textY += lineHeight;
+	DrawText("Wave right: 1", textX, textY, 14, RAYWHITE);
+    textX += columnWidth;
+	DrawText("Wave left: 2", textX, textY, 14, RAYWHITE);
+}
+
+void Game::HandleInput()
+{
+    if (IsKeyPressed(KEY_ONE)) world.ToggleGesture("waveRight");
+    if (IsKeyPressed(KEY_TWO)) world.ToggleGesture("waveLeft");
+}
+
 
 
 =====================================
@@ -1717,6 +2258,10 @@ inline bool dirFlag = true;
 
 void GameWorld::Initialise(ScreenDimensions& screenDimensions)
 {
+    DebugPanel::Instance().Initialise();
+    DebugPanel::Instance().SetPosition({ 0.0f, 4.0f, 0.0f });
+    DebugPanel::Instance().SetWorldSize(4.0f, 2.0f);
+
     spaceBackground = LoadTexture("assets/images/background/space.jpg");
 
     this->screenDimensions = screenDimensions;
@@ -1768,7 +2313,7 @@ void GameWorld::Initialise(ScreenDimensions& screenDimensions)
 
     initialTransform.rotationAxis = {1.0f, 1.0f, 1.0f};
     initialTransform.rotationAngle = 0.0f;
-    initialTransform.scale = {1.0f, 1.0f, 1.0f};
+    initialTransform.scale = dimensions.globalScale;
 
     tingo.Initialise();
     tingo.SetTransform(initialTransform);
@@ -1930,14 +2475,73 @@ void GameWorld::Draw()
 
     tingo.Draw();
 
+    DebugPanel::Instance().Draw3D(camera);
+
     EndMode3D();
 
     DrawOrientationGizmo();
+    DrawGesturesState();
 }
 
 void GameWorld::Shutdown()
 {
     tingo.ShutDown();
+    DebugPanel::Instance().Shutdown();
+}
+
+void GameWorld::ToggleGesture(std::string gesture) 
+{
+    TingoState& state = tingo.GetState();
+    
+    if(gesture == "waveRight") 
+    {
+        state.gestures.waveRight = !state.gestures.waveRight;
+    }
+    else if(gesture == "waveLeft")
+    {
+        state.gestures.waveLeft = !state.gestures.waveLeft;
+    }
+}
+
+void GameWorld::DrawGesturesState()
+{
+    const auto flag = [](bool value) { return value ? "ON" : "off"; };
+    const auto& gestures = tingo.GetState().gestures;
+    int x = 12;
+    int y = 12;
+    const int fontSize = 20;
+    const int lineHeight = fontSize + 4;
+    const int coloumnWidth = 200;
+    
+    DrawText("TINGO STATE", x, y, 16, YELLOW); 
+    
+    y += lineHeight;
+    DrawText
+    (
+        TextFormat
+        (
+            "waveRight %s", 
+            flag(gestures.waveRight)
+        ), 
+        x, 
+        y, 
+        fontSize, 
+        RAYWHITE
+    );
+
+    x += coloumnWidth;
+    DrawText
+    (
+        TextFormat
+        (
+            "waveLeft %s", 
+            flag(gestures.waveLeft)
+        ), 
+        x, 
+        y, 
+        fontSize, 
+        RAYWHITE
+    );
 }
 
 
@@ -1968,12 +2572,19 @@ int main()
 #include "TingoBingo/Body/Arm/Elbow.h"
 #include "raymath.h"
 
-Elbow::Elbow(TingoAssets& assets, TingoDimensions& dimensions) :
+Elbow::Elbow
+(
+    TingoAssets& assets, 
+    TingoDimensions& dimensions,
+    TingoState& state,
+    std::string side
+) :
     assets(assets),
     dimensions(dimensions),
-    foreArm(assets, dimensions)
+    state(state),
+    side(side),
+    foreArm(assets, dimensions, state, side)
 {}
-
 
 void Elbow::Initialise()
 {
@@ -2021,6 +2632,11 @@ void Elbow::SetTransform(MyTransform3D parentTransform)
     foreArm.SetTransform(transform);
 }
 
+void Elbow::Wave()
+{
+    foreArm.Wave();
+}
+
 
 =====================================
 .\src\TingoBingo\Body\Arm\Finger.cpp
@@ -2029,9 +2645,16 @@ void Elbow::SetTransform(MyTransform3D parentTransform)
 #include "TingoBingo/Body/Arm/Finger.h"
 #include "raymath.h"
 
-Finger::Finger(TingoAssets& assets, TingoDimensions& dimensions, std::string side) :
+Finger::Finger
+(
+    TingoAssets& assets, 
+    TingoDimensions& dimensions, 
+    TingoState& state,
+    std::string side
+) :
     assets(assets),
     dimensions(dimensions),
+    state(state),
     side(side)
 {}
 
@@ -2083,7 +2706,7 @@ void Finger::SetTransform(MyTransform3D parentTransform)
     
     if(side == "left")
     {
-        localTransform.rotationAxis = {1.0f, 0.0f, 1.0f};
+        localTransform.rotationAxis = {0.0f, 0.0f, 1.0f};
         localTransform.rotationAngle = -15.0f;
     }
     else if(side == "right")
@@ -2105,10 +2728,18 @@ void Finger::SetTransform(MyTransform3D parentTransform)
 #include "TingoBingo/Body/Arm/ForeArm.h"
 #include "raymath.h"
 
-ForeArm::ForeArm(TingoAssets& assets, TingoDimensions& dimensions) :
+ForeArm::ForeArm
+(
+    TingoAssets& assets, 
+    TingoDimensions& dimensions,
+    TingoState& state,
+    std::string side
+) :
     assets(assets),
     dimensions(dimensions),
-    hand(assets, dimensions)
+    state(state),
+    side(side),
+    hand(assets, dimensions, state)
 {}
 
 
@@ -2120,17 +2751,17 @@ void ForeArm::Initialise()
         0.0f
     };
 
+    waveState = WaveState::None;
+
     hand.Initialise();
 }
 
 void ForeArm::Update(float dt)
 {
-    (void)dt;
-
-    //dirFlag ? localRotation += dt * 80 : localRotation -= dt * 80;
-
-    if(localRotation <= -45) dirFlag = true;
-    if(localRotation >= 45) dirFlag = false;
+    if(waveState != WaveState::None)
+    {
+        AdvanceWave(dt);
+    }
 
     SetTransform(tempParentTransform);
 
@@ -2158,13 +2789,96 @@ void ForeArm::SetTransform(MyTransform3D parentTransform)
     MyTransform3D localTransform{};
 
     localTransform.position = positionOffset;
-    localTransform.rotationAxis = {1.0f, 0.0f, 0.0f};
+    localTransform.rotationAxis = {0.0f, 0.0f, 1.0f};
     localTransform.rotationAngle += localRotation;
     localTransform.scale = {1.0f, 1.0f, 1.0f};
 
     transform = MakeChildTransform(parentTransform, localTransform);
     
     hand.SetTransform(transform);
+}
+
+void ForeArm::Wave()
+{
+    if(waveState == WaveState::None)
+    {
+        waveState = WaveState::Raising;
+    }
+}
+
+void ForeArm::AdvanceWave(float dt)
+{
+    if(side == "left")
+    {
+        const float speed = 400.0f;
+        const float minRotation = 0.0f;
+        const float maxRotation = 70.0f;
+        
+        if(waveState == WaveState::Raising)
+        {
+            localRotation += speed * dt;
+            
+            if(localRotation >= maxRotation)
+            {
+                localRotation = maxRotation;
+                waveState = WaveState::Lowering;
+            }
+        }
+        else if(waveState == WaveState::Lowering)
+        {
+            localRotation -= speed * dt;
+
+            if(localRotation <= minRotation)
+            {
+                localRotation = minRotation;
+                
+                if(state.gestures.waveLeft)
+                {
+                    waveState = WaveState::Raising;
+                }
+                else {
+                    waveState = WaveState::None;
+                }
+            }
+        }
+    }
+
+    if(side == "right")
+    {
+        const float speed = 400.0f;
+        const float minRotation = 0.0f;
+        const float maxRotation = -70.0f;
+
+        if(waveState == WaveState::Raising)
+        {
+            localRotation -= speed * dt;
+            
+            if(localRotation <= maxRotation)
+            {
+                localRotation = maxRotation;
+                waveState = WaveState::Lowering;
+            }
+        }
+        else if(waveState == WaveState::Lowering)
+        {
+            localRotation += speed * dt;
+
+            if(localRotation >= minRotation)
+            {
+                localRotation = minRotation;
+                
+                if(state.gestures.waveRight)
+                {
+                    waveState = WaveState::Raising;
+                }
+                else {
+                    waveState = WaveState::None;
+                }
+            }
+        }
+    }
+
+    SetTransform(tempParentTransform);
 }
 
 
@@ -2175,11 +2889,17 @@ void ForeArm::SetTransform(MyTransform3D parentTransform)
 #include "TingoBingo/Body/Arm/Hand.h"
 #include "raymath.h"
 
-Hand::Hand(TingoAssets& assets, TingoDimensions& dimensions) :
+Hand::Hand
+(
+    TingoAssets& assets, 
+    TingoDimensions& dimensions,
+    TingoState& state
+) :
     assets(assets),
     dimensions(dimensions),
-    leftFinger(assets, dimensions, "left"),
-    rightFinger(assets, dimensions, "right")
+    state(state),
+    leftFinger(assets, dimensions, state, "left"),
+    rightFinger(assets, dimensions, state, "right")
 {}
 
 
@@ -2247,13 +2967,19 @@ void Hand::SetTransform(MyTransform3D parentTransform)
 #include "TingoBingo/Body/Arm/Shoulder.h"
 #include "raymath.h"
 
-Shoulder::Shoulder(TingoAssets& assets, TingoDimensions& dimensions, std::string side) :
+Shoulder::Shoulder
+(
+    TingoAssets& assets, 
+    TingoDimensions& dimensions,
+    TingoState& state,
+    std::string side
+) :
     assets(assets),
     dimensions(dimensions),
+    state(state),
     side(side),
-    upperArm(assets, dimensions)
+    upperArm(assets, dimensions, state, side)
 {}
-
 
 void Shoulder::Initialise()
 {
@@ -2316,6 +3042,11 @@ void Shoulder::SetTransform(MyTransform3D parentTransform)
     upperArm.SetTransform(transform);
 }
 
+void Shoulder::Wave() 
+{
+    upperArm.Wave();
+}
+
 
 =====================================
 .\src\TingoBingo\Body\Arm\UpperArm.cpp
@@ -2324,10 +3055,18 @@ void Shoulder::SetTransform(MyTransform3D parentTransform)
 #include "TingoBingo/Body/Arm/UpperArm.h"
 #include "raymath.h"
 
-UpperArm::UpperArm(TingoAssets& assets, TingoDimensions& dimensions) :
+UpperArm::UpperArm
+(
+    TingoAssets& assets, 
+    TingoDimensions& dimensions,
+    TingoState& state,
+    std::string side
+) :
     assets(assets),
     dimensions(dimensions),
-    elbow(assets, dimensions)
+    state(state),
+    side(side),
+    elbow(assets, dimensions, state, side)
 {}
 
 
@@ -2335,21 +3074,21 @@ void UpperArm::Initialise()
 {
     positionOffset = {
         0.0f,
-        -dimensions.shoulder.height / 2.0f,
+        0.0f,
         0.0f
     };
     
+    waveState = WaveState::None;
+
     elbow.Initialise();
 }
 
 void UpperArm::Update(float dt)
 {
-    (void)dt;
-
-    //dirFlag ? localRotation += dt * 80 : localRotation -= dt * 80;
-    
-    if(localRotation <= -45) dirFlag = true;
-    if(localRotation >= 45) dirFlag = false;
+    if(waveState != WaveState::None)
+    {
+        AdvanceWave(dt);
+    }
 
     SetTransform(tempParentTransform);
 
@@ -2377,13 +3116,94 @@ void UpperArm::SetTransform(MyTransform3D parentTransform)
     MyTransform3D localTransform{};
 
     localTransform.position = positionOffset;
-    localTransform.rotationAxis = {1.0f, 0.0f, 0.0f};
+    localTransform.rotationAxis = {0.0f, 0.0f, 1.0f};
     localTransform.rotationAngle += localRotation;
     localTransform.scale = {1.0f, 1.0f, 1.0f};
 
     transform = MakeChildTransform(parentTransform, localTransform);
     
     elbow.SetTransform(transform);
+}
+
+void UpperArm::Wave()
+{
+    if(waveState == WaveState::None)
+    {
+        waveState = WaveState::Raising;
+    }
+}
+
+void UpperArm::AdvanceWave(float dt)
+{
+    const float speed = 450.0f;
+    const float minRotation = 0.0f;
+    const float maxRotation = 135.0f;
+
+    if(side == "left")
+    {
+        if(waveState == WaveState::Raising)
+        {
+            localRotation += speed * dt;
+            
+            if(localRotation >= maxRotation)
+            {
+                localRotation = maxRotation;
+                waveState = WaveState::Waving;
+                elbow.Wave();
+            }
+        }
+        else if(waveState == WaveState::Waving)
+        {
+            if(!state.gestures.waveLeft)
+            {
+                waveState = WaveState::Lowering;
+            }
+        }
+        else if(waveState == WaveState::Lowering)
+        {
+            localRotation -= speed * dt;
+
+            if(localRotation <= minRotation)
+            {
+                localRotation = minRotation;
+                waveState = WaveState::None;
+            }
+        }
+    }
+
+    if(side == "right")
+    {
+        if(waveState == WaveState::Raising)
+        {
+            localRotation -= speed * dt;
+            
+            if(localRotation <= -maxRotation)
+            {
+                localRotation = -maxRotation;
+                waveState = WaveState::Waving;
+                elbow.Wave();
+            }
+        }
+        else if(waveState == WaveState::Waving)
+        {
+            if(!state.gestures.waveRight)
+            {
+                waveState = WaveState::Lowering;
+            }
+        }
+        else if(waveState == WaveState::Lowering)
+        {
+            localRotation += speed * dt;
+
+            if(localRotation >= -minRotation)
+            {
+                localRotation = -minRotation;
+                waveState = WaveState::None;
+            }
+        }
+    }
+
+    SetTransform(tempParentTransform);
 }
 
 
@@ -2393,13 +3213,19 @@ void UpperArm::SetTransform(MyTransform3D parentTransform)
 
 #include "TingoBingo/Body/Body.h"
 
-Body::Body(TingoAssets& assets, TingoDimensions& dimensions) :
+Body::Body
+(
+    TingoAssets& assets, 
+    TingoDimensions& dimensions, 
+    TingoState& state
+) :
     assets(assets),
     dimensions(dimensions),
+    state(state),
     pelvis(assets, dimensions),
     neck(assets, dimensions),
-    leftShoulder(assets, dimensions, "left"),
-    rightShoulder(assets, dimensions, "right")
+    leftShoulder(assets, dimensions, state, "left"),
+    rightShoulder(assets, dimensions, state, "right")
 {}
 
 void Body::Initialise()
@@ -2414,6 +3240,8 @@ void Body::Initialise()
 
 void Body::Update(float dt)
 {
+    Wave();
+
     pelvis.Update(dt);
     neck.Update(dt);
     leftShoulder.Update(dt);
@@ -2452,6 +3280,12 @@ void Body::SetTransform(MyTransform3D parentTransform)
     neck.SetTransform(transform);
     leftShoulder.SetTransform(transform);
     rightShoulder.SetTransform(transform);
+}
+
+void Body::Wave()
+{
+    if(state.gestures.waveRight) rightShoulder.Wave();
+    if(state.gestures.waveLeft) leftShoulder.Wave();
 }
 
 
@@ -2589,6 +3423,8 @@ void Ear::SetTransform(MyTransform3D parentTransform)
 
 #include "TingoBingo/Body/Head/Eye.h"
 #include "raymath.h"
+#include <iostream>
+#include "DebugPanel.h"
 
 Eye::Eye(TingoAssets& assets, TingoDimensions& dimensions, std::string side) :
     assets(assets),
@@ -2619,12 +3455,20 @@ void Eye::Initialise()
         };
     }
 
+    localScale = {1.0f, 1.0f, 1.0f};
+    blinkSpeed = 10.0f;
+    blinkState = BlinkState::None;
+
     pupil.Initialise();
 }
 
 void Eye::Update(float dt)
 {
-    (void)dt;
+    AdvanceBlink(dt);
+
+    std::string state = "hello world";
+
+    DebugPanel::Instance().Print("BlinkState: ", state);
 }
 
 void Eye::Draw()
@@ -2643,16 +3487,61 @@ void Eye::Draw()
 
 void Eye::SetTransform(MyTransform3D parentTransform)
 {
+    tempParentTransform = parentTransform;
+
     MyTransform3D localTransform{};
 
     localTransform.position = positionOffset;
     localTransform.rotationAxis = {1.0f, 0.0f, 0.0f};
     localTransform.rotationAngle = 0.0f;
-    localTransform.scale = {1.0f, 1.0f, 1.0f};
+    localTransform.scale = localScale;
 
     transform = MakeChildTransform(parentTransform, localTransform);
 
     pupil.SetTransform(transform);
+}
+
+void Eye::Blink()
+{
+    if (blinkState == BlinkState::None)
+    {
+        blinkState = BlinkState::Closing;
+    }
+}
+
+void Eye::AdvanceBlink(float dt)
+{
+    switch (blinkState)
+    {
+        case BlinkState::Closing:
+
+            localScale.y -= blinkSpeed * dt;
+
+            if (localScale.y <= 0.0f)
+            {
+                localScale.y = 0.0f;
+                blinkState = BlinkState::Opening;
+            }
+
+            break;
+
+        case BlinkState::Opening:
+
+            localScale.y += blinkSpeed * dt;
+
+            if (localScale.y >= 1.0f)
+            {
+                localScale.y = 1.0f;
+                blinkState = BlinkState::None;
+            }
+
+            break;
+
+        case BlinkState::None:
+            break;
+    }
+
+    SetTransform(tempParentTransform);
 }
 
 
@@ -2735,6 +3624,7 @@ void EyeBrow::SetTransform(MyTransform3D parentTransform)
 
 #include "TingoBingo/Body/Head/Head.h"
 #include "raymath.h"
+#include <iostream>
 
 Head::Head(TingoAssets& assets, TingoDimensions& dimensions) :
     assets(assets),
@@ -2757,6 +3647,8 @@ void Head::Initialise()
         dimensions.neck.height / 2.0f,
         0.0f        
     };
+    
+    blinkState = BlinkState::Blinking;
 
     mouthDisplay.Initialise();
     leftEye.Initialise();
@@ -2771,9 +3663,11 @@ void Head::Initialise()
 
 void Head::Update(float dt)
 {
-    mouthDisplay.Update(dt);
+    Blink(dt);
 
-    //localRotation += dt * 50;
+    mouthDisplay.Update(dt);
+    leftEye.Update(dt);
+    rightEye.Update(dt);
 }
 
 void Head::Draw()
@@ -2818,6 +3712,26 @@ void Head::SetTransform(MyTransform3D parentTransform)
     leftEar.SetTransform(transform);
     rightEar.SetTransform(transform);
     antenna.SetTransform(transform);
+}
+
+void Head::Blink(float dt)
+{
+    blinkTimer += dt;
+    
+    if(blinkTimer == 0.0f)
+    {
+         blinkState = BlinkState::None;
+    }
+
+    if (blinkTimer > nextBlink)
+    {
+        blinkState = BlinkState::Blinking;
+        leftEye.Blink();
+        rightEye.Blink();
+
+        blinkTimer = 0.0f;
+        nextBlink = GetRandomValue(1000, 5000) / 1000.0f;
+    }
 }
 
 
@@ -3523,7 +4437,7 @@ void Pelvis::SetTransform(MyTransform3D parentTransform)
 Tingo::Tingo(TingoAssets& assets, TingoDimensions& dimensions) :
     assets(assets),
     dimensions(dimensions),
-    body(assets, dimensions)
+    body(assets, dimensions, state)
 {}
 
 void Tingo::Initialise()
@@ -3550,6 +4464,11 @@ void Tingo::SetTransform(MyTransform3D initialTransform)
 {
     transform = initialTransform;
     body.SetTransform(transform);
+}
+
+TingoState& Tingo::GetState()
+{
+    return state;
 }
 
 
@@ -3866,7 +4785,7 @@ void TingoDimensions::Initialise
     Vector4Int mouthSpriteSheetDimensions
 )
 {
-    scale = {2.0f, 2.0f, 2.0f};
+    globalScale = {1.0f, 1.0f, 1.0f};
 
     bodyShape.width = bodyDimensions.x;
     bodyShape.height = bodyDimensions.y;

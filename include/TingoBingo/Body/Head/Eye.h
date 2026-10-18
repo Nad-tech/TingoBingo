@@ -8,6 +8,13 @@
 class Eye
 {
 public:
+    enum class BlinkState
+    {
+        None,
+        Closing,
+        Opening
+    };
+
     Eye
     (
         TingoAssets& assets, 
@@ -22,6 +29,8 @@ public:
 
     void SetTransform(MyTransform3D parentTransform);
 
+    void Blink();
+
 private:
     TingoAssets& assets;
     TingoDimensions& dimensions;
@@ -33,4 +42,12 @@ private:
     std::string side;
 
     Pupil pupil;
+
+    MyTransform3D tempParentTransform;
+
+    BlinkState blinkState;
+    Vector3 localScale;
+    float blinkSpeed;
+
+    void AdvanceBlink(float dt);
 };

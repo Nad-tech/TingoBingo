@@ -4,11 +4,25 @@
 #include "TingoBingo/TingoDimensions.h"
 #include "TingoBingo/TingoAssets.h"
 #include "Hand.h"
+#include "TingoBingo/TingoState.h"
 
 class ForeArm
 {
 public:
-    ForeArm(TingoAssets& assets, TingoDimensions& dimensions);
+    enum class WaveState
+    {
+        None,
+        Raising,
+        Lowering
+    };
+
+    ForeArm
+    (
+        TingoAssets& assets, 
+        TingoDimensions& dimensions,
+        TingoState& state,
+        std::string side
+    );
 
     void Initialise();
     
@@ -17,14 +31,16 @@ public:
 
     void SetTransform(MyTransform3D parentTransform);
 
+    void Wave();
+
 private:
     TingoAssets& assets;
     TingoDimensions& dimensions;
+    TingoState& state;
+
+    std::string side;
 
     Vector3 positionOffset;
-    
-    std::string side;
-    
     MyTransform3D transform;
 
     Hand hand;
@@ -32,4 +48,7 @@ private:
     float localRotation = 0.0f;
     bool dirFlag = false;
     MyTransform3D tempParentTransform;
+
+    void AdvanceWave(float dt);
+    WaveState waveState;
 };

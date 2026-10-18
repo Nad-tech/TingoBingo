@@ -6,7 +6,7 @@
 Tingo::Tingo(TingoAssets& assets, TingoDimensions& dimensions) :
     assets(assets),
     dimensions(dimensions),
-    body(assets, dimensions)
+    body(assets, dimensions, state)
 {}
 
 void Tingo::Initialise()
@@ -33,4 +33,9 @@ void Tingo::SetTransform(MyTransform3D initialTransform)
 {
     transform = initialTransform;
     body.SetTransform(transform);
+}
+
+TingoState& Tingo::GetState()
+{
+    return state;
 }

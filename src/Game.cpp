@@ -25,6 +25,8 @@ void Game::Run()
 {
     while (!WindowShouldClose())
     {
+        HandleInput();
+
         float dt = GetFrameTime();
 
         world.Update(dt);
@@ -34,6 +36,8 @@ void Game::Run()
         ClearBackground(BLACK);
 
         world.Draw();
+
+        DrawLegend();
 
         EndDrawing();
     }
@@ -45,3 +49,37 @@ void Game::Shutdown()
 
     CloseWindow();
 }
+
+void Game::DrawLegend()
+{
+    const int legendX = screenDimensions.screenWidth - 350;
+	const int legendY = 150;
+	const int legendWidth = 335;
+	const int legendHeight = 310;
+	const int lineHeight = 20;
+    const int columnWidth = 160;
+	int textY = legendY + 10;
+    int textX = legendX + 10;
+
+	DrawRectangle(
+		legendX,
+		legendY,
+		legendWidth,
+		legendHeight,
+		Fade(BLACK, 0.75f)
+	);
+	DrawRectangleLines(legendX, legendY, legendWidth, legendHeight, Fade(RAYWHITE, 0.5f));
+
+	DrawText("KEY BINDINGS", textX, textY, 18, YELLOW);
+	textY += lineHeight;
+	DrawText("Wave right: 1", textX, textY, 14, RAYWHITE);
+    textX += columnWidth;
+	DrawText("Wave left: 2", textX, textY, 14, RAYWHITE);
+}
+
+void Game::HandleInput()
+{
+    if (IsKeyPressed(KEY_ONE)) world.ToggleGesture("waveRight");
+    if (IsKeyPressed(KEY_TWO)) world.ToggleGesture("waveLeft");
+}
+

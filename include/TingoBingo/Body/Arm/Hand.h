@@ -4,11 +4,16 @@
 #include "TingoBingo/TingoDimensions.h"
 #include "TingoBingo/TingoAssets.h"
 #include "Finger.h"
-
+#include "TingoBingo/TingoState.h"
 class Hand
 {
 public:
-    Hand(TingoAssets& assets, TingoDimensions& dimensions);
+    Hand
+    (
+        TingoAssets& assets, 
+        TingoDimensions& dimensions,
+        TingoState& state
+    );
 
     void Initialise();
     
@@ -20,9 +25,9 @@ public:
 private:
     TingoAssets& assets;
     TingoDimensions& dimensions;
+    TingoState& state;
 
     Vector3 positionOffset;
-    
     MyTransform3D transform;
 
     Finger leftFinger;

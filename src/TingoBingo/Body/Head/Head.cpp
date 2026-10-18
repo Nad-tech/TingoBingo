@@ -1,5 +1,6 @@
 #include "TingoBingo/Body/Head/Head.h"
 #include "raymath.h"
+#include <iostream>
 
 Head::Head(TingoAssets& assets, TingoDimensions& dimensions) :
     assets(assets),
@@ -22,6 +23,8 @@ void Head::Initialise()
         dimensions.neck.height / 2.0f,
         0.0f        
     };
+    
+    blinkState = BlinkState::Blinking;
 
     mouthDisplay.Initialise();
     leftEye.Initialise();
@@ -36,9 +39,11 @@ void Head::Initialise()
 
 void Head::Update(float dt)
 {
-    mouthDisplay.Update(dt);
+    Blink(dt);
 
-    //localRotation += dt * 50;
+    mouthDisplay.Update(dt);
+    leftEye.Update(dt);
+    rightEye.Update(dt);
 }
 
 void Head::Draw()
@@ -83,4 +88,24 @@ void Head::SetTransform(MyTransform3D parentTransform)
     leftEar.SetTransform(transform);
     rightEar.SetTransform(transform);
     antenna.SetTransform(transform);
+}
+
+void Head::Blink(float dt)
+{
+    blinkTimer += dt;
+    
+    if(blinkTimer == 0.0f)
+    {
+         blinkState = BlinkState::None;
+    }
+
+    if (blinkTimer > nextBlink)
+    {
+        blinkState = BlinkState::Blinking;
+        leftEye.Blink();
+        rightEye.Blink();
+
+        blinkTimer = 0.0f;
+        nextBlink = GetRandomValue(1000, 5000) / 1000.0f;
+    }
 }

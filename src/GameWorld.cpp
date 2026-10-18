@@ -11,6 +11,11 @@ inline bool dirFlag = true;
 
 void GameWorld::Initialise(ScreenDimensions& screenDimensions)
 {
+    DebugPanel::Instance().Initialise();
+    DebugPanel::Instance().SetPosition({ -5.0f, 3.0f, 0.0f });
+    DebugPanel::Instance().SetWorldSize(4.0f, 4.0f);
+    DebugPanel::Instance().SetVisible(true);
+
     spaceBackground = LoadTexture("assets/images/background/space.jpg");
 
     this->screenDimensions = screenDimensions;
@@ -224,12 +229,71 @@ void GameWorld::Draw()
 
     tingo.Draw();
 
+    DebugPanel::Instance().Draw3D(camera);
+
     EndMode3D();
 
     DrawOrientationGizmo();
+    DrawGesturesState();
 }
 
 void GameWorld::Shutdown()
 {
     tingo.ShutDown();
+    DebugPanel::Instance().Shutdown();
+}
+
+void GameWorld::ToggleGesture(std::string gesture) 
+{
+    TingoState& state = tingo.GetState();
+    
+    if(gesture == "waveRight") 
+    {
+        state.gestures.waveRight = !state.gestures.waveRight;
+    }
+    else if(gesture == "waveLeft")
+    {
+        state.gestures.waveLeft = !state.gestures.waveLeft;
+    }
+}
+
+void GameWorld::DrawGesturesState()
+{
+    const auto flag = [](bool value) { return value ? "ON" : "off"; };
+    const auto& gestures = tingo.GetState().gestures;
+    int x = 12;
+    int y = 12;
+    const int fontSize = 20;
+    const int lineHeight = fontSize + 4;
+    const int coloumnWidth = 200;
+    
+    DrawText("TINGO STATE", x, y, 16, YELLOW); 
+    
+    y += lineHeight;
+    DrawText
+    (
+        TextFormat
+        (
+            "waveRight %s", 
+            flag(gestures.waveRight)
+        ), 
+        x, 
+        y, 
+        fontSize, 
+        RAYWHITE
+    );
+
+    x += coloumnWidth;
+    DrawText
+    (
+        TextFormat
+        (
+            "waveLeft %s", 
+            flag(gestures.waveLeft)
+        ), 
+        x, 
+        y, 
+        fontSize, 
+        RAYWHITE
+    );
 }
