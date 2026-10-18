@@ -11,8 +11,7 @@ void Shin::Initialise()
 {
     positionOffset = {
         0.0f,
-        -dimensions.knee.height / 2.0f
-        -dimensions.shin.height / 2.0f,
+        -dimensions.knee.height / 2.0f,
         0.0f
     };
 
@@ -21,7 +20,14 @@ void Shin::Initialise()
 
 void Shin::Update(float dt)
 {
-    (void)dt;
+    //dirFlag ? localRotation += dt * 80 : localRotation -= dt * 80;
+
+    if(localRotation <= -45) dirFlag = true;
+    if(localRotation >= 45) dirFlag = false;
+
+    SetTransform(tempParentTransform);
+
+    foot.Update(dt);
 }
 
 void Shin::Draw()
@@ -40,11 +46,13 @@ void Shin::Draw()
 
 void Shin::SetTransform(MyTransform3D parentTransform)
 {
+    tempParentTransform = parentTransform;
+
     MyTransform3D localTransform{};
 
     localTransform.position = positionOffset;
     localTransform.rotationAxis = {1.0f, 0.0f, 0.0f};
-    localTransform.rotationAngle = 0.0f;
+    localTransform.rotationAngle += localRotation;
     localTransform.scale = {1.0f, 1.0f, 1.0f};
 
     transform = MakeChildTransform(parentTransform, localTransform);

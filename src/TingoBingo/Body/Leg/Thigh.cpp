@@ -36,7 +36,7 @@ void Thigh::Update(float dt)
 {
     (void)dt;
 
-    dirFlag ? localRotation += dt * 80 : localRotation -= dt * 80;
+    //dirFlag ? localRotation += dt * 80 : localRotation -= dt * 80;
 
     if(localRotation <= -45) dirFlag = true;
     if(localRotation >= 45) dirFlag = false;

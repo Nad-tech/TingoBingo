@@ -21,7 +21,7 @@ void Knee::Initialise()
 
 void Knee::Update(float dt)
 {
-    (void)dt;
+    shin.Update(dt);
 }
 
 void Knee::Draw()

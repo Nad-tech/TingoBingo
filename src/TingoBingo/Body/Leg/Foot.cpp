@@ -10,8 +10,7 @@ void Foot::Initialise()
 {
     positionOffset = {
         0.0f,
-        -dimensions.shin.height / 2.0f
-        -dimensions.foot.height / 2.0f,
+        -dimensions.shin.height,
         dimensions.foot.length / 2.0f
         -dimensions.shin.length / 2.0f
     };
@@ -20,6 +19,12 @@ void Foot::Initialise()
 void Foot::Update(float dt)
 {
     (void)dt;
+    //dirFlag ? localRotation += dt * 80 : localRotation -= dt * 80;
+
+    if(localRotation <= -45) dirFlag = true;
+    if(localRotation >= 45) dirFlag = false;
+
+    SetTransform(tempParentTransform);
 }
 
 void Foot::Draw()
@@ -36,11 +41,13 @@ void Foot::Draw()
 
 void Foot::SetTransform(MyTransform3D parentTransform)
 {
-    MyTransform3D localTransform{};
+    tempParentTransform = parentTransform;
+
+    MyTransform3D localTransform{}; 
 
     localTransform.position = positionOffset;
     localTransform.rotationAxis = {1.0f, 0.0f, 0.0f};
-    localTransform.rotationAngle = 0.0f;
+    localTransform.rotationAngle += localRotation;
     localTransform.scale = {1.0f, 1.0f, 1.0f};
 
     transform = MakeChildTransform(parentTransform, localTransform);

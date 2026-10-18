@@ -25,4 +25,8 @@ private:
     Vector3 positionOffset;
 
     Foot foot;
+
+    float localRotation = 0.0f;
+    MyTransform3D tempParentTransform;
+    bool dirFlag = false;
 };
