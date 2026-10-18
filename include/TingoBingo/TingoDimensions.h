@@ -7,7 +7,7 @@ class TingoDimensions
 {
 public:
 
-    Vector3 scale;
+    Vector3 globalScale;
 
     void Initialise
     (

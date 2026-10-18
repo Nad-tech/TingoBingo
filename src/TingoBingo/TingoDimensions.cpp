@@ -26,7 +26,7 @@ void TingoDimensions::Initialise
     Vector4Int mouthSpriteSheetDimensions
 )
 {
-    scale = {1.0f, 1.0f, 1.0f};
+    globalScale = {1.0f, 1.0f, 1.0f};
 
     bodyShape.width = bodyDimensions.x;
     bodyShape.height = bodyDimensions.y;

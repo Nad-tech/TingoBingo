@@ -62,7 +62,7 @@ void GameWorld::Initialise(ScreenDimensions& screenDimensions)
 
     initialTransform.rotationAxis = {1.0f, 1.0f, 1.0f};
     initialTransform.rotationAngle = 0.0f;
-    initialTransform.scale = dimensions.scale;
+    initialTransform.scale = dimensions.globalScale;
 
     tingo.Initialise();
     tingo.SetTransform(initialTransform);

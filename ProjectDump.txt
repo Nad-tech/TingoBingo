@@ -429,6 +429,10 @@ private:
     MyTransform3D transform;
 
     Hand hand;
+
+    float localRotation = 0.0f;
+    bool dirFlag = false;
+    MyTransform3D tempParentTransform;
 };
 
 
@@ -465,6 +469,10 @@ private:
 
     Finger leftFinger;
     Finger rightFinger;
+
+    float localRotation = 0.0f;
+    MyTransform3D tempParentTransform;
+    bool dirFlag = false;
 };
 
 
@@ -510,6 +518,7 @@ private:
     UpperArm upperArm;
 
     float localRotation = 0.0f;
+    bool dirFlag = false;
 };
 
 
@@ -547,6 +556,10 @@ private:
     MyTransform3D transform;
 
     Elbow elbow;
+
+    float localRotation = 0.0f;
+    MyTransform3D tempParentTransform;
+    bool dirFlag = false;
 };
 
 
@@ -833,6 +846,7 @@ private:
 
     Model mouthPlane{};
     MyTransform3D mouthPlaneTransform{};
+    Vector3 mouthPlaneOffset;
 };
 
 
@@ -928,6 +942,10 @@ private:
 
     MyTransform3D transform;
     Vector3 positionOffset;
+
+    float localRotation = 0.0f;
+    MyTransform3D tempParentTransform;
+    bool dirFlag = false;
 };
 
 
@@ -996,6 +1014,10 @@ private:
     Vector3 positionOffset;
 
     Foot foot;
+
+    float localRotation = 0.0f;
+    MyTransform3D tempParentTransform;
+    bool dirFlag = false;
 };
 
 
@@ -1038,6 +1060,10 @@ private:
     std::string side;
 
     Knee knee;
+
+    float localRotation = 0.0f;
+    MyTransform3D tempParentTransform;
+    bool dirFlag = false;
 };
 
 
@@ -1107,6 +1133,11 @@ private:
 
     Thigh leftThigh;
     Thigh rightThigh;
+
+    float localRotation = 0.0f;
+    MyTransform3D tempParentTransform;
+    bool dirFlag = false;
+
 };
 
 
@@ -1691,8 +1722,8 @@ void GameWorld::Initialise(ScreenDimensions& screenDimensions)
     this->screenDimensions = screenDimensions;
 
     // Configure the 3D camera.
-    camera.position = { -5.0, 10.0f, 20.0f };  // Move camera further away and higher // Camera's position in the 3D world (X, Y, Z)
-    camera.target = { 0.0f, 0.0f, 0.0f };  // Point the camera looks at
+    camera.position = { -6.0, 10.0f, 15.0f };  // Move camera further away and higher // Camera's position in the 3D world (X, Y, Z)
+    camera.target = { 0.0f, 5.0f, 0.0f };  // Point the camera looks at
     camera.up = { 0.0f, 1.0f, 0.0f };      // Defines the upward direction (positive Y)
     camera.fovy = 45.0f;                   // Vertical field of view in degrees
     camera.projection = CAMERA_PERSPECTIVE;// Objects farther away appear smaller
@@ -1737,7 +1768,7 @@ void GameWorld::Initialise(ScreenDimensions& screenDimensions)
 
     initialTransform.rotationAxis = {1.0f, 1.0f, 1.0f};
     initialTransform.rotationAngle = 0.0f;
-    initialTransform.scale = dimensions.scale;
+    initialTransform.scale = {1.0f, 1.0f, 1.0f};
 
     tingo.Initialise();
     tingo.SetTransform(initialTransform);
@@ -1948,7 +1979,7 @@ void Elbow::Initialise()
 {
     positionOffset = {
         0.0f,
-        -dimensions.upperArm.height / 2.0f - dimensions.elbow.height / 2.0f, 
+        -dimensions.upperArm.height - dimensions.elbow.height / 2.0f, 
         0.0f
     };
 
@@ -1958,6 +1989,8 @@ void Elbow::Initialise()
 void Elbow::Update(float dt)
 {
     (void)dt;
+
+    foreArm.Update(dt);
 }
 
 void Elbow::Draw()
@@ -2008,16 +2041,18 @@ void Finger::Initialise()
     if(side == "left")
     {
         positionOffset = {
-            dimensions.hand.width / 2.0f - dimensions.finger.width / 2.0f,
-            -dimensions.hand.height / 2.0f,
+            dimensions.hand.width / 2.0f - 
+            dimensions.finger.width / 2.0f,
+            -dimensions.hand.height,
             0.0f
         };
     }
     else if (side == "right")
     {
         positionOffset = {
-            -dimensions.hand.width / 2.0f + dimensions.finger.width / 2.0f,
-            -dimensions.hand.height / 2.0f,
+            -dimensions.hand.width / 2.0f + 
+            dimensions.finger.width / 2.0f,
+            -dimensions.hand.height,
             0.0f
         };
     }
@@ -2048,7 +2083,7 @@ void Finger::SetTransform(MyTransform3D parentTransform)
     
     if(side == "left")
     {
-        localTransform.rotationAxis = {0.0f, 0.0f, 1.0f};
+        localTransform.rotationAxis = {1.0f, 0.0f, 1.0f};
         localTransform.rotationAngle = -15.0f;
     }
     else if(side == "right")
@@ -2081,7 +2116,7 @@ void ForeArm::Initialise()
 {
     positionOffset = {
         0.0f,
-        -dimensions.elbow.height / 2.0f - dimensions.foreArm.height / 2.0f,
+        -dimensions.elbow.height / 2.0f,
         0.0f
     };
 
@@ -2091,6 +2126,15 @@ void ForeArm::Initialise()
 void ForeArm::Update(float dt)
 {
     (void)dt;
+
+    //dirFlag ? localRotation += dt * 80 : localRotation -= dt * 80;
+
+    if(localRotation <= -45) dirFlag = true;
+    if(localRotation >= 45) dirFlag = false;
+
+    SetTransform(tempParentTransform);
+
+    hand.Update(dt);
 }
 
 void ForeArm::Draw()
@@ -2109,11 +2153,13 @@ void ForeArm::Draw()
 
 void ForeArm::SetTransform(MyTransform3D parentTransform)
 {
+    tempParentTransform = parentTransform;
+
     MyTransform3D localTransform{};
 
     localTransform.position = positionOffset;
     localTransform.rotationAxis = {1.0f, 0.0f, 0.0f};
-    localTransform.rotationAngle = 0.0f;
+    localTransform.rotationAngle += localRotation;
     localTransform.scale = {1.0f, 1.0f, 1.0f};
 
     transform = MakeChildTransform(parentTransform, localTransform);
@@ -2141,7 +2187,7 @@ void Hand::Initialise()
 {
     positionOffset = {
         0.0f,
-        -dimensions.foreArm.height / 2.0f - dimensions.hand.height / 2.0f,
+        -dimensions.foreArm.height,
         0.0f
     };
 
@@ -2152,6 +2198,13 @@ void Hand::Initialise()
 void Hand::Update(float dt)
 {
     (void)dt;
+
+    //dirFlag ? localRotation += dt * 80 : localRotation -= dt * 80;
+    
+    if(localRotation <= -45) dirFlag = true;
+    if(localRotation >= 45) dirFlag = false;
+
+    SetTransform(tempParentTransform);
 }
 
 void Hand::Draw()
@@ -2171,11 +2224,13 @@ void Hand::Draw()
 
 void Hand::SetTransform(MyTransform3D parentTransform)
 {
+    tempParentTransform = parentTransform;
+
     MyTransform3D localTransform{};
 
     localTransform.position = positionOffset;
-    localTransform.rotationAxis = {1.0f, 0.0f, 0.0f};
-    localTransform.rotationAngle = 0.0f;
+    localTransform.rotationAxis = {0.0f, 1.0f, 0.0f};
+    localTransform.rotationAngle += localRotation;
     localTransform.scale = {1.0f, 1.0f, 1.0f};
 
     transform = MakeChildTransform(parentTransform, localTransform);
@@ -2225,7 +2280,12 @@ void Shoulder::Initialise()
 void Shoulder::Update(float dt)
 {
     (void)dt;
-    // localRotation += dt * 80;
+    //dirFlag ? localRotation += dt * 80 : localRotation -= dt * 80;
+    
+    if(localRotation <= -45) dirFlag = true;
+    if(localRotation >= 45) dirFlag = false;
+
+    upperArm.Update(dt);
 }
 
 void Shoulder::Draw()
@@ -2275,7 +2335,7 @@ void UpperArm::Initialise()
 {
     positionOffset = {
         0.0f,
-        -dimensions.upperArm.height / 2.0f - dimensions.shoulder.height / 2.0f,
+        -dimensions.shoulder.height / 2.0f,
         0.0f
     };
     
@@ -2285,6 +2345,15 @@ void UpperArm::Initialise()
 void UpperArm::Update(float dt)
 {
     (void)dt;
+
+    //dirFlag ? localRotation += dt * 80 : localRotation -= dt * 80;
+    
+    if(localRotation <= -45) dirFlag = true;
+    if(localRotation >= 45) dirFlag = false;
+
+    SetTransform(tempParentTransform);
+
+    elbow.Update(dt);
 }
 
 void UpperArm::Draw()
@@ -2303,11 +2372,13 @@ void UpperArm::Draw()
 
 void UpperArm::SetTransform(MyTransform3D parentTransform)
 {
+    tempParentTransform = parentTransform;
+
     MyTransform3D localTransform{};
 
     localTransform.position = positionOffset;
     localTransform.rotationAxis = {1.0f, 0.0f, 0.0f};
-    localTransform.rotationAngle = 0.0f;
+    localTransform.rotationAngle += localRotation;
     localTransform.scale = {1.0f, 1.0f, 1.0f};
 
     transform = MakeChildTransform(parentTransform, localTransform);
@@ -2773,6 +2844,8 @@ void MouthDisplay::Initialise()
         dimensions.head.length / 2.0f + dimensions.mouthDisplay.length / 2.0f        
     };
 
+    mouthPlaneOffset = {0.0f, 0.0f, 0.06f};
+
     int frameWidth = 
         dimensions.mouthSpriteSheet.width / 
         dimensions.mouthSpriteSheet.cols;
@@ -2804,13 +2877,16 @@ void MouthDisplay::Initialise()
     //into a Model that Raylib can render.
     // The resulting model is stored in mouthPlane for
     //later positioning, texturing, and drawing.
+    
+    //- 0.05 is so plane is slightly smaller than display so weirdness
+    //doesnt happen at edges
     mouthPlane = LoadModelFromMesh(GenMeshPlane(
-        dimensions.mouthDisplay.width,  // Width of the mouth plane
-        dimensions.mouthDisplay.height, // Height of the mouth plane
-        1,                               // Number of subdivisions along the width
-        1                                // Number of subdivisions along the length
+        dimensions.mouthDisplay.width - 0.05,  // Width of the mouth plane
+        dimensions.mouthDisplay.height - 0.05, // Height of the mouth plane
+        1,                                     // Number of subdivisions along the width
+        1                                      // Number of subdivisions along the length
     ));
-
+    
     // Assign the mouth sprite sheet image as the diffuse texture
     // for the first material on the mouth plane.
     // The diffuse texture determines the image displayed on the surface
@@ -2856,14 +2932,19 @@ void MouthDisplay::SetTransform(MyTransform3D parentTransform)
     localTransform.position = positionOffset;
     localTransform.rotationAxis = {1.0f, 0.0f, 0.0f};
     localTransform.rotationAngle = 0.0f;
-    localTransform.scale = dimensions.scale;
+    localTransform.scale = {1.0f, 1.0f, 1.0f};
 
     transform = MakeChildTransform(parentTransform, localTransform);
 
-    mouthPlaneTransform = transform;
-    mouthPlaneTransform.rotationAxis = {1.0f, 0.0f, 0.0f};
-    mouthPlaneTransform.rotationAngle = 90.0f;
-    mouthPlaneTransform.position.z += 0.06f;
+    MyTransform3D localMouthPlaneTransform{};
+
+    localMouthPlaneTransform.position = mouthPlaneOffset;
+    localMouthPlaneTransform.rotationAxis = {1.0f, 0.0f, 0.0f};
+    localMouthPlaneTransform.rotationAngle = 90.0f;
+    localMouthPlaneTransform.scale = {1.0f, 1.0f, 1.0f};
+
+    mouthPlaneTransform = 
+        MakeChildTransform(transform, localMouthPlaneTransform);
 }
 
 void MouthDisplay::SetMouthFrame(int frame)
@@ -3043,8 +3124,7 @@ void Foot::Initialise()
 {
     positionOffset = {
         0.0f,
-        -dimensions.shin.height / 2.0f
-        -dimensions.foot.height / 2.0f,
+        -dimensions.shin.height,
         dimensions.foot.length / 2.0f
         -dimensions.shin.length / 2.0f
     };
@@ -3053,6 +3133,12 @@ void Foot::Initialise()
 void Foot::Update(float dt)
 {
     (void)dt;
+    //dirFlag ? localRotation += dt * 80 : localRotation -= dt * 80;
+
+    if(localRotation <= -45) dirFlag = true;
+    if(localRotation >= 45) dirFlag = false;
+
+    SetTransform(tempParentTransform);
 }
 
 void Foot::Draw()
@@ -3069,11 +3155,13 @@ void Foot::Draw()
 
 void Foot::SetTransform(MyTransform3D parentTransform)
 {
-    MyTransform3D localTransform{};
+    tempParentTransform = parentTransform;
+
+    MyTransform3D localTransform{}; 
 
     localTransform.position = positionOffset;
     localTransform.rotationAxis = {1.0f, 0.0f, 0.0f};
-    localTransform.rotationAngle = 0.0f;
+    localTransform.rotationAngle += localRotation;
     localTransform.scale = {1.0f, 1.0f, 1.0f};
 
     transform = MakeChildTransform(parentTransform, localTransform);
@@ -3098,7 +3186,7 @@ void Knee::Initialise()
     positionOffset = {
         0.0f,
         -dimensions.knee.height / 2.0f
-        -dimensions.shin.height / 2.0f,
+        -dimensions.thigh.height,
         0.0f
     };
 
@@ -3107,7 +3195,7 @@ void Knee::Initialise()
 
 void Knee::Update(float dt)
 {
-    (void)dt;
+    shin.Update(dt);
 }
 
 void Knee::Draw()
@@ -3156,8 +3244,7 @@ void Shin::Initialise()
 {
     positionOffset = {
         0.0f,
-        -dimensions.knee.height / 2.0f
-        -dimensions.shin.height / 2.0f,
+        -dimensions.knee.height / 2.0f,
         0.0f
     };
 
@@ -3166,7 +3253,14 @@ void Shin::Initialise()
 
 void Shin::Update(float dt)
 {
-    (void)dt;
+    //dirFlag ? localRotation += dt * 80 : localRotation -= dt * 80;
+
+    if(localRotation <= -45) dirFlag = true;
+    if(localRotation >= 45) dirFlag = false;
+
+    SetTransform(tempParentTransform);
+
+    foot.Update(dt);
 }
 
 void Shin::Draw()
@@ -3185,11 +3279,13 @@ void Shin::Draw()
 
 void Shin::SetTransform(MyTransform3D parentTransform)
 {
+    tempParentTransform = parentTransform;
+
     MyTransform3D localTransform{};
 
     localTransform.position = positionOffset;
     localTransform.rotationAxis = {1.0f, 0.0f, 0.0f};
-    localTransform.rotationAngle = 0.0f;
+    localTransform.rotationAngle += localRotation;
     localTransform.scale = {1.0f, 1.0f, 1.0f};
 
     transform = MakeChildTransform(parentTransform, localTransform);
@@ -3240,6 +3336,15 @@ void Thigh::Initialise()
 void Thigh::Update(float dt)
 {
     (void)dt;
+
+    //dirFlag ? localRotation += dt * 80 : localRotation -= dt * 80;
+
+    if(localRotation <= -45) dirFlag = true;
+    if(localRotation >= 45) dirFlag = false;
+
+    SetTransform(tempParentTransform);
+
+    knee.Update(dt);
 }
 
 void Thigh::Draw()
@@ -3258,11 +3363,13 @@ void Thigh::Draw()
 
 void Thigh::SetTransform(MyTransform3D parentTransform)
 {
+    tempParentTransform = parentTransform;
+
     MyTransform3D localTransform{};
 
     localTransform.position = positionOffset;
     localTransform.rotationAxis = {1.0f, 0.0f, 0.0f};
-    localTransform.rotationAngle = 0.0f;
+    localTransform.rotationAngle += localRotation;
     localTransform.scale = {1.0f, 1.0f, 1.0f};
 
     transform = MakeChildTransform(parentTransform, localTransform);
@@ -3350,8 +3457,7 @@ void Pelvis::Initialise()
 {
     positionOffset = {
         0.0f, 
-        -dimensions.bodyShape.height / 2.0f - 
-        dimensions.pelvis.height / 2.0f,
+        -dimensions.bodyShape.height / 2.0f,
         0.0f
     };
 
@@ -3361,7 +3467,15 @@ void Pelvis::Initialise()
 
 void Pelvis::Update(float dt)
 {
-    (void)dt;
+    //dirFlag ? localRotation += dt * 80 : localRotation -= dt * 80;
+
+    if(localRotation <= -45) dirFlag = true;
+    if(localRotation >= 45) dirFlag = false;
+
+    SetTransform(tempParentTransform);
+
+    leftThigh.Update(dt);
+    rightThigh.Update(dt);
 }
 
 void Pelvis::Draw()
@@ -3381,11 +3495,13 @@ void Pelvis::Draw()
 
 void Pelvis::SetTransform(MyTransform3D parentTransform)
 {
+    tempParentTransform = parentTransform;
+
     MyTransform3D localTransform{};
 
     localTransform.position = positionOffset;
-    localTransform.rotationAxis = {1.0f, 0.0f, 0.0f};
-    localTransform.rotationAngle = 0.0f;
+    localTransform.rotationAxis = {0.0f, 1.0f, 0.0f};
+    localTransform.rotationAngle += localRotation;
     localTransform.scale = {1.0f, 1.0f, 1.0f};
 
     transform = MakeChildTransform(parentTransform, localTransform);
@@ -3750,7 +3866,7 @@ void TingoDimensions::Initialise
     Vector4Int mouthSpriteSheetDimensions
 )
 {
-    scale = {1.0f, 1.0f, 1.0f};
+    scale = {2.0f, 2.0f, 2.0f};
 
     bodyShape.width = bodyDimensions.x;
     bodyShape.height = bodyDimensions.y;

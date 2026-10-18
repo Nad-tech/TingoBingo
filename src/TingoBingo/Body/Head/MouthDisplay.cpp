@@ -105,7 +105,7 @@ void MouthDisplay::SetTransform(MyTransform3D parentTransform)
     localTransform.position = positionOffset;
     localTransform.rotationAxis = {1.0f, 0.0f, 0.0f};
     localTransform.rotationAngle = 0.0f;
-    localTransform.scale = dimensions.scale;
+    localTransform.scale = {1.0f, 1.0f, 1.0f};
 
     transform = MakeChildTransform(parentTransform, localTransform);
 
@@ -114,7 +114,7 @@ void MouthDisplay::SetTransform(MyTransform3D parentTransform)
     localMouthPlaneTransform.position = mouthPlaneOffset;
     localMouthPlaneTransform.rotationAxis = {1.0f, 0.0f, 0.0f};
     localMouthPlaneTransform.rotationAngle = 90.0f;
-    localMouthPlaneTransform.scale = dimensions.scale;
+    localMouthPlaneTransform.scale = {1.0f, 1.0f, 1.0f};
 
     mouthPlaneTransform = 
         MakeChildTransform(transform, localMouthPlaneTransform);
