@@ -37,7 +37,7 @@ void Game::Run()
 
         world.Draw();
 
-        DrawLegend();
+        //DrawLegend();
 
         EndDrawing();
     }
@@ -79,7 +79,6 @@ void Game::DrawLegend()
 
 void Game::HandleInput()
 {
-    if (IsKeyPressed(KEY_ONE)) world.ToggleGesture("waveRight");
-    if (IsKeyPressed(KEY_TWO)) world.ToggleGesture("waveLeft");
+    
 }
 

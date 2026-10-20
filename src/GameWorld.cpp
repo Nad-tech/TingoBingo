@@ -229,12 +229,12 @@ void GameWorld::Draw()
 
     tingo.Draw();
 
-    DebugPanel::Instance().Draw3D(camera);
+    //DebugPanel::Instance().Draw3D(camera);
 
     EndMode3D();
 
     DrawOrientationGizmo();
-    DrawGesturesState();
+    DrawGesturesStates();
 }
 
 void GameWorld::Shutdown()
@@ -242,54 +242,58 @@ void GameWorld::Shutdown()
     tingo.ShutDown();
     DebugPanel::Instance().Shutdown();
 }
-
-void GameWorld::ToggleGesture(std::string gesture) 
+void GameWorld::DrawGesturesStates()
 {
-    TingoState& state = tingo.GetState();
-    
-    if(gesture == "waveRight") 
-    {
-        state.gestures.waveRight = !state.gestures.waveRight;
-    }
-    else if(gesture == "waveLeft")
-    {
-        state.gestures.waveLeft = !state.gestures.waveLeft;
-    }
-}
-
-void GameWorld::DrawGesturesState()
-{
-    const auto flag = [](bool value) { return value ? "ON" : "off"; };
-    const auto& gestures = tingo.GetState().gestures;
     int x = 12;
     int y = 12;
     const int fontSize = 20;
     const int lineHeight = fontSize + 4;
-    const int coloumnWidth = 200;
+    //const int coloumnWidth = 200;
     
-    DrawText("TINGO STATE", x, y, 16, YELLOW); 
-    
+    const char* stateName = "Unknown";
+    switch (tingo.GetState().brainState)
+    {
+        case TingoState::BrainState::Idle: 
+            stateName = "Idle"; break;
+        case TingoState::BrainState::Sleeping: 
+            stateName = "Sleeping"; break;
+    }
+
+    DrawText("TINGO STATE", x, y, 16, YELLOW);
+
     y += lineHeight;
-    DrawText
-    (
+
+    DrawText(
         TextFormat
         (
-            "waveRight %s", 
-            flag(gestures.waveRight)
+            "State: %s", stateName
         ), 
         x, 
         y, 
         fontSize, 
         RAYWHITE
     );
+    
+    const char* waveStateName = "Unknown";
+    switch (tingo.GetState().waveState)
+    {
+        case TingoState::WaveState::Inactive: 
+            waveStateName = "Inactive"; break;
+        case TingoState::WaveState::WaveLeft: 
+            waveStateName = "Wave left"; break;
+        case TingoState::WaveState::WaveRight: 
+            waveStateName = "Wave right"; break;
+    }
 
-    x += coloumnWidth;
-    DrawText
-    (
+    y += lineHeight;
+    DrawText("TINGO WAVE STATE", x, y, 16, YELLOW);
+
+    y += lineHeight;
+
+    DrawText(
         TextFormat
         (
-            "waveLeft %s", 
-            flag(gestures.waveLeft)
+            "Wave State: %s", waveStateName
         ), 
         x, 
         y, 
@@ -297,3 +301,4 @@ void GameWorld::DrawGesturesState()
         RAYWHITE
     );
 }
+

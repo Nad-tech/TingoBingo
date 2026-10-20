@@ -33,44 +33,11 @@ void UpperArm::Initialise()
 
 void UpperArm::Update(float dt)
 {
-    if(waveState != WaveState::None)
-    {
-        AdvanceWave(dt);
-    }
+    AdvanceWave(dt);
 
     SetTransform(tempParentTransform);
 
     elbow.Update(dt);
-
-    std::string state = "";
-    switch (waveState)
-    {
-    case WaveState::None :
-        state = "None";
-        break;
-    
-    case WaveState::Lowering :
-        state = "Lowering";
-        break;
-    
-    case WaveState::Raising :
-        state = "Raising";
-        break;
-    
-    case WaveState::Waving :
-        state = "Waving";
-        break;
-        
-    default:
-        state = "NULL";
-        break;
-    }
-
-    if(side == "left")
-        DebugPanel::Instance().Print("WaveState: ", state);
-
-    /*if(side == "right")
-        DebugPanel::Instance().Print("WaveState: ", state);*/
 }
 
 void UpperArm::Draw()
@@ -103,83 +70,105 @@ void UpperArm::SetTransform(MyTransform3D parentTransform)
     elbow.SetTransform(transform);
 }
 
-void UpperArm::Wave()
+void UpperArm::AdvanceWave(float dt)
 {
     if(waveState == WaveState::None)
     {
-        waveState = WaveState::Raising;
+        if 
+        (
+            state.waveState == TingoState::WaveState::WaveLeft && 
+            side == "left"
+        )
+        {
+            waveState = WaveState::Raising;
+        }
+        else if 
+        (
+            state.waveState == TingoState::WaveState::WaveRight && 
+            side == "right"
+        )
+        {
+            waveState = WaveState::Raising;
+        }
     }
-}
 
-void UpperArm::AdvanceWave(float dt)
-{
     const float speed = 450.0f;
     const float minRotation = 0.0f;
     const float maxRotation = 135.0f;
 
-    if(side == "left")
+    switch (waveState)
     {
-        if(waveState == WaveState::Raising)
-        {
-            localRotation += speed * dt;
-            
-            if(localRotation >= maxRotation)
+        case WaveState::None:
+            break;
+        
+        case WaveState::Raising:
+            if
+            (
+                state.waveState == TingoState::WaveState::WaveLeft && 
+                side == "left"
+            )
             {
-                localRotation = maxRotation;
-                waveState = WaveState::Waving;
-                elbow.Wave();
+                localRotation += dt * speed;
+                if(localRotation >= maxRotation)
+                {
+                    localRotation = maxRotation;
+                    waveState = WaveState::Waving;
+                }
             }
-        }
-        else if(waveState == WaveState::Waving)
-        {
-            if(!state.gestures.waveLeft)
+
+            if
+            (
+                state.waveState == TingoState::WaveState::WaveRight && 
+                side == "right"
+            )
+            {
+                localRotation -= dt * speed;
+                if(localRotation <= -maxRotation)
+                {
+                    localRotation = -maxRotation;
+                    waveState = WaveState::Waving;
+                }
+            }
+            break;
+
+        case WaveState::Waving:
+            if(state.waveState == TingoState::WaveState::Inactive)
             {
                 waveState = WaveState::Lowering;
             }
-        }
-        else if(waveState == WaveState::Lowering)
-        {
-            localRotation -= speed * dt;
-
-            if(localRotation <= minRotation)
-            {
-                localRotation = minRotation;
-                waveState = WaveState::None;
-            }
-        }
-    }
-
-    if(side == "right")
-    {
-        if(waveState == WaveState::Raising)
-        {
-            localRotation -= speed * dt;
+            break;
             
-            if(localRotation <= -maxRotation)
+        case WaveState::Lowering:
+            if(side == "left")
             {
-                localRotation = -maxRotation;
-                waveState = WaveState::Waving;
-                elbow.Wave();
+                localRotation -= dt * speed;
+                if(localRotation <= minRotation)
+                {
+                    localRotation = minRotation;
+                    waveState = WaveState::None;
+                }
             }
-        }
-        else if(waveState == WaveState::Waving)
-        {
-            if(!state.gestures.waveRight)
-            {
-                waveState = WaveState::Lowering;
-            }
-        }
-        else if(waveState == WaveState::Lowering)
-        {
-            localRotation += speed * dt;
 
-            if(localRotation >= -minRotation)
+            if(side == "right")
             {
-                localRotation = -minRotation;
-                waveState = WaveState::None;
+                localRotation += dt * speed;
+                if(localRotation >= minRotation)
+                {
+                    localRotation = minRotation;
+                    waveState = WaveState::None;
+                }
             }
-        }
+
+            break;
+
+        default:
+            break;
     }
 
     SetTransform(tempParentTransform);
+}
+
+UpperArm::WaveState UpperArm::GetWaveState() const
+{
+    return waveState;
 }

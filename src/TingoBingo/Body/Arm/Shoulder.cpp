@@ -39,12 +39,6 @@ void Shoulder::Initialise()
 
 void Shoulder::Update(float dt)
 {
-    (void)dt;
-    //dirFlag ? localRotation += dt * 80 : localRotation -= dt * 80;
-    
-    if(localRotation <= -45) dirFlag = true;
-    if(localRotation >= 45) dirFlag = false;
-
     upperArm.Update(dt);
 }
 
@@ -76,7 +70,7 @@ void Shoulder::SetTransform(MyTransform3D parentTransform)
     upperArm.SetTransform(transform);
 }
 
-void Shoulder::Wave() 
+UpperArm::WaveState Shoulder::GetWaveState() const
 {
-    upperArm.Wave();
+    return upperArm.GetWaveState();
 }

@@ -22,6 +22,9 @@ public:
 
     TingoState& GetState();
 
+    UpperArm::WaveState GetLeftArmWaveState() const;
+    UpperArm::WaveState GetRightArmWaveState() const;
+
 private:
     MyTransform3D transform;
     TingoAssets &assets;

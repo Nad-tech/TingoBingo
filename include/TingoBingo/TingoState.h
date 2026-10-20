@@ -2,13 +2,23 @@
 
 class TingoState
 {
-public:
-    bool speaking = false;
-
-    struct Gestures
+public:    
+    enum class BrainState
     {
-        bool waveRight = false;
-        bool waveLeft = false;
-    };
-    Gestures gestures;
+        Idle,
+        Sleeping
+    } brainState;
+
+    enum class WaveState
+    {
+        Inactive,
+        WaveLeft,
+        WaveRight
+    } waveState;
+
+    enum class BlinkState
+    {
+        Disable,
+        Enable
+    } blinkState;
 };

@@ -81,75 +81,75 @@ void ForeArm::Wave()
 
 void ForeArm::AdvanceWave(float dt)
 {
-    if(side == "left")
-    {
-        const float speed = 400.0f;
-        const float minRotation = 0.0f;
-        const float maxRotation = 70.0f;
+    // if(side == "left")
+    // {
+    //     const float speed = 400.0f;
+    //     const float minRotation = 0.0f;
+    //     const float maxRotation = 70.0f;
         
-        if(waveState == WaveState::Raising)
-        {
-            localRotation += speed * dt;
+    //     if(waveState == WaveState::Raising)
+    //     {
+    //         localRotation += speed * dt;
             
-            if(localRotation >= maxRotation)
-            {
-                localRotation = maxRotation;
-                waveState = WaveState::Lowering;
-            }
-        }
-        else if(waveState == WaveState::Lowering)
-        {
-            localRotation -= speed * dt;
+    //         if(localRotation >= maxRotation)
+    //         {
+    //             localRotation = maxRotation;
+    //             waveState = WaveState::Lowering;
+    //         }
+    //     }
+    //     else if(waveState == WaveState::Lowering)
+    //     {
+    //         localRotation -= speed * dt;
 
-            if(localRotation <= minRotation)
-            {
-                localRotation = minRotation;
+    //         if(localRotation <= minRotation)
+    //         {
+    //             localRotation = minRotation;
                 
-                if(state.gestures.waveLeft)
-                {
-                    waveState = WaveState::Raising;
-                }
-                else {
-                    waveState = WaveState::None;
-                }
-            }
-        }
-    }
+    //             if(state.gestures.waveLeft)
+    //             {
+    //                 waveState = WaveState::Raising;
+    //             }
+    //             else {
+    //                 waveState = WaveState::None;
+    //             }
+    //         }
+    //     }
+    // }
 
-    if(side == "right")
-    {
-        const float speed = 400.0f;
-        const float minRotation = 0.0f;
-        const float maxRotation = -70.0f;
+    // if(side == "right")
+    // {
+    //     const float speed = 400.0f;
+    //     const float minRotation = 0.0f;
+    //     const float maxRotation = -70.0f;
 
-        if(waveState == WaveState::Raising)
-        {
-            localRotation -= speed * dt;
+    //     if(waveState == WaveState::Raising)
+    //     {
+    //         localRotation -= speed * dt;
             
-            if(localRotation <= maxRotation)
-            {
-                localRotation = maxRotation;
-                waveState = WaveState::Lowering;
-            }
-        }
-        else if(waveState == WaveState::Lowering)
-        {
-            localRotation += speed * dt;
+    //         if(localRotation <= maxRotation)
+    //         {
+    //             localRotation = maxRotation;
+    //             waveState = WaveState::Lowering;
+    //         }
+    //     }
+    //     else if(waveState == WaveState::Lowering)
+    //     {
+    //         localRotation += speed * dt;
 
-            if(localRotation >= minRotation)
-            {
-                localRotation = minRotation;
+    //         if(localRotation >= minRotation)
+    //         {
+    //             localRotation = minRotation;
                 
-                if(state.gestures.waveRight)
-                {
-                    waveState = WaveState::Raising;
-                }
-                else {
-                    waveState = WaveState::None;
-                }
-            }
-        }
-    }
+    //             if(state.gestures.waveRight)
+    //             {
+    //                 waveState = WaveState::Raising;
+    //             }
+    //             else {
+    //                 waveState = WaveState::None;
+    //             }
+    //         }
+    //     }
+    // }
 
     SetTransform(tempParentTransform);
 }

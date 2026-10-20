@@ -23,8 +23,6 @@ void Head::Initialise()
         dimensions.neck.height / 2.0f,
         0.0f        
     };
-    
-    blinkState = BlinkState::Blinking;
 
     mouthDisplay.Initialise();
     leftEye.Initialise();
@@ -40,6 +38,7 @@ void Head::Initialise()
 void Head::Update(float dt)
 {
     Blink(dt);
+    Sleep(dt);
 
     mouthDisplay.Update(dt);
     leftEye.Update(dt);
@@ -92,20 +91,10 @@ void Head::SetTransform(MyTransform3D parentTransform)
 
 void Head::Blink(float dt)
 {
-    blinkTimer += dt;
     
-    if(blinkTimer == 0.0f)
-    {
-         blinkState = BlinkState::None;
-    }
+}
 
-    if (blinkTimer > nextBlink)
-    {
-        blinkState = BlinkState::Blinking;
-        leftEye.Blink();
-        rightEye.Blink();
+void Head::Sleep(float dt)
+{
 
-        blinkTimer = 0.0f;
-        nextBlink = GetRandomValue(1000, 5000) / 1000.0f;
-    }
 }

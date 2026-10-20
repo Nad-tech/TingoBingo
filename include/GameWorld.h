@@ -20,8 +20,6 @@ public:
     
     void Shutdown();
 
-    void ToggleGesture(std::string gesture);
-
 private:
     Camera3D camera{};
     TingoAssets assets;
@@ -32,5 +30,5 @@ private:
     Texture2D spaceBackground{};
 
     void DrawOrientationGizmo();
-    void DrawGesturesState();
+    void DrawGesturesStates();
 };

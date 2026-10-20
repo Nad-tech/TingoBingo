@@ -16,7 +16,6 @@ public:
         TingoDimensions& dimensions, 
         TingoState& state,
         std::string side
-        
     );
 
     void Initialise();
@@ -26,7 +25,7 @@ public:
 
     void SetTransform(MyTransform3D parentTransform);
 
-    void Wave();
+    UpperArm::WaveState GetWaveState() const;
 
 private:
     TingoAssets& assets;

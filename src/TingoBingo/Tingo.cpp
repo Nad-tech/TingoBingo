@@ -6,12 +6,14 @@
 Tingo::Tingo(TingoAssets& assets, TingoDimensions& dimensions) :
     assets(assets),
     dimensions(dimensions),
-    body(assets, dimensions, state)
+    body(assets, dimensions, state),
+    tingoBrain(*this, state)
 {}
 
 void Tingo::Initialise()
 {
     body.Initialise();
+    tingoBrain.Initialise();
 }
 
 void Tingo::ShutDown()
@@ -21,6 +23,7 @@ void Tingo::ShutDown()
 
 void Tingo::Update(float dt)
 {
+    tingoBrain.Update(dt);
     body.Update(dt);
 }
 
@@ -38,4 +41,14 @@ void Tingo::SetTransform(MyTransform3D initialTransform)
 TingoState& Tingo::GetState()
 {
     return state;
+}
+
+UpperArm::WaveState Tingo::GetLeftArmWaveState() const
+{
+    return body.GetLeftArmWaveState();
+}
+
+UpperArm::WaveState Tingo::GetRightArmWaveState() const
+{
+    return body.GetRightArmWaveState();
 }

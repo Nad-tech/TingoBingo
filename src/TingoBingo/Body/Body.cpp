@@ -27,8 +27,6 @@ void Body::Initialise()
 
 void Body::Update(float dt)
 {
-    Wave();
-
     pelvis.Update(dt);
     neck.Update(dt);
     leftShoulder.Update(dt);
@@ -69,8 +67,12 @@ void Body::SetTransform(MyTransform3D parentTransform)
     rightShoulder.SetTransform(transform);
 }
 
-void Body::Wave()
+UpperArm::WaveState Body::GetLeftArmWaveState() const
 {
-    if(state.gestures.waveRight) rightShoulder.Wave();
-    if(state.gestures.waveLeft) leftShoulder.Wave();
+    return leftShoulder.GetWaveState();
+}
+
+UpperArm::WaveState Body::GetRightArmWaveState() const
+{
+    return rightShoulder.GetWaveState();
 }

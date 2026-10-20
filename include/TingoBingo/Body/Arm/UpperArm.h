@@ -31,8 +31,8 @@ public:
 
     void SetTransform(MyTransform3D parentTransform);
 
-    void Wave();
-
+    WaveState GetWaveState() const;
+    
 private:
     TingoAssets& assets;
     TingoDimensions& dimensions;
