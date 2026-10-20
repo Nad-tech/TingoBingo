@@ -5,17 +5,10 @@
 #include "TingoBingo/TingoAssets.h"
 #include "Elbow.h"
 #include "TingoBingo/TingoState.h"
+#include "TingoBingo/Body/Arm/ArmWaveState.h"
 class UpperArm
 {
 public:
-    enum class WaveState
-    {
-        None,
-        Raising,
-        Lowering,
-        Waving
-    };
-
     UpperArm
     (
         TingoAssets& assets, 
@@ -31,7 +24,7 @@ public:
 
     void SetTransform(MyTransform3D parentTransform);
 
-    WaveState GetWaveState() const;
+    ArmWaveState GetWaveState() const;
     
 private:
     TingoAssets& assets;
@@ -48,6 +41,6 @@ private:
     float localRotation = 0.0f;
     MyTransform3D tempParentTransform;
 
-    WaveState waveState;
+    ArmWaveState armWaveState;
     void AdvanceWave(float dt);
 };

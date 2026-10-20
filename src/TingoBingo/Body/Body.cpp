@@ -67,12 +67,12 @@ void Body::SetTransform(MyTransform3D parentTransform)
     rightShoulder.SetTransform(transform);
 }
 
-UpperArm::WaveState Body::GetLeftArmWaveState() const
+ArmWaveState Body::GetLeftArmWaveState() const
 {
     return leftShoulder.GetWaveState();
 }
 
-UpperArm::WaveState Body::GetRightArmWaveState() const
+ArmWaveState Body::GetRightArmWaveState() const
 {
     return rightShoulder.GetWaveState();
 }

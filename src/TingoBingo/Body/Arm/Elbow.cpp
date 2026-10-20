@@ -26,11 +26,9 @@ void Elbow::Initialise()
     foreArm.Initialise();
 }
 
-void Elbow::Update(float dt)
+void Elbow::Update(float dt, ArmWaveState armWaveState)
 {
-    (void)dt;
-
-    foreArm.Update(dt);
+    foreArm.Update(dt, armWaveState);
 }
 
 void Elbow::Draw()
@@ -59,9 +57,4 @@ void Elbow::SetTransform(MyTransform3D parentTransform)
     transform = MakeChildTransform(parentTransform, localTransform);
     
     foreArm.SetTransform(transform);
-}
-
-void Elbow::Wave()
-{
-    foreArm.Wave();
 }

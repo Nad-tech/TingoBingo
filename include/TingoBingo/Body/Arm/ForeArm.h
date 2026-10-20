@@ -5,6 +5,7 @@
 #include "TingoBingo/TingoAssets.h"
 #include "Hand.h"
 #include "TingoBingo/TingoState.h"
+#include "TingoBingo/Body/Arm/ArmWaveState.h"
 
 class ForeArm
 {
@@ -26,12 +27,10 @@ public:
 
     void Initialise();
     
-    void Update(float dt);
+    void Update(float dt, ArmWaveState armWaveState);
     void Draw();
 
     void SetTransform(MyTransform3D parentTransform);
-
-    void Wave();
 
 private:
     TingoAssets& assets;
@@ -49,6 +48,6 @@ private:
     bool dirFlag = false;
     MyTransform3D tempParentTransform;
 
-    void AdvanceWave(float dt);
+    void AdvanceWave(float dt, ArmWaveState armWaveState);
     WaveState waveState;
 };

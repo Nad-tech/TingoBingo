@@ -18,12 +18,10 @@ public:
 
     void Initialise();
     
-    void Update(float dt);
+    void Update(float dt, ArmWaveState waveState);
     void Draw();
 
     void SetTransform(MyTransform3D parentTransform);
-
-    void Wave();
 
 private:
     TingoAssets& assets;

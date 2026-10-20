@@ -43,12 +43,12 @@ TingoState& Tingo::GetState()
     return state;
 }
 
-UpperArm::WaveState Tingo::GetLeftArmWaveState() const
+ArmWaveState Tingo::GetLeftArmWaveState() const
 {
     return body.GetLeftArmWaveState();
 }
 
-UpperArm::WaveState Tingo::GetRightArmWaveState() const
+ArmWaveState Tingo::GetRightArmWaveState() const
 {
     return body.GetRightArmWaveState();
 }

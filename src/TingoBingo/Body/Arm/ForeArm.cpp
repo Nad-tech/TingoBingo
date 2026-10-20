@@ -29,12 +29,9 @@ void ForeArm::Initialise()
     hand.Initialise();
 }
 
-void ForeArm::Update(float dt)
+void ForeArm::Update(float dt, ArmWaveState armWaveState)
 {
-    if(waveState != WaveState::None)
-    {
-        AdvanceWave(dt);
-    }
+    AdvanceWave(dt, armWaveState);
 
     SetTransform(tempParentTransform);
 
@@ -71,85 +68,40 @@ void ForeArm::SetTransform(MyTransform3D parentTransform)
     hand.SetTransform(transform);
 }
 
-void ForeArm::Wave()
+void ForeArm::AdvanceWave(float dt, ArmWaveState armWaveState)
 {
-    if(waveState == WaveState::None)
+    const float speed = 450.0f;
+    const float minRotation = 0.0f;
+    const float maxRotation = 90.0f;
+
+    switch (armWaveState)
     {
-        waveState = WaveState::Raising;
+    case ArmWaveState::Waving:
+        switch (waveState)
+        {
+            case WaveState::None:
+            waveState = WaveState::Raising;
+            break;
+
+            case WaveState::Raising:
+            //Raise arm to maximum then set to lowering
+            break;
+
+            case WaveState::Lowering:
+            //Lower arm to minimum then set to raising
+            break;
+
+            default:
+                break;
+        }
+
+        break;
+    case ArmWaveState::None:
+        //set to lowering, once lowered set to none
+        break;
+    default:
+        break;
     }
-}
-
-void ForeArm::AdvanceWave(float dt)
-{
-    // if(side == "left")
-    // {
-    //     const float speed = 400.0f;
-    //     const float minRotation = 0.0f;
-    //     const float maxRotation = 70.0f;
-        
-    //     if(waveState == WaveState::Raising)
-    //     {
-    //         localRotation += speed * dt;
-            
-    //         if(localRotation >= maxRotation)
-    //         {
-    //             localRotation = maxRotation;
-    //             waveState = WaveState::Lowering;
-    //         }
-    //     }
-    //     else if(waveState == WaveState::Lowering)
-    //     {
-    //         localRotation -= speed * dt;
-
-    //         if(localRotation <= minRotation)
-    //         {
-    //             localRotation = minRotation;
-                
-    //             if(state.gestures.waveLeft)
-    //             {
-    //                 waveState = WaveState::Raising;
-    //             }
-    //             else {
-    //                 waveState = WaveState::None;
-    //             }
-    //         }
-    //     }
-    // }
-
-    // if(side == "right")
-    // {
-    //     const float speed = 400.0f;
-    //     const float minRotation = 0.0f;
-    //     const float maxRotation = -70.0f;
-
-    //     if(waveState == WaveState::Raising)
-    //     {
-    //         localRotation -= speed * dt;
-            
-    //         if(localRotation <= maxRotation)
-    //         {
-    //             localRotation = maxRotation;
-    //             waveState = WaveState::Lowering;
-    //         }
-    //     }
-    //     else if(waveState == WaveState::Lowering)
-    //     {
-    //         localRotation += speed * dt;
-
-    //         if(localRotation >= minRotation)
-    //         {
-    //             localRotation = minRotation;
-                
-    //             if(state.gestures.waveRight)
-    //             {
-    //                 waveState = WaveState::Raising;
-    //             }
-    //             else {
-    //                 waveState = WaveState::None;
-    //             }
-    //         }
-    //     }
-    // }
 
     SetTransform(tempParentTransform);
 }

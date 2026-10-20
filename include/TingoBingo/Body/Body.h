@@ -27,8 +27,8 @@ public:
 
     void SetTransform(MyTransform3D parentTransform);
 
-    UpperArm::WaveState GetLeftArmWaveState() const;
-    UpperArm::WaveState GetRightArmWaveState() const;
+    ArmWaveState GetLeftArmWaveState() const;
+    ArmWaveState GetRightArmWaveState() const;
     
 private:
     TingoAssets& assets;

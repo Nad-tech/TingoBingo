@@ -78,7 +78,7 @@ void TingoBrain::AdvanceIdleWave(float dt)
 
         case WaveSequence::RightArm:
         {
-            if (tingo.GetRightArmWaveState() == UpperArm::WaveState::Waving)
+            if (tingo.GetRightArmWaveState() == ArmWaveState::Waving)
             {
                 waveDurationTimer += dt;
 
@@ -93,7 +93,7 @@ void TingoBrain::AdvanceIdleWave(float dt)
 
         case WaveSequence::WaitingForRightArm:
         {
-            if (tingo.GetRightArmWaveState() == UpperArm::WaveState::None)
+            if (tingo.GetRightArmWaveState() == ArmWaveState::None)
             {
                 idleWaveTimer = 0.0f;
                 waveSequence = WaveSequence::WaitingBetweenArms;
@@ -117,7 +117,7 @@ void TingoBrain::AdvanceIdleWave(float dt)
 
         case WaveSequence::LeftArm:
         {
-            if (tingo.GetLeftArmWaveState() == UpperArm::WaveState::Waving)
+            if (tingo.GetLeftArmWaveState() == ArmWaveState::Waving)
             {
                 waveDurationTimer += dt;
 
@@ -132,7 +132,7 @@ void TingoBrain::AdvanceIdleWave(float dt)
 
         case WaveSequence::WaitingForLeftArm:
         {
-            if (tingo.GetLeftArmWaveState() == UpperArm::WaveState::None)
+            if (tingo.GetLeftArmWaveState() == ArmWaveState::None)
             {
                 idleWaveTimer = 0.0f;
                 waveDurationTimer = 0.0f;
@@ -163,10 +163,10 @@ bool TingoBrain::IsWaveComplete() const
     switch (state.waveState)
     {
         case TingoState::WaveState::WaveRight:
-            return tingo.GetRightArmWaveState() == UpperArm::WaveState::None;
+            return tingo.GetRightArmWaveState() == ArmWaveState::None;
 
         case TingoState::WaveState::WaveLeft:
-            return tingo.GetLeftArmWaveState() == UpperArm::WaveState::None;
+            return tingo.GetLeftArmWaveState() == ArmWaveState::None;
 
         case TingoState::WaveState::Inactive:
             return true;

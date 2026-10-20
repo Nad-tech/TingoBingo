@@ -70,7 +70,7 @@ void Shoulder::SetTransform(MyTransform3D parentTransform)
     upperArm.SetTransform(transform);
 }
 
-UpperArm::WaveState Shoulder::GetWaveState() const
+ArmWaveState Shoulder::GetWaveState() const
 {
     return upperArm.GetWaveState();
 }

@@ -26,7 +26,7 @@ void UpperArm::Initialise()
         0.0f
     };
     
-    waveState = WaveState::None;
+    armWaveState = ArmWaveState::None;
 
     elbow.Initialise();
 }
@@ -37,7 +37,7 @@ void UpperArm::Update(float dt)
 
     SetTransform(tempParentTransform);
 
-    elbow.Update(dt);
+    elbow.Update(dt, armWaveState);
 }
 
 void UpperArm::Draw()
@@ -72,7 +72,7 @@ void UpperArm::SetTransform(MyTransform3D parentTransform)
 
 void UpperArm::AdvanceWave(float dt)
 {
-    if(waveState == WaveState::None)
+    if(armWaveState == ArmWaveState::None)
     {
         if 
         (
@@ -80,7 +80,7 @@ void UpperArm::AdvanceWave(float dt)
             side == "left"
         )
         {
-            waveState = WaveState::Raising;
+            armWaveState = ArmWaveState::Raising;
         }
         else if 
         (
@@ -88,7 +88,7 @@ void UpperArm::AdvanceWave(float dt)
             side == "right"
         )
         {
-            waveState = WaveState::Raising;
+            armWaveState = ArmWaveState::Raising;
         }
     }
 
@@ -96,12 +96,12 @@ void UpperArm::AdvanceWave(float dt)
     const float minRotation = 0.0f;
     const float maxRotation = 135.0f;
 
-    switch (waveState)
+    switch (armWaveState)
     {
-        case WaveState::None:
+        case ArmWaveState::None:
             break;
         
-        case WaveState::Raising:
+        case ArmWaveState::Raising:
             if
             (
                 state.waveState == TingoState::WaveState::WaveLeft && 
@@ -112,7 +112,7 @@ void UpperArm::AdvanceWave(float dt)
                 if(localRotation >= maxRotation)
                 {
                     localRotation = maxRotation;
-                    waveState = WaveState::Waving;
+                    armWaveState = ArmWaveState::Waving;
                 }
             }
 
@@ -126,26 +126,26 @@ void UpperArm::AdvanceWave(float dt)
                 if(localRotation <= -maxRotation)
                 {
                     localRotation = -maxRotation;
-                    waveState = WaveState::Waving;
+                    armWaveState = ArmWaveState::Waving;
                 }
             }
             break;
 
-        case WaveState::Waving:
+        case ArmWaveState::Waving:
             if(state.waveState == TingoState::WaveState::Inactive)
             {
-                waveState = WaveState::Lowering;
+                armWaveState = ArmWaveState::Lowering;
             }
             break;
             
-        case WaveState::Lowering:
+        case ArmWaveState::Lowering:
             if(side == "left")
             {
                 localRotation -= dt * speed;
                 if(localRotation <= minRotation)
                 {
                     localRotation = minRotation;
-                    waveState = WaveState::None;
+                    armWaveState = ArmWaveState::None;
                 }
             }
 
@@ -155,7 +155,7 @@ void UpperArm::AdvanceWave(float dt)
                 if(localRotation >= minRotation)
                 {
                     localRotation = minRotation;
-                    waveState = WaveState::None;
+                    armWaveState = ArmWaveState::None;
                 }
             }
 
@@ -168,7 +168,7 @@ void UpperArm::AdvanceWave(float dt)
     SetTransform(tempParentTransform);
 }
 
-UpperArm::WaveState UpperArm::GetWaveState() const
+ArmWaveState UpperArm::GetWaveState() const
 {
-    return waveState;
+    return armWaveState;
 }
