@@ -18,7 +18,7 @@ public:
 
     enum class BlinkState
     {
-        Disable,
-        Enable
+        Inactive,
+        Blinking
     } blinkState;
 };

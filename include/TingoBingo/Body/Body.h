@@ -10,6 +10,8 @@
 
 #include "TingoBingo/TingoState.h"
 
+#include "TingoBingo/Body/Head/EyeState.h"
+
 class Body
 {
 public:
@@ -29,6 +31,9 @@ public:
 
     ArmWaveState GetLeftArmWaveState() const;
     ArmWaveState GetRightArmWaveState() const;
+
+    EyeState GetLeftEyeState() const;
+    EyeState GetRightEyeState() const;
     
 private:
     TingoAssets& assets;

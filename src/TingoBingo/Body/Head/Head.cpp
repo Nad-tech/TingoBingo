@@ -2,12 +2,18 @@
 #include "raymath.h"
 #include <iostream>
 
-Head::Head(TingoAssets& assets, TingoDimensions& dimensions) :
+Head::Head
+(
+    TingoAssets& assets, 
+    TingoDimensions& dimensions,
+    TingoState& state
+) :
     assets(assets),
     dimensions(dimensions),
+    state(state),
     mouthDisplay(assets, dimensions),
-    leftEye(assets, dimensions, "left"),
-    rightEye(assets, dimensions, "right"),
+    leftEye(assets, dimensions, state, "left"),
+    rightEye(assets, dimensions, state, "right"),
     nose(assets, dimensions),
     leftEyeBrow(assets, dimensions, "left"),
     rightEyeBrow(assets, dimensions, "right"),
@@ -37,9 +43,6 @@ void Head::Initialise()
 
 void Head::Update(float dt)
 {
-    Blink(dt);
-    Sleep(dt);
-
     mouthDisplay.Update(dt);
     leftEye.Update(dt);
     rightEye.Update(dt);
@@ -89,12 +92,12 @@ void Head::SetTransform(MyTransform3D parentTransform)
     antenna.SetTransform(transform);
 }
 
-void Head::Blink(float dt)
+EyeState Head::GetLeftEyeState() const
 {
-    
+    return leftEye.GetEyeState();
 }
 
-void Head::Sleep(float dt)
+EyeState Head::GetRightEyeState() const
 {
-
+    return rightEye.GetEyeState();
 }

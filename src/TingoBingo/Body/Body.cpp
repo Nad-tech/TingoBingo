@@ -10,7 +10,7 @@ Body::Body
     dimensions(dimensions),
     state(state),
     pelvis(assets, dimensions),
-    neck(assets, dimensions),
+    neck(assets, dimensions, state),
     leftShoulder(assets, dimensions, state, "left"),
     rightShoulder(assets, dimensions, state, "right")
 {}
@@ -75,4 +75,14 @@ ArmWaveState Body::GetLeftArmWaveState() const
 ArmWaveState Body::GetRightArmWaveState() const
 {
     return rightShoulder.GetWaveState();
+}
+
+EyeState Body::GetLeftEyeState() const
+{
+    return neck.GetLeftEyeState();
+}
+
+EyeState Body::GetRightEyeState() const
+{
+    return neck.GetRightEyeState();
 }

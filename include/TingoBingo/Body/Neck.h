@@ -4,11 +4,18 @@
 #include "TingoBingo/TingoDimensions.h"
 #include "TingoBingo/TingoAssets.h"
 #include "TingoBingo/Body/Head/Head.h"
+#include "TingoBingo/Body/Head/EyeState.h"
+#include "TingoBingo/TingoState.h"
 
 class Neck
 {
 public:
-    Neck(TingoAssets& assets,TingoDimensions& dimensions);
+    Neck
+    (
+        TingoAssets& assets,
+        TingoDimensions& dimensions, 
+        TingoState& state
+    );
 
     void Initialise();
     
@@ -17,9 +24,13 @@ public:
 
     void SetTransform(MyTransform3D parentTransform);
 
+    EyeState GetLeftEyeState() const;
+    EyeState GetRightEyeState() const;
+
 private:
     TingoAssets& assets;
     TingoDimensions& dimensions;
+    TingoState& state;
 
     MyTransform3D transform;
     Vector3 positionOffset;

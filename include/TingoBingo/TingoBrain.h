@@ -15,6 +15,12 @@ public:
         WaitingForLeftArm
     };
 
+    enum class BlinkSequence
+    {
+        Blinking,
+        WaitingBetweenBlinks
+    };
+
     TingoBrain(Tingo& tingo, TingoState& state);
     void Initialise();
 
@@ -34,6 +40,11 @@ private:
 
     WaveSequence waveSequence;
     void AdvanceIdleWave(float dt);
-    bool IsWaveComplete() const;
     void AdvanceSleep(float dt);
+    
+    BlinkSequence blinkSequence;
+    void AdvanceBlink(float dt);
+
+    float blinkTimer;
+    float nextBlinkTimer;
 };

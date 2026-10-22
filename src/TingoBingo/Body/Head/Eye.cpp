@@ -3,9 +3,16 @@
 #include <iostream>
 #include "DebugPanel.h"
 
-Eye::Eye(TingoAssets& assets, TingoDimensions& dimensions, std::string side) :
+Eye::Eye
+(
+    TingoAssets& assets, 
+    TingoDimensions& dimensions,
+    TingoState& state, 
+    std::string side
+) :
     assets(assets),
     dimensions(dimensions),
+    state(state),
     side(side),
     pupil(assets, dimensions)
 {}
@@ -33,8 +40,8 @@ void Eye::Initialise()
     }
 
     localScale = {1.0f, 1.0f, 1.0f};
-    blinkSpeed = 10.0f;
-    blinkState = BlinkState::None;
+
+    eyeState = EyeState::Inactive;
 
     pupil.Initialise();
 }
@@ -76,45 +83,78 @@ void Eye::SetTransform(MyTransform3D parentTransform)
     pupil.SetTransform(transform);
 }
 
-void Eye::Blink()
-{
-    if (blinkState == BlinkState::None)
-    {
-        blinkState = BlinkState::Closing;
-    }
-}
-
 void Eye::AdvanceBlink(float dt)
 {
-    switch (blinkState)
+    const float speed = 10.0f;
+    const float minScale = 0.1f;
+    const float maxScale = 1.0f;
+
+    switch (state.blinkState)
     {
-        case BlinkState::Closing:
+    case TingoState::BlinkState::Inactive:
+        switch (eyeState)
+        {
+        case EyeState::Inactive:
+            break;
 
-            localScale.y -= blinkSpeed * dt;
+        case EyeState::Closing:
+        case EyeState::Opening:
+            localScale.y += dt * speed;
 
-            if (localScale.y <= 0.0f)
+            if(localScale.y >= maxScale)
             {
-                localScale.y = 0.0f;
-                blinkState = BlinkState::Opening;
+                localScale.y = maxScale;
+                eyeState = EyeState::Inactive;
+            } 
+            break;
+            
+        default:
+            break;
+        }
+        break;
+    
+    case TingoState::BlinkState::Blinking:
+        switch (eyeState)
+        {
+        case EyeState::Inactive:
+            eyeState = EyeState::Closing;
+            break;
+        
+        case EyeState::Closing:
+            localScale.y -= dt * speed;
+
+            if(localScale.y <= minScale)
+            {
+                localScale.y = minScale;
+                eyeState = EyeState::Opening;
+            }
+
+            break;
+            
+        case EyeState::Opening:
+            localScale.y += dt * speed;
+
+            if(localScale.y >= maxScale)
+            {
+                localScale.y = maxScale;
+                eyeState = EyeState::Inactive;
             }
 
             break;
 
-        case BlinkState::Opening:
-
-            localScale.y += blinkSpeed * dt;
-
-            if (localScale.y >= 1.0f)
-            {
-                localScale.y = 1.0f;
-                blinkState = BlinkState::None;
-            }
-
+        default:
             break;
+        }
+        break;
 
-        case BlinkState::None:
-            break;
+    default:
+        break;
     }
 
     SetTransform(tempParentTransform);
+}
+
+EyeState Eye::GetEyeState() const
+{
+    return eyeState;
 }

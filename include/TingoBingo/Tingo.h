@@ -25,6 +25,9 @@ public:
     ArmWaveState GetLeftArmWaveState() const;
     ArmWaveState GetRightArmWaveState() const;
 
+    EyeState GetLeftEyeState() const;
+    EyeState GetRightEyeState() const;
+
 private:
     MyTransform3D transform;
     TingoAssets &assets;

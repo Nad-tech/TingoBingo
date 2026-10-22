@@ -1,10 +1,16 @@
 #include "TingoBingo/Body/Neck.h"
 #include "raymath.h"
 
-Neck::Neck(TingoAssets& assets, TingoDimensions& dimensions) :
+Neck::Neck
+(
+    TingoAssets& assets, 
+    TingoDimensions& dimensions,
+    TingoState& state
+) :
     assets(assets),
     dimensions(dimensions),
-    head(assets, dimensions)
+    state(state),
+    head(assets, dimensions, state)
 {}
 
 void Neck::Initialise()
@@ -52,4 +58,12 @@ void Neck::SetTransform(MyTransform3D parentTransform)
     transform = MakeChildTransform(parentTransform, localTransform);
 
     head.SetTransform(transform);
+}
+
+EyeState Neck::GetLeftEyeState() const {
+    return head.GetLeftEyeState();
+}
+
+EyeState Neck::GetRightEyeState() const {
+    return head.GetRightEyeState();
 }

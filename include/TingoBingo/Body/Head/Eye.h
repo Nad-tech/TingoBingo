@@ -5,20 +5,16 @@
 #include "TingoBingo/TingoAssets.h"
 #include <string>
 #include "TingoBingo/Body/Head/Pupil.h"
+#include "TingoBingo/Body/Head/EyeState.h"
+#include "TingoBingo/TingoState.h"
 class Eye
 {
 public:
-    enum class BlinkState
-    {
-        None,
-        Closing,
-        Opening
-    };
-
     Eye
     (
         TingoAssets& assets, 
-        TingoDimensions& dimensions, 
+        TingoDimensions& dimensions,
+        TingoState& state, 
         std::string side
     );
 
@@ -29,11 +25,12 @@ public:
 
     void SetTransform(MyTransform3D parentTransform);
 
-    void Blink();
+    EyeState GetEyeState() const;
 
 private:
     TingoAssets& assets;
     TingoDimensions& dimensions;
+    TingoState& state;
 
     Vector3 positionOffset;
     
@@ -45,9 +42,8 @@ private:
 
     MyTransform3D tempParentTransform;
 
-    BlinkState blinkState;
-    Vector3 localScale;
-    float blinkSpeed;
+    EyeState eyeState;
 
+    Vector3 localScale;
     void AdvanceBlink(float dt);
 };

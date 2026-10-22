@@ -255,7 +255,7 @@ private:
 
     int textureWidth = 1024;
     int textureHeight = 512;
-    int fontSize = 28;
+    int fontSize = 60;
     int lineSpacing = 36;
     int padding = 18;
 
@@ -319,8 +319,6 @@ public:
     
     void Shutdown();
 
-    void ToggleGesture(std::string gesture);
-
 private:
     Camera3D camera{};
     TingoAssets assets;
@@ -331,7 +329,7 @@ private:
     Texture2D spaceBackground{};
 
     void DrawOrientationGizmo();
-    void DrawGesturesState();
+    void DrawGesturesStates();
 };
 
 
@@ -438,6 +436,21 @@ struct ScreenDimensions
 
 
 =====================================
+.\include\TingoBingo\Body\Arm\ArmWaveState.h
+=====================================
+
+#pragma once
+
+enum class ArmWaveState
+{
+    None,
+    Raising,
+    Lowering,
+    Waving
+};
+
+
+=====================================
 .\include\TingoBingo\Body\Arm\Elbow.h
 =====================================
 
@@ -461,12 +474,10 @@ public:
 
     void Initialise();
     
-    void Update(float dt);
+    void Update(float dt, ArmWaveState waveState);
     void Draw();
 
     void SetTransform(MyTransform3D parentTransform);
-
-    void Wave();
 
 private:
     TingoAssets& assets;
@@ -535,6 +546,7 @@ private:
 #include "TingoBingo/TingoAssets.h"
 #include "Hand.h"
 #include "TingoBingo/TingoState.h"
+#include "TingoBingo/Body/Arm/ArmWaveState.h"
 
 class ForeArm
 {
@@ -556,12 +568,10 @@ public:
 
     void Initialise();
     
-    void Update(float dt);
+    void Update(float dt, ArmWaveState armWaveState);
     void Draw();
 
     void SetTransform(MyTransform3D parentTransform);
-
-    void Wave();
 
 private:
     TingoAssets& assets;
@@ -576,10 +586,9 @@ private:
     Hand hand;
 
     float localRotation = 0.0f;
-    bool dirFlag = false;
     MyTransform3D tempParentTransform;
 
-    void AdvanceWave(float dt);
+    void AdvanceWave(float dt, ArmWaveState armWaveState);
     WaveState waveState;
 };
 
@@ -595,9 +604,16 @@ private:
 #include "TingoBingo/TingoAssets.h"
 #include "Finger.h"
 #include "TingoBingo/TingoState.h"
+#include "TingoBingo/Body/Arm/ArmWaveState.h"
 class Hand
 {
 public:
+    enum class SpinState
+    {
+        None,
+        Spinning
+    };
+
     Hand
     (
         TingoAssets& assets, 
@@ -607,10 +623,12 @@ public:
 
     void Initialise();
     
-    void Update(float dt);
+    void Update(float dt, ArmWaveState armWaveState);
     void Draw();
 
     void SetTransform(MyTransform3D parentTransform);
+
+    void AdvanceWaveSpin(float dt, ArmWaveState armWaveState);
 
 private:
     TingoAssets& assets;
@@ -651,7 +669,6 @@ public:
         TingoDimensions& dimensions, 
         TingoState& state,
         std::string side
-        
     );
 
     void Initialise();
@@ -661,7 +678,7 @@ public:
 
     void SetTransform(MyTransform3D parentTransform);
 
-    void Wave();
+    ArmWaveState GetWaveState() const;
 
 private:
     TingoAssets& assets;
@@ -676,7 +693,6 @@ private:
     UpperArm upperArm;
 
     float localRotation = 0.0f;
-    bool dirFlag = false;
 };
 
 
@@ -691,17 +707,10 @@ private:
 #include "TingoBingo/TingoAssets.h"
 #include "Elbow.h"
 #include "TingoBingo/TingoState.h"
+#include "TingoBingo/Body/Arm/ArmWaveState.h"
 class UpperArm
 {
 public:
-    enum class WaveState
-    {
-        None,
-        Raising,
-        Lowering,
-        Waving
-    };
-
     UpperArm
     (
         TingoAssets& assets, 
@@ -717,8 +726,8 @@ public:
 
     void SetTransform(MyTransform3D parentTransform);
 
-    void Wave();
-
+    ArmWaveState GetWaveState() const;
+    
 private:
     TingoAssets& assets;
     TingoDimensions& dimensions;
@@ -734,7 +743,7 @@ private:
     float localRotation = 0.0f;
     MyTransform3D tempParentTransform;
 
-    WaveState waveState;
+    ArmWaveState armWaveState;
     void AdvanceWave(float dt);
 };
 
@@ -755,6 +764,8 @@ private:
 
 #include "TingoBingo/TingoState.h"
 
+#include "TingoBingo/Body/Head/EyeState.h"
+
 class Body
 {
 public:
@@ -772,8 +783,12 @@ public:
 
     void SetTransform(MyTransform3D parentTransform);
 
-    void Wave();
+    ArmWaveState GetLeftArmWaveState() const;
+    ArmWaveState GetRightArmWaveState() const;
 
+    EyeState GetLeftEyeState() const;
+    EyeState GetRightEyeState() const;
+    
 private:
     TingoAssets& assets;
     TingoDimensions& dimensions;
@@ -873,20 +888,16 @@ private:
 #include "TingoBingo/TingoAssets.h"
 #include <string>
 #include "TingoBingo/Body/Head/Pupil.h"
+#include "TingoBingo/Body/Head/EyeState.h"
+#include "TingoBingo/TingoState.h"
 class Eye
 {
 public:
-    enum class BlinkState
-    {
-        None,
-        Closing,
-        Opening
-    };
-
     Eye
     (
         TingoAssets& assets, 
-        TingoDimensions& dimensions, 
+        TingoDimensions& dimensions,
+        TingoState& state, 
         std::string side
     );
 
@@ -897,11 +908,12 @@ public:
 
     void SetTransform(MyTransform3D parentTransform);
 
-    void Blink();
+    EyeState GetEyeState() const;
 
 private:
     TingoAssets& assets;
     TingoDimensions& dimensions;
+    TingoState& state;
 
     Vector3 positionOffset;
     
@@ -913,10 +925,9 @@ private:
 
     MyTransform3D tempParentTransform;
 
-    BlinkState blinkState;
-    Vector3 localScale;
-    float blinkSpeed;
+    EyeState eyeState;
 
+    Vector3 localScale;
     void AdvanceBlink(float dt);
 };
 
@@ -962,6 +973,19 @@ private:
 
 
 =====================================
+.\include\TingoBingo\Body\Head\EyeState.h
+=====================================
+
+#pragma once
+
+enum class EyeState
+{
+    Open,
+    Close
+};
+
+
+=====================================
 .\include\TingoBingo\Body\Head\Head.h
 =====================================
 
@@ -976,17 +1000,17 @@ private:
 #include "TingoBingo/Body/Head/EyeBrow.h"
 #include "TingoBingo/Body/Head/Ear.h"
 #include "TingoBingo/Body/Head/Antenna.h"
+#include "TingoBingo/TingoState.h"
 
 class Head
 {
 public:
-    enum class BlinkState
-    {
-        None,
-        Blinking
-    };
-
-    Head(TingoAssets& assets, TingoDimensions& dimensions);
+    Head
+    (
+        TingoAssets& assets, 
+        TingoDimensions& dimensions,
+        TingoState& state
+    );
 
     void Initialise();
     
@@ -995,11 +1019,13 @@ public:
 
     void SetTransform(MyTransform3D parentTransform);
 
-    void Blink(float dt);
+    EyeState GetLeftEyeState() const;
+    EyeState GetRightEyeState() const;
 
 private:
     TingoAssets& assets;
     TingoDimensions& dimensions;
+    TingoState& state;
 
     Vector3 positionOffset;
     
@@ -1017,7 +1043,6 @@ private:
 
     float localRotation = 0.0f;
 
-    BlinkState blinkState;
     float blinkTimer = 0.0f;
     float nextBlink = 0.0f;
 };
@@ -1292,11 +1317,18 @@ private:
 #include "TingoBingo/TingoDimensions.h"
 #include "TingoBingo/TingoAssets.h"
 #include "TingoBingo/Body/Head/Head.h"
+#include "TingoBingo/Body/Head/EyeState.h"
+#include "TingoBingo/TingoState.h"
 
 class Neck
 {
 public:
-    Neck(TingoAssets& assets,TingoDimensions& dimensions);
+    Neck
+    (
+        TingoAssets& assets,
+        TingoDimensions& dimensions, 
+        TingoState& state
+    );
 
     void Initialise();
     
@@ -1305,9 +1337,13 @@ public:
 
     void SetTransform(MyTransform3D parentTransform);
 
+    EyeState GetLeftEyeState() const;
+    EyeState GetRightEyeState() const;
+
 private:
     TingoAssets& assets;
     TingoDimensions& dimensions;
+    TingoState& state;
 
     MyTransform3D transform;
     Vector3 positionOffset;
@@ -1367,6 +1403,7 @@ private:
 #include "TingoDimensions.h"
 #include "TingoAssets.h"
 #include "TingoBingo/TingoState.h"
+#include "TingoBingo/TingoBrain.h"
 
 class Tingo
 {
@@ -1383,12 +1420,16 @@ public:
 
     TingoState& GetState();
 
+    ArmWaveState GetLeftArmWaveState() const;
+    ArmWaveState GetRightArmWaveState() const;
+
 private:
     MyTransform3D transform;
     TingoAssets &assets;
     TingoDimensions& dimensions;
     TingoState state;
     Body body;
+    TingoBrain tingoBrain;
 };
 
 
@@ -1463,6 +1504,54 @@ public:
 
     // Update the lighting using the current camera position.
     void UpdateLighting(Vector3 cameraPosition);
+};
+
+
+=====================================
+.\include\TingoBingo\TingoBrain.h
+=====================================
+
+#pragma once
+#include "TingoBingo/TingoState.h"
+
+class Tingo;
+class TingoBrain
+{
+public:
+    enum class WaveSequence
+    {
+        Waiting,
+        RightArm,
+        WaitingForRightArm,
+        WaitingBetweenArms,
+        LeftArm,
+        WaitingForLeftArm
+    };
+
+    TingoBrain(Tingo& tingo, TingoState& state);
+    void Initialise();
+
+    void Update(float dt);
+    void Draw();
+    
+private:
+    Tingo& tingo;
+    TingoState& state;
+
+    float idleWaveTimer;
+    float waveDurationTimer;
+    float idleTimer;
+
+    float sleepTimer;
+    float sleepingTimer;
+
+    WaveSequence waveSequence;
+    void AdvanceIdleWave(float dt);
+    bool IsWaveComplete() const;
+    void AdvanceSleep(float dt);
+
+    float blinkTimer;
+    float nextBlinkTimer;
 };
 
 
@@ -1675,15 +1764,28 @@ public:
 
 class TingoState
 {
-public:
-    bool speaking = false;
-
-    struct Gestures
+public:    
+    enum class BrainState
     {
-        bool waveRight = false;
-        bool waveLeft = false;
-    };
-    Gestures gestures;
+        Idle,
+        Sleeping
+    } brainState;
+
+    enum class WaveState
+    {
+        Inactive,
+        WaveLeft,
+        WaveRight
+    } waveState;
+
+    enum class BlinkState
+    {
+        Enable,
+        Waiting,
+        Sleep
+    } blinkState;
+
+    bool blinkRequested = false;
 };
 
 
@@ -1892,9 +1994,6 @@ void Animation::Stop()
 
 #include "DebugPanel.h"
 
-#include "raymath.h"
-#include "rlgl.h"
-
 #include <iomanip>
 #include <sstream>
 
@@ -1919,12 +2018,21 @@ void DebugPanel::Initialise()
         return;
 
     renderTexture = LoadRenderTexture(textureWidth, textureHeight);
-    SetTextureFilter(renderTexture.texture, TEXTURE_FILTER_BILINEAR);
-
-    initialised = renderTexture.id != 0;
+    initialised = renderTexture.id != 0 && renderTexture.texture.id != 0;
 
     if (initialised)
+    {
+        SetTextureFilter(renderTexture.texture, TEXTURE_FILTER_BILINEAR);
         RefreshTexture();
+    }
+    else
+    {
+        if (renderTexture.id != 0)
+            UnloadRenderTexture(renderTexture);
+
+        renderTexture = {};
+        TraceLog(LOG_WARNING, "DebugPanel: render texture allocation failed");
+    }
 }
 
 void DebugPanel::Shutdown()
@@ -2096,57 +2204,20 @@ void DebugPanel::Draw3D(const Camera3D& camera)
     if (!visible || !initialised)
         return;
 
-    // Build a quad perpendicular to the direction from the panel to camera.
-    // This makes the panel readable while orbiting around Tingo.
-    Vector3 toCamera = Vector3Subtract(camera.position, position);
-
-    if (Vector3Length(toCamera) < 0.0001f)
-        return;
-
-    toCamera = Vector3Normalize(toCamera);
-
-    Vector3 worldUp = { 0.0f, 1.0f, 0.0f };
-    Vector3 right = Vector3CrossProduct(worldUp, toCamera);
-
-    // If the camera direction is almost vertical, use another reference axis.
-    if (Vector3Length(right) < 0.0001f)
-    {
-        worldUp = { 0.0f, 0.0f, 1.0f };
-        right = Vector3CrossProduct(worldUp, toCamera);
-    }
-
-    right = Vector3Normalize(right);
-    const Vector3 up = Vector3Normalize(Vector3CrossProduct(toCamera, right));
-
-    const Vector3 halfRight = Vector3Scale(right, worldWidth * 0.5f);
-    const Vector3 halfUp = Vector3Scale(up, worldHeight * 0.5f);
-
-    const Vector3 topLeft = Vector3Add(position, Vector3Add(Vector3Scale(halfRight, -1.0f), halfUp));
-    const Vector3 topRight = Vector3Add(position, Vector3Add(halfRight, halfUp));
-    const Vector3 bottomRight = Vector3Add(position, Vector3Subtract(halfRight, halfUp));
-    const Vector3 bottomLeft = Vector3Subtract(position, Vector3Add(halfRight, halfUp));
-
-    // Texture coordinates are flipped vertically because RenderTexture2D
-    // textures are vertically inverted in Raylib.
-    const float u0 = 0.0f;
-    const float u1 = 1.0f;
-    const float vTop = 1.0f;
-    const float vBottom = 0.0f;
-
-    rlDisableBackfaceCulling();
-    rlSetTexture(renderTexture.texture.id);
-
-    rlBegin(RL_QUADS);
-        rlColor4ub(255, 255, 255, 255);
-
-        rlTexCoord2f(u0, vTop);    rlVertex3f(topLeft.x, topLeft.y, topLeft.z);
-        rlTexCoord2f(u1, vTop);    rlVertex3f(topRight.x, topRight.y, topRight.z);
-        rlTexCoord2f(u1, vBottom); rlVertex3f(bottomRight.x, bottomRight.y, bottomRight.z);
-        rlTexCoord2f(u0, vBottom); rlVertex3f(bottomLeft.x, bottomLeft.y, bottomLeft.z);
-    rlEnd();
-
-    rlSetTexture(0);
-    rlEnableBackfaceCulling();
+    // raylib's billboard path builds the camera-facing quad and manages its
+    // texture and render state. A negative source height corrects the
+    // vertical inversion of RenderTexture2D textures.
+    DrawBillboardPro(
+        camera,
+        renderTexture.texture,
+        { 0.0f, 0.0f, static_cast<float>(textureWidth), -static_cast<float>(textureHeight) },
+        position,
+        { 0.0f, 1.0f, 0.0f },
+        { worldWidth, worldHeight },
+        { worldWidth * 0.5f, worldHeight * 0.5f },
+        0.0f,
+        WHITE
+    );
 }
 
 
@@ -2193,7 +2264,7 @@ void Game::Run()
 
         world.Draw();
 
-        DrawLegend();
+        //DrawLegend();
 
         EndDrawing();
     }
@@ -2235,8 +2306,7 @@ void Game::DrawLegend()
 
 void Game::HandleInput()
 {
-    if (IsKeyPressed(KEY_ONE)) world.ToggleGesture("waveRight");
-    if (IsKeyPressed(KEY_TWO)) world.ToggleGesture("waveLeft");
+    
 }
 
 
@@ -2259,8 +2329,9 @@ inline bool dirFlag = true;
 void GameWorld::Initialise(ScreenDimensions& screenDimensions)
 {
     DebugPanel::Instance().Initialise();
-    DebugPanel::Instance().SetPosition({ 0.0f, 4.0f, 0.0f });
-    DebugPanel::Instance().SetWorldSize(4.0f, 2.0f);
+    DebugPanel::Instance().SetPosition({ -5.0f, 3.0f, 0.0f });
+    DebugPanel::Instance().SetWorldSize(4.0f, 4.0f);
+    DebugPanel::Instance().SetVisible(true);
 
     spaceBackground = LoadTexture("assets/images/background/space.jpg");
 
@@ -2475,12 +2546,12 @@ void GameWorld::Draw()
 
     tingo.Draw();
 
-    DebugPanel::Instance().Draw3D(camera);
+    //DebugPanel::Instance().Draw3D(camera);
 
     EndMode3D();
 
     DrawOrientationGizmo();
-    DrawGesturesState();
+    DrawGesturesStates();
 }
 
 void GameWorld::Shutdown()
@@ -2488,54 +2559,58 @@ void GameWorld::Shutdown()
     tingo.ShutDown();
     DebugPanel::Instance().Shutdown();
 }
-
-void GameWorld::ToggleGesture(std::string gesture) 
+void GameWorld::DrawGesturesStates()
 {
-    TingoState& state = tingo.GetState();
-    
-    if(gesture == "waveRight") 
-    {
-        state.gestures.waveRight = !state.gestures.waveRight;
-    }
-    else if(gesture == "waveLeft")
-    {
-        state.gestures.waveLeft = !state.gestures.waveLeft;
-    }
-}
-
-void GameWorld::DrawGesturesState()
-{
-    const auto flag = [](bool value) { return value ? "ON" : "off"; };
-    const auto& gestures = tingo.GetState().gestures;
     int x = 12;
     int y = 12;
     const int fontSize = 20;
     const int lineHeight = fontSize + 4;
-    const int coloumnWidth = 200;
+    //const int coloumnWidth = 200;
     
-    DrawText("TINGO STATE", x, y, 16, YELLOW); 
-    
+    const char* stateName = "Unknown";
+    switch (tingo.GetState().brainState)
+    {
+        case TingoState::BrainState::Idle: 
+            stateName = "Idle"; break;
+        case TingoState::BrainState::Sleeping: 
+            stateName = "Sleeping"; break;
+    }
+
+    DrawText("TINGO STATE", x, y, 16, YELLOW);
+
     y += lineHeight;
-    DrawText
-    (
+
+    DrawText(
         TextFormat
         (
-            "waveRight %s", 
-            flag(gestures.waveRight)
+            "State: %s", stateName
         ), 
         x, 
         y, 
         fontSize, 
         RAYWHITE
     );
+    
+    const char* waveStateName = "Unknown";
+    switch (tingo.GetState().waveState)
+    {
+        case TingoState::WaveState::Inactive: 
+            waveStateName = "Inactive"; break;
+        case TingoState::WaveState::WaveLeft: 
+            waveStateName = "Wave left"; break;
+        case TingoState::WaveState::WaveRight: 
+            waveStateName = "Wave right"; break;
+    }
 
-    x += coloumnWidth;
-    DrawText
-    (
+    y += lineHeight;
+    DrawText("TINGO WAVE STATE", x, y, 16, YELLOW);
+
+    y += lineHeight;
+
+    DrawText(
         TextFormat
         (
-            "waveLeft %s", 
-            flag(gestures.waveLeft)
+            "Wave State: %s", waveStateName
         ), 
         x, 
         y, 
@@ -2543,6 +2618,7 @@ void GameWorld::DrawGesturesState()
         RAYWHITE
     );
 }
+
 
 
 =====================================
@@ -2597,11 +2673,9 @@ void Elbow::Initialise()
     foreArm.Initialise();
 }
 
-void Elbow::Update(float dt)
+void Elbow::Update(float dt, ArmWaveState armWaveState)
 {
-    (void)dt;
-
-    foreArm.Update(dt);
+    foreArm.Update(dt, armWaveState);
 }
 
 void Elbow::Draw()
@@ -2630,11 +2704,6 @@ void Elbow::SetTransform(MyTransform3D parentTransform)
     transform = MakeChildTransform(parentTransform, localTransform);
     
     foreArm.SetTransform(transform);
-}
-
-void Elbow::Wave()
-{
-    foreArm.Wave();
 }
 
 
@@ -2756,16 +2825,10 @@ void ForeArm::Initialise()
     hand.Initialise();
 }
 
-void ForeArm::Update(float dt)
+void ForeArm::Update(float dt, ArmWaveState armWaveState)
 {
-    if(waveState != WaveState::None)
-    {
-        AdvanceWave(dt);
-    }
-
-    SetTransform(tempParentTransform);
-
-    hand.Update(dt);
+    AdvanceWave(dt, armWaveState);
+    hand.Update(dt, armWaveState);
 }
 
 void ForeArm::Draw()
@@ -2798,84 +2861,91 @@ void ForeArm::SetTransform(MyTransform3D parentTransform)
     hand.SetTransform(transform);
 }
 
-void ForeArm::Wave()
+void ForeArm::AdvanceWave(float dt, ArmWaveState armWaveState)
 {
-    if(waveState == WaveState::None)
-    {
-        waveState = WaveState::Raising;
-    }
-}
+    const float speed = 450.0f;
+    const float minRotation = 0.0f;
+    const float maxRotation = 60.0f;
+    const float restingRotation = 0.0f;
 
-void ForeArm::AdvanceWave(float dt)
-{
-    if(side == "left")
+    switch (armWaveState)
     {
-        const float speed = 400.0f;
-        const float minRotation = 0.0f;
-        const float maxRotation = 70.0f;
+    case ArmWaveState::Waving:
+        switch (waveState)
+        {
+            case WaveState::None:
+                waveState = WaveState::Raising;
+                
+                break;
+
+            case WaveState::Raising:
+                if(side == "left")
+                {
+                    localRotation += dt * speed;
+                    
+                    if(localRotation >= maxRotation)
+                        waveState = WaveState::Lowering;
+                }
+                else if(side == "right")
+                {
+                    localRotation -= dt * speed;
+                    
+                    if(localRotation <= -maxRotation)
+                        waveState = WaveState::Lowering;
+                }
+                break;
+
+            case WaveState::Lowering:
+                if(side == "left")
+                {
+                    localRotation -= dt * speed;
+                    
+                    if(localRotation <= minRotation)
+                        waveState = WaveState::Raising;
+                }
+                else if(side == "right")
+                {
+                    localRotation += dt * speed;
+                    
+                    if(localRotation >= -minRotation)
+                        waveState = WaveState::Raising;
+                }
+
+                break;
+
+            default:
+                break;
+        }
+
+        break;
         
-        if(waveState == WaveState::Raising)
-        {
-            localRotation += speed * dt;
-            
-            if(localRotation >= maxRotation)
-            {
-                localRotation = maxRotation;
-                waveState = WaveState::Lowering;
-            }
-        }
-        else if(waveState == WaveState::Lowering)
-        {
-            localRotation -= speed * dt;
+    case ArmWaveState::None:
+    {
+        const float returnSpeed = 180.0f;
 
-            if(localRotation <= minRotation)
-            {
-                localRotation = minRotation;
-                
-                if(state.gestures.waveLeft)
-                {
-                    waveState = WaveState::Raising;
-                }
-                else {
-                    waveState = WaveState::None;
-                }
-            }
+        if (localRotation > restingRotation)
+        {
+            localRotation -= dt * returnSpeed;
+
+            if (localRotation < restingRotation)
+                localRotation = restingRotation;
         }
+        else if (localRotation < restingRotation)
+        {
+            localRotation += dt * returnSpeed;
+
+            if (localRotation > restingRotation)
+                localRotation = restingRotation;
+        }
+
+        if (localRotation == restingRotation)
+            waveState = WaveState::None;
+
+        break;
     }
 
-    if(side == "right")
-    {
-        const float speed = 400.0f;
-        const float minRotation = 0.0f;
-        const float maxRotation = -70.0f;
-
-        if(waveState == WaveState::Raising)
-        {
-            localRotation -= speed * dt;
-            
-            if(localRotation <= maxRotation)
-            {
-                localRotation = maxRotation;
-                waveState = WaveState::Lowering;
-            }
-        }
-        else if(waveState == WaveState::Lowering)
-        {
-            localRotation += speed * dt;
-
-            if(localRotation >= minRotation)
-            {
-                localRotation = minRotation;
-                
-                if(state.gestures.waveRight)
-                {
-                    waveState = WaveState::Raising;
-                }
-                else {
-                    waveState = WaveState::None;
-                }
-            }
-        }
+    default:
+        break;
     }
 
     SetTransform(tempParentTransform);
@@ -2915,16 +2985,9 @@ void Hand::Initialise()
     rightFinger.Initialise();
 }
 
-void Hand::Update(float dt)
+void Hand::Update(float dt, ArmWaveState armWaveState)
 {
-    (void)dt;
-
-    //dirFlag ? localRotation += dt * 80 : localRotation -= dt * 80;
-    
-    if(localRotation <= -45) dirFlag = true;
-    if(localRotation >= 45) dirFlag = false;
-
-    SetTransform(tempParentTransform);
+    AdvanceWaveSpin(dt, armWaveState);
 }
 
 void Hand::Draw()
@@ -2957,6 +3020,27 @@ void Hand::SetTransform(MyTransform3D parentTransform)
     
     leftFinger.SetTransform(transform);
     rightFinger.SetTransform(transform);
+}
+
+void Hand::AdvanceWaveSpin(float dt, ArmWaveState armWaveState)
+{
+    const float speed = 300;
+
+    switch (armWaveState)
+    {
+    case ArmWaveState::Waving:
+        localRotation += dt * speed;
+        break;
+
+    case ArmWaveState::None:
+        localRotation -= dt * speed;
+        if(localRotation < 0.0f)
+            localRotation = 0.0f;
+        break;
+    
+    default:
+        break;
+    }
 }
 
 
@@ -3005,12 +3089,6 @@ void Shoulder::Initialise()
 
 void Shoulder::Update(float dt)
 {
-    (void)dt;
-    //dirFlag ? localRotation += dt * 80 : localRotation -= dt * 80;
-    
-    if(localRotation <= -45) dirFlag = true;
-    if(localRotation >= 45) dirFlag = false;
-
     upperArm.Update(dt);
 }
 
@@ -3042,9 +3120,9 @@ void Shoulder::SetTransform(MyTransform3D parentTransform)
     upperArm.SetTransform(transform);
 }
 
-void Shoulder::Wave() 
+ArmWaveState Shoulder::GetWaveState() const
 {
-    upperArm.Wave();
+    return upperArm.GetWaveState();
 }
 
 
@@ -3054,6 +3132,8 @@ void Shoulder::Wave()
 
 #include "TingoBingo/Body/Arm/UpperArm.h"
 #include "raymath.h"
+
+#include "DebugPanel.h"
 
 UpperArm::UpperArm
 (
@@ -3078,21 +3158,15 @@ void UpperArm::Initialise()
         0.0f
     };
     
-    waveState = WaveState::None;
+    armWaveState = ArmWaveState::None;
 
     elbow.Initialise();
 }
 
 void UpperArm::Update(float dt)
 {
-    if(waveState != WaveState::None)
-    {
-        AdvanceWave(dt);
-    }
-
-    SetTransform(tempParentTransform);
-
-    elbow.Update(dt);
+    AdvanceWave(dt);
+    elbow.Update(dt, armWaveState);
 }
 
 void UpperArm::Draw()
@@ -3125,85 +3199,107 @@ void UpperArm::SetTransform(MyTransform3D parentTransform)
     elbow.SetTransform(transform);
 }
 
-void UpperArm::Wave()
-{
-    if(waveState == WaveState::None)
-    {
-        waveState = WaveState::Raising;
-    }
-}
-
 void UpperArm::AdvanceWave(float dt)
 {
-    const float speed = 450.0f;
+    if(armWaveState == ArmWaveState::None)
+    {
+        if 
+        (
+            state.waveState == TingoState::WaveState::WaveLeft && 
+            side == "left"
+        )
+        {
+            armWaveState = ArmWaveState::Raising;
+        }
+        else if 
+        (
+            state.waveState == TingoState::WaveState::WaveRight && 
+            side == "right"
+        )
+        {
+            armWaveState = ArmWaveState::Raising;
+        }
+    }
+
+    const float speed = 300.0f;
     const float minRotation = 0.0f;
     const float maxRotation = 135.0f;
 
-    if(side == "left")
+    switch (armWaveState)
     {
-        if(waveState == WaveState::Raising)
-        {
-            localRotation += speed * dt;
+        case ArmWaveState::None:
+            break;
+        
+        case ArmWaveState::Raising:
+            if
+            (
+                state.waveState == TingoState::WaveState::WaveLeft && 
+                side == "left"
+            )
+            {
+                localRotation += dt * speed;
+                if(localRotation >= maxRotation)
+                {
+                    localRotation = maxRotation;
+                    armWaveState = ArmWaveState::Waving;
+                }
+            }
+
+            if
+            (
+                state.waveState == TingoState::WaveState::WaveRight && 
+                side == "right"
+            )
+            {
+                localRotation -= dt * speed;
+                if(localRotation <= -maxRotation)
+                {
+                    localRotation = -maxRotation;
+                    armWaveState = ArmWaveState::Waving;
+                }
+            }
+            break;
+
+        case ArmWaveState::Waving:
+            if(state.waveState == TingoState::WaveState::Inactive)
+            {
+                armWaveState = ArmWaveState::Lowering;
+            }
+            break;
             
-            if(localRotation >= maxRotation)
+        case ArmWaveState::Lowering:
+            if(side == "left")
             {
-                localRotation = maxRotation;
-                waveState = WaveState::Waving;
-                elbow.Wave();
+                localRotation -= dt * speed;
+                if(localRotation <= minRotation)
+                {
+                    localRotation = minRotation;
+                    armWaveState = ArmWaveState::None;
+                }
             }
-        }
-        else if(waveState == WaveState::Waving)
-        {
-            if(!state.gestures.waveLeft)
-            {
-                waveState = WaveState::Lowering;
-            }
-        }
-        else if(waveState == WaveState::Lowering)
-        {
-            localRotation -= speed * dt;
 
-            if(localRotation <= minRotation)
+            if(side == "right")
             {
-                localRotation = minRotation;
-                waveState = WaveState::None;
+                localRotation += dt * speed;
+                if(localRotation >= minRotation)
+                {
+                    localRotation = minRotation;
+                    armWaveState = ArmWaveState::None;
+                }
             }
-        }
-    }
 
-    if(side == "right")
-    {
-        if(waveState == WaveState::Raising)
-        {
-            localRotation -= speed * dt;
-            
-            if(localRotation <= -maxRotation)
-            {
-                localRotation = -maxRotation;
-                waveState = WaveState::Waving;
-                elbow.Wave();
-            }
-        }
-        else if(waveState == WaveState::Waving)
-        {
-            if(!state.gestures.waveRight)
-            {
-                waveState = WaveState::Lowering;
-            }
-        }
-        else if(waveState == WaveState::Lowering)
-        {
-            localRotation += speed * dt;
+            break;
 
-            if(localRotation >= -minRotation)
-            {
-                localRotation = -minRotation;
-                waveState = WaveState::None;
-            }
-        }
+        default:
+            break;
     }
 
     SetTransform(tempParentTransform);
+}
+
+ArmWaveState UpperArm::GetWaveState() const
+{
+    return armWaveState;
 }
 
 
@@ -3223,7 +3319,7 @@ Body::Body
     dimensions(dimensions),
     state(state),
     pelvis(assets, dimensions),
-    neck(assets, dimensions),
+    neck(assets, dimensions, state),
     leftShoulder(assets, dimensions, state, "left"),
     rightShoulder(assets, dimensions, state, "right")
 {}
@@ -3240,8 +3336,6 @@ void Body::Initialise()
 
 void Body::Update(float dt)
 {
-    Wave();
-
     pelvis.Update(dt);
     neck.Update(dt);
     leftShoulder.Update(dt);
@@ -3282,10 +3376,24 @@ void Body::SetTransform(MyTransform3D parentTransform)
     rightShoulder.SetTransform(transform);
 }
 
-void Body::Wave()
+ArmWaveState Body::GetLeftArmWaveState() const
 {
-    if(state.gestures.waveRight) rightShoulder.Wave();
-    if(state.gestures.waveLeft) leftShoulder.Wave();
+    return leftShoulder.GetWaveState();
+}
+
+ArmWaveState Body::GetRightArmWaveState() const
+{
+    return rightShoulder.GetWaveState();
+}
+
+EyeState Body::GetLeftEyeState() const
+{
+    return neck.GetLeftEyeState();
+}
+
+EyeState Body::GetRightEyeState() const
+{
+    return neck.GetRightEyeState();
 }
 
 
@@ -3426,9 +3534,16 @@ void Ear::SetTransform(MyTransform3D parentTransform)
 #include <iostream>
 #include "DebugPanel.h"
 
-Eye::Eye(TingoAssets& assets, TingoDimensions& dimensions, std::string side) :
+Eye::Eye
+(
+    TingoAssets& assets, 
+    TingoDimensions& dimensions,
+    TingoState& state, 
+    std::string side
+) :
     assets(assets),
     dimensions(dimensions),
+    state(state),
     side(side),
     pupil(assets, dimensions)
 {}
@@ -3456,8 +3571,8 @@ void Eye::Initialise()
     }
 
     localScale = {1.0f, 1.0f, 1.0f};
-    blinkSpeed = 10.0f;
-    blinkState = BlinkState::None;
+
+    eyeState = EyeState::Open;
 
     pupil.Initialise();
 }
@@ -3466,9 +3581,7 @@ void Eye::Update(float dt)
 {
     AdvanceBlink(dt);
 
-    std::string state = "hello world";
-
-    DebugPanel::Instance().Print("BlinkState: ", state);
+    std::string state = "NULL";
 }
 
 void Eye::Draw()
@@ -3501,47 +3614,65 @@ void Eye::SetTransform(MyTransform3D parentTransform)
     pupil.SetTransform(transform);
 }
 
-void Eye::Blink()
-{
-    if (blinkState == BlinkState::None)
-    {
-        blinkState = BlinkState::Closing;
-    }
-}
 
 void Eye::AdvanceBlink(float dt)
 {
-    switch (blinkState)
+    const float speed = 10.0f;
+    const float minScale = 0.1f;
+    const float maxScale = 1.0f;
+
+    switch (state.blinkState)
     {
-        case BlinkState::Closing:
+    case TingoState::BlinkState::Enable:
+        if()
+    
+        switch (eyeState)
+        {
+        case EyeState::Open:
+            localScale.y += dt * speed;
 
-            localScale.y -= blinkSpeed * dt;
-
-            if (localScale.y <= 0.0f)
-            {
-                localScale.y = 0.0f;
-                blinkState = BlinkState::Opening;
+            if(localScale.y >= maxScale)
+            {    
+                localScale.y = maxScale;
+                eyeState = EyeState::Close;
             }
-
             break;
 
-        case BlinkState::Opening:
+        case EyeState::Close:
+            localScale.y -= dt * speed;
 
-            localScale.y += blinkSpeed * dt;
-
-            if (localScale.y >= 1.0f)
+            if(localScale.y <= minScale)
             {
-                localScale.y = 1.0f;
-                blinkState = BlinkState::None;
+                localScale.y = minScale;
+                eyeState = EyeState::Open;
             }
-
             break;
-
-        case BlinkState::None:
+        default:
             break;
+        }
+        break;
+    
+    case TingoState::BlinkState::Sleep:
+        if(localScale.y > minScale)
+        {
+            localScale.y -= dt * speed;
+
+            if(localScale.y <= minScale)
+                localScale.y = minScale;
+        }
+        eyeState = EyeState::Close;
+        break;
+
+    default:
+        break;
     }
 
     SetTransform(tempParentTransform);
+}
+
+EyeState Eye::GetEyeState() const
+{
+    return eyeState;
 }
 
 
@@ -3626,12 +3757,18 @@ void EyeBrow::SetTransform(MyTransform3D parentTransform)
 #include "raymath.h"
 #include <iostream>
 
-Head::Head(TingoAssets& assets, TingoDimensions& dimensions) :
+Head::Head
+(
+    TingoAssets& assets, 
+    TingoDimensions& dimensions,
+    TingoState& state
+) :
     assets(assets),
     dimensions(dimensions),
+    state(state),
     mouthDisplay(assets, dimensions),
-    leftEye(assets, dimensions, "left"),
-    rightEye(assets, dimensions, "right"),
+    leftEye(assets, dimensions, state, "left"),
+    rightEye(assets, dimensions, state, "right"),
     nose(assets, dimensions),
     leftEyeBrow(assets, dimensions, "left"),
     rightEyeBrow(assets, dimensions, "right"),
@@ -3647,8 +3784,6 @@ void Head::Initialise()
         dimensions.neck.height / 2.0f,
         0.0f        
     };
-    
-    blinkState = BlinkState::Blinking;
 
     mouthDisplay.Initialise();
     leftEye.Initialise();
@@ -3663,8 +3798,6 @@ void Head::Initialise()
 
 void Head::Update(float dt)
 {
-    Blink(dt);
-
     mouthDisplay.Update(dt);
     leftEye.Update(dt);
     rightEye.Update(dt);
@@ -3714,24 +3847,14 @@ void Head::SetTransform(MyTransform3D parentTransform)
     antenna.SetTransform(transform);
 }
 
-void Head::Blink(float dt)
+EyeState Head::GetLeftEyeState() const
 {
-    blinkTimer += dt;
-    
-    if(blinkTimer == 0.0f)
-    {
-         blinkState = BlinkState::None;
-    }
+    return leftEye.GetEyeState();
+}
 
-    if (blinkTimer > nextBlink)
-    {
-        blinkState = BlinkState::Blinking;
-        leftEye.Blink();
-        rightEye.Blink();
-
-        blinkTimer = 0.0f;
-        nextBlink = GetRandomValue(1000, 5000) / 1000.0f;
-    }
+EyeState Head::GetRightEyeState() const
+{
+    return rightEye.GetEyeState();
 }
 
 
@@ -4299,10 +4422,16 @@ void Thigh::SetTransform(MyTransform3D parentTransform)
 #include "TingoBingo/Body/Neck.h"
 #include "raymath.h"
 
-Neck::Neck(TingoAssets& assets, TingoDimensions& dimensions) :
+Neck::Neck
+(
+    TingoAssets& assets, 
+    TingoDimensions& dimensions,
+    TingoState& state
+) :
     assets(assets),
     dimensions(dimensions),
-    head(assets, dimensions)
+    state(state),
+    head(assets, dimensions, state)
 {}
 
 void Neck::Initialise()
@@ -4350,6 +4479,14 @@ void Neck::SetTransform(MyTransform3D parentTransform)
     transform = MakeChildTransform(parentTransform, localTransform);
 
     head.SetTransform(transform);
+}
+
+EyeState Neck::GetLeftEyeState() const {
+    return head.GetLeftEyeState();
+}
+
+EyeState Neck::GetRightEyeState() const {
+    return head.GetRightEyeState();
 }
 
 
@@ -4437,12 +4574,14 @@ void Pelvis::SetTransform(MyTransform3D parentTransform)
 Tingo::Tingo(TingoAssets& assets, TingoDimensions& dimensions) :
     assets(assets),
     dimensions(dimensions),
-    body(assets, dimensions, state)
+    body(assets, dimensions, state),
+    tingoBrain(*this, state)
 {}
 
 void Tingo::Initialise()
 {
     body.Initialise();
+    tingoBrain.Initialise();
 }
 
 void Tingo::ShutDown()
@@ -4452,6 +4591,7 @@ void Tingo::ShutDown()
 
 void Tingo::Update(float dt)
 {
+    tingoBrain.Update(dt);
     body.Update(dt);
 }
 
@@ -4469,6 +4609,16 @@ void Tingo::SetTransform(MyTransform3D initialTransform)
 TingoState& Tingo::GetState()
 {
     return state;
+}
+
+ArmWaveState Tingo::GetLeftArmWaveState() const
+{
+    return body.GetLeftArmWaveState();
+}
+
+ArmWaveState Tingo::GetRightArmWaveState() const
+{
+    return body.GetRightArmWaveState();
 }
 
 
@@ -4750,6 +4900,202 @@ void TingoAssets::ShutDown()
     UnloadShader(lightingShader);
 
     UnloadTexture(mouthSpriteSheet);
+}
+
+
+=====================================
+.\src\TingoBingo\TingoBrain.cpp
+=====================================
+
+#include "TingoBingo/TingoBrain.h"
+#include "TingoBingo/Tingo.h"
+
+TingoBrain::TingoBrain(Tingo& tingo, TingoState& state) :
+    tingo(tingo),
+    state(state)
+{}
+
+void TingoBrain::Initialise()
+{
+    state.brainState = TingoState::BrainState::Idle;
+    state.waveState = TingoState::WaveState::Inactive;
+    state.blinkState = TingoState::BlinkState::Enable;
+    
+    waveSequence = WaveSequence::Waiting;
+
+    idleWaveTimer = 0.0f;
+    idleTimer = 0.0f;
+    sleepTimer = 0.0f;
+    waveDurationTimer = 0.0f;
+
+    blinkTimer = 0.0f;
+    nextBlinkTimer = GetRandomValue(2, 6);
+}
+
+void TingoBrain::Update(float dt)
+{
+    blinkTimer += dt;
+
+    if(blinkTimer >= nextBlinkTimer)
+    {
+        state.blinkRequested = true;
+        blinkTimer = 0.0f;
+        nextBlinkTimer = GetRandomValue(2, 6);
+    }
+
+    switch (state.brainState)
+    {
+    case TingoState::BrainState::Idle:
+        AdvanceIdleWave(dt);
+        idleTimer += dt;
+        if(idleTimer > 10)
+        {
+            state.brainState = TingoState::BrainState::Sleeping;
+            state.waveState = TingoState::WaveState::Inactive;
+            state.blinkState = TingoState::BlinkState::Sleep;
+            idleTimer = 0.0f;
+            idleWaveTimer = 0.0f;
+        }
+        break;
+    
+    case TingoState::BrainState::Sleeping:
+        AdvanceSleep(dt);
+        sleepTimer += dt;
+        if(sleepTimer > 10)
+        {
+            state.brainState = TingoState::BrainState::Idle;
+            state.blinkState = TingoState::BlinkState::Enable;
+            sleepTimer = 0.0f;
+        }
+        break;
+    
+    default:
+        break;
+    }    
+}
+
+void TingoBrain::Draw()
+{
+
+}
+
+void TingoBrain::AdvanceIdleWave(float dt)
+{
+    switch (waveSequence)
+    {
+        case WaveSequence::Waiting:
+        {
+            state.waveState = TingoState::WaveState::Inactive;
+            idleWaveTimer += dt;
+
+            if (idleWaveTimer >= 5.0f)
+            {
+                state.waveState = TingoState::WaveState::WaveRight;
+                waveDurationTimer = 0.0f;
+                idleWaveTimer = 0.0f;
+                waveSequence = WaveSequence::RightArm;
+            }
+            break;
+        }
+
+        case WaveSequence::RightArm:
+        {
+            if (tingo.GetRightArmWaveState() == ArmWaveState::Waving)
+            {
+                waveDurationTimer += dt;
+
+                if (waveDurationTimer >= 2.0f)
+                {
+                    state.waveState = TingoState::WaveState::Inactive;
+                    waveSequence = WaveSequence::WaitingForRightArm;
+                }
+            }
+            break;
+        }
+
+        case WaveSequence::WaitingForRightArm:
+        {
+            if (tingo.GetRightArmWaveState() == ArmWaveState::None)
+            {
+                idleWaveTimer = 0.0f;
+                waveSequence = WaveSequence::WaitingBetweenArms;
+            }
+            break;
+        }
+
+        case WaveSequence::WaitingBetweenArms:
+        {
+            idleWaveTimer += dt;
+
+            if (idleWaveTimer >= 2.0f)
+            {
+                state.waveState = TingoState::WaveState::WaveLeft;
+                waveDurationTimer = 0.0f;
+                idleWaveTimer = 0.0f;
+                waveSequence = WaveSequence::LeftArm;
+            }
+            break;
+        }
+
+        case WaveSequence::LeftArm:
+        {
+            if (tingo.GetLeftArmWaveState() == ArmWaveState::Waving)
+            {
+                waveDurationTimer += dt;
+
+                if (waveDurationTimer >= 2.0f)
+                {
+                    state.waveState = TingoState::WaveState::Inactive;
+                    waveSequence = WaveSequence::WaitingForLeftArm;
+                }
+            }
+            break;
+        }
+
+        case WaveSequence::WaitingForLeftArm:
+        {
+            if (tingo.GetLeftArmWaveState() == ArmWaveState::None)
+            {
+                idleWaveTimer = 0.0f;
+                waveDurationTimer = 0.0f;
+                waveSequence = WaveSequence::Waiting;
+            }
+            break;
+        }
+    }
+}
+
+void TingoBrain::AdvanceSleep(float dt)
+{
+    (void)dt;
+    switch (state.blinkState)
+    {
+    case TingoState::BlinkState::Sleep:
+        /* code */
+        break;
+    
+    
+    default:
+        break;
+    }
+}
+
+bool TingoBrain::IsWaveComplete() const
+{
+    switch (state.waveState)
+    {
+        case TingoState::WaveState::WaveRight:
+            return tingo.GetRightArmWaveState() == ArmWaveState::None;
+
+        case TingoState::WaveState::WaveLeft:
+            return tingo.GetLeftArmWaveState() == ArmWaveState::None;
+
+        case TingoState::WaveState::Inactive:
+            return true;
+
+        default:
+            return false;
+    }
 }
 
 

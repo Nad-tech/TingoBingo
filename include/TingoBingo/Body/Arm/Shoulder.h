@@ -40,5 +40,4 @@ private:
     UpperArm upperArm;
 
     float localRotation = 0.0f;
-    bool dirFlag = false;
 };

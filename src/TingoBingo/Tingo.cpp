@@ -52,3 +52,13 @@ ArmWaveState Tingo::GetRightArmWaveState() const
 {
     return body.GetRightArmWaveState();
 }
+
+EyeState Tingo::GetLeftEyeState() const
+{
+    return body.GetLeftEyeState();
+}
+
+EyeState Tingo::GetRightEyeState() const
+{
+    return body.GetRightEyeState();
+}

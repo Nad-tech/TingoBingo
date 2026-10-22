@@ -9,11 +9,17 @@
 #include "TingoBingo/Body/Head/EyeBrow.h"
 #include "TingoBingo/Body/Head/Ear.h"
 #include "TingoBingo/Body/Head/Antenna.h"
+#include "TingoBingo/TingoState.h"
 
 class Head
 {
 public:
-    Head(TingoAssets& assets, TingoDimensions& dimensions);
+    Head
+    (
+        TingoAssets& assets, 
+        TingoDimensions& dimensions,
+        TingoState& state
+    );
 
     void Initialise();
     
@@ -22,12 +28,13 @@ public:
 
     void SetTransform(MyTransform3D parentTransform);
 
-    void Blink(float dt);
-    void Sleep(float dt);
+    EyeState GetLeftEyeState() const;
+    EyeState GetRightEyeState() const;
 
 private:
     TingoAssets& assets;
     TingoDimensions& dimensions;
+    TingoState& state;
 
     Vector3 positionOffset;
     
