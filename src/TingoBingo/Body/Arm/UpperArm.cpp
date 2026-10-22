@@ -34,9 +34,6 @@ void UpperArm::Initialise()
 void UpperArm::Update(float dt)
 {
     AdvanceWave(dt);
-
-    SetTransform(tempParentTransform);
-
     elbow.Update(dt, armWaveState);
 }
 
@@ -92,7 +89,7 @@ void UpperArm::AdvanceWave(float dt)
         }
     }
 
-    const float speed = 450.0f;
+    const float speed = 300.0f;
     const float minRotation = 0.0f;
     const float maxRotation = 135.0f;
 

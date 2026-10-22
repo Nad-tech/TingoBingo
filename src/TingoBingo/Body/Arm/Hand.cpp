@@ -27,16 +27,9 @@ void Hand::Initialise()
     rightFinger.Initialise();
 }
 
-void Hand::Update(float dt)
+void Hand::Update(float dt, ArmWaveState armWaveState)
 {
-    (void)dt;
-
-    //dirFlag ? localRotation += dt * 80 : localRotation -= dt * 80;
-    
-    if(localRotation <= -45) dirFlag = true;
-    if(localRotation >= 45) dirFlag = false;
-
-    SetTransform(tempParentTransform);
+    AdvanceWaveSpin(dt, armWaveState);
 }
 
 void Hand::Draw()
@@ -69,4 +62,25 @@ void Hand::SetTransform(MyTransform3D parentTransform)
     
     leftFinger.SetTransform(transform);
     rightFinger.SetTransform(transform);
+}
+
+void Hand::AdvanceWaveSpin(float dt, ArmWaveState armWaveState)
+{
+    const float speed = 300;
+
+    switch (armWaveState)
+    {
+    case ArmWaveState::Waving:
+        localRotation += dt * speed;
+        break;
+
+    case ArmWaveState::None:
+        localRotation -= dt * speed;
+        if(localRotation < 0.0f)
+            localRotation = 0.0f;
+        break;
+    
+    default:
+        break;
+    }
 }

@@ -32,10 +32,7 @@ void ForeArm::Initialise()
 void ForeArm::Update(float dt, ArmWaveState armWaveState)
 {
     AdvanceWave(dt, armWaveState);
-
-    SetTransform(tempParentTransform);
-
-    hand.Update(dt);
+    hand.Update(dt, armWaveState);
 }
 
 void ForeArm::Draw()
@@ -72,7 +69,8 @@ void ForeArm::AdvanceWave(float dt, ArmWaveState armWaveState)
 {
     const float speed = 450.0f;
     const float minRotation = 0.0f;
-    const float maxRotation = 90.0f;
+    const float maxRotation = 60.0f;
+    const float restingRotation = 0.0f;
 
     switch (armWaveState)
     {
@@ -80,25 +78,76 @@ void ForeArm::AdvanceWave(float dt, ArmWaveState armWaveState)
         switch (waveState)
         {
             case WaveState::None:
-            waveState = WaveState::Raising;
-            break;
+                waveState = WaveState::Raising;
+                
+                break;
 
             case WaveState::Raising:
-            //Raise arm to maximum then set to lowering
-            break;
+                if(side == "left")
+                {
+                    localRotation += dt * speed;
+                    
+                    if(localRotation >= maxRotation)
+                        waveState = WaveState::Lowering;
+                }
+                else if(side == "right")
+                {
+                    localRotation -= dt * speed;
+                    
+                    if(localRotation <= -maxRotation)
+                        waveState = WaveState::Lowering;
+                }
+                break;
 
             case WaveState::Lowering:
-            //Lower arm to minimum then set to raising
-            break;
+                if(side == "left")
+                {
+                    localRotation -= dt * speed;
+                    
+                    if(localRotation <= minRotation)
+                        waveState = WaveState::Raising;
+                }
+                else if(side == "right")
+                {
+                    localRotation += dt * speed;
+                    
+                    if(localRotation >= -minRotation)
+                        waveState = WaveState::Raising;
+                }
+
+                break;
 
             default:
                 break;
         }
 
         break;
+        
     case ArmWaveState::None:
-        //set to lowering, once lowered set to none
+    {
+        const float returnSpeed = 180.0f;
+
+        if (localRotation > restingRotation)
+        {
+            localRotation -= dt * returnSpeed;
+
+            if (localRotation < restingRotation)
+                localRotation = restingRotation;
+        }
+        else if (localRotation < restingRotation)
+        {
+            localRotation += dt * returnSpeed;
+
+            if (localRotation > restingRotation)
+                localRotation = restingRotation;
+        }
+
+        if (localRotation == restingRotation)
+            waveState = WaveState::None;
+
         break;
+    }
+
     default:
         break;
     }

@@ -5,9 +5,16 @@
 #include "TingoBingo/TingoAssets.h"
 #include "Finger.h"
 #include "TingoBingo/TingoState.h"
+#include "TingoBingo/Body/Arm/ArmWaveState.h"
 class Hand
 {
 public:
+    enum class SpinState
+    {
+        None,
+        Spinning
+    };
+
     Hand
     (
         TingoAssets& assets, 
@@ -17,10 +24,12 @@ public:
 
     void Initialise();
     
-    void Update(float dt);
+    void Update(float dt, ArmWaveState armWaveState);
     void Draw();
 
     void SetTransform(MyTransform3D parentTransform);
+
+    void AdvanceWaveSpin(float dt, ArmWaveState armWaveState);
 
 private:
     TingoAssets& assets;
