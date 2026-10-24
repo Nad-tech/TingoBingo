@@ -2,7 +2,8 @@
 
 enum class EyeState
 {
-    Inactive,
+    Open,
+    Closed,
     Opening,
     Closing
 };

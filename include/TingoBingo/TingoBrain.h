@@ -21,6 +21,17 @@ public:
         WaitingBetweenBlinks
     };
 
+    enum class SleepSequence
+    {
+        Inactive,
+        PreparingToSleep,
+        WaitingForLimbs,
+        ClosingEyes,
+        Sleeping,
+        WakingUp,
+        Finished
+    };
+
     TingoBrain(Tingo& tingo, TingoState& state);
     void Initialise();
 
@@ -35,16 +46,16 @@ private:
     float waveDurationTimer;
     float idleTimer;
 
-    float sleepTimer;
-    float sleepingTimer;
-
     WaveSequence waveSequence;
     void AdvanceIdleWave(float dt);
-    void AdvanceSleep(float dt);
     
     BlinkSequence blinkSequence;
     void AdvanceBlink(float dt);
 
     float blinkTimer;
     float nextBlinkTimer;
+
+    SleepSequence sleepSequence;
+    void AdvanceSleep(float dt);
+    float sleepTimer;
 };

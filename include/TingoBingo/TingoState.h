@@ -21,4 +21,10 @@ public:
         Inactive,
         Blinking
     } blinkState;
+
+    enum class EyeStateBrain
+    {
+        Open,
+        Close
+    }eyeStateBrain;
 };

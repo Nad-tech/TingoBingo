@@ -1,195 +1,314 @@
-    #include "TingoBingo/TingoBrain.h"
-    #include "TingoBingo/Tingo.h"
+#include "TingoBingo/TingoBrain.h"
+#include "TingoBingo/Tingo.h"
 
-    TingoBrain::TingoBrain(Tingo& tingo, TingoState& state) :
-        tingo(tingo),
-        state(state)
-    {}
+TingoBrain::TingoBrain(Tingo& tingo, TingoState& state) :
+    tingo(tingo),
+    state(state)
+{
+}
 
-    void TingoBrain::Initialise()
+void TingoBrain::Initialise()
+{
+    state.brainState = TingoState::BrainState::Idle;
+    idleTimer = 0.0f;
+
+    state.waveState = TingoState::WaveState::Inactive;
+    waveSequence = WaveSequence::Waiting;
+    waveDurationTimer = 0.0f;
+    idleWaveTimer = 0.0f;
+
+    state.blinkState = TingoState::BlinkState::Inactive;
+    blinkSequence = BlinkSequence::WaitingBetweenBlinks;
+    blinkTimer = 0.0f;
+    nextBlinkTimer = GetRandomValue(2, 6);
+
+    sleepSequence = SleepSequence::Inactive;
+    state.eyeStateBrain = TingoState::EyeStateBrain::Open;
+    sleepTimer = 0.0f;
+}
+
+void TingoBrain::Update(float dt)
+{
+    switch (state.brainState)
     {
-        state.brainState = TingoState::BrainState::Idle;
-        idleTimer = 0.0f;
-        sleepTimer = 0.0f;
-
-        state.waveState = TingoState::WaveState::Inactive;
-        waveSequence = WaveSequence::Waiting;
-        waveDurationTimer = 0.0f;
-        idleWaveTimer = 0.0f;
-
-        state.blinkState = TingoState::BlinkState::Inactive;
-        blinkSequence = BlinkSequence::WaitingBetweenBlinks;
-        blinkTimer = 0.0f;
-        nextBlinkTimer = GetRandomValue(2, 6);    
-    }
-
-    void TingoBrain::Update(float dt)
-    {
-        switch (state.brainState)
-        {
         case TingoState::BrainState::Idle:
-
+        {
             AdvanceIdleWave(dt);
             AdvanceBlink(dt);
 
             idleTimer += dt;
-            
-            if(idleTimer > 60)
+
+            if (idleTimer > 10.0f)
             {
                 state.brainState = TingoState::BrainState::Sleeping;
-                state.waveState = TingoState::WaveState::Inactive;
-                state.blinkState = TingoState::BlinkState::Inactive;
+
                 idleTimer = 0.0f;
                 idleWaveTimer = 0.0f;
             }
-             
+
             break;
-        
+        }
+
         case TingoState::BrainState::Sleeping:
+        {
             AdvanceSleep(dt);
-            
-            sleepTimer += dt;
-            
-            if(sleepTimer > 10)
-            {
-                state.brainState = TingoState::BrainState::Idle;
-                sleepTimer = 0.0f;
-            }
-            
             break;
-        
+        }
+
         default:
             break;
-        }    
     }
+}
 
-    void TingoBrain::Draw()
+void TingoBrain::Draw()
+{
+}
+
+void TingoBrain::AdvanceIdleWave(float dt)
+{
+    switch (waveSequence)
     {
-
-    }
-
-    void TingoBrain::AdvanceIdleWave(float dt)
-    {
-        switch (waveSequence)
+        case WaveSequence::Waiting:
         {
-            case WaveSequence::Waiting:
-            {
-                state.waveState = TingoState::WaveState::Inactive;
-                idleWaveTimer += dt;
+            state.waveState = TingoState::WaveState::Inactive;
+            idleWaveTimer += dt;
 
-                if (idleWaveTimer >= 5.0f)
-                {
-                    state.waveState = TingoState::WaveState::WaveRight;
-                    waveDurationTimer = 0.0f;
-                    idleWaveTimer = 0.0f;
-                    waveSequence = WaveSequence::RightArm;
-                }
-                break;
+            if (idleWaveTimer >= 5.0f)
+            {
+                state.waveState = TingoState::WaveState::WaveRight;
+
+                waveDurationTimer = 0.0f;
+                idleWaveTimer = 0.0f;
+
+                waveSequence = WaveSequence::RightArm;
             }
 
-            case WaveSequence::RightArm:
-            {
-                if (tingo.GetRightArmWaveState() == ArmWaveState::Waving)
-                {
-                    waveDurationTimer += dt;
-
-                    if (waveDurationTimer >= 2.0f)
-                    {
-                        state.waveState = TingoState::WaveState::Inactive;
-                        waveSequence = WaveSequence::WaitingForRightArm;
-                    }
-                }
-                break;
-            }
-
-            case WaveSequence::WaitingForRightArm:
-            {
-                if (tingo.GetRightArmWaveState() == ArmWaveState::None)
-                {
-                    idleWaveTimer = 0.0f;
-                    waveSequence = WaveSequence::WaitingBetweenArms;
-                }
-                break;
-            }
-
-            case WaveSequence::WaitingBetweenArms:
-            {
-                idleWaveTimer += dt;
-
-                if (idleWaveTimer >= 2.0f)
-                {
-                    state.waveState = TingoState::WaveState::WaveLeft;
-                    waveDurationTimer = 0.0f;
-                    idleWaveTimer = 0.0f;
-                    waveSequence = WaveSequence::LeftArm;
-                }
-                break;
-            }
-
-            case WaveSequence::LeftArm:
-            {
-                if (tingo.GetLeftArmWaveState() == ArmWaveState::Waving)
-                {
-                    waveDurationTimer += dt;
-
-                    if (waveDurationTimer >= 2.0f)
-                    {
-                        state.waveState = TingoState::WaveState::Inactive;
-                        waveSequence = WaveSequence::WaitingForLeftArm;
-                    }
-                }
-                break;
-            }
-
-            case WaveSequence::WaitingForLeftArm:
-            {
-                if (tingo.GetLeftArmWaveState() == ArmWaveState::None)
-                {
-                    idleWaveTimer = 0.0f;
-                    waveDurationTimer = 0.0f;
-                    waveSequence = WaveSequence::Waiting;
-                }
-                break;
-            }
+            break;
         }
-    }
 
-    void TingoBrain::AdvanceSleep(float dt)
-    {
-        (void)dt;
-    }
-
-    void TingoBrain::AdvanceBlink(float dt)
-    {
-        switch (blinkSequence)
+        case WaveSequence::RightArm:
         {
+            if (tingo.GetRightArmWaveState() == ArmWaveState::Waving)
+            {
+                waveDurationTimer += dt;
+
+                if (waveDurationTimer >= 2.0f)
+                {
+                    state.waveState = TingoState::WaveState::Inactive;
+                    waveSequence = WaveSequence::WaitingForRightArm;
+                }
+            }
+
+            break;
+        }
+
+        case WaveSequence::WaitingForRightArm:
+        {
+            if (tingo.GetRightArmWaveState() == ArmWaveState::None)
+            {
+                idleWaveTimer = 0.0f;
+                waveSequence = WaveSequence::WaitingBetweenArms;
+            }
+
+            break;
+        }
+
+        case WaveSequence::WaitingBetweenArms:
+        {
+            idleWaveTimer += dt;
+
+            if (idleWaveTimer >= 2.0f)
+            {
+                state.waveState = TingoState::WaveState::WaveLeft;
+
+                waveDurationTimer = 0.0f;
+                idleWaveTimer = 0.0f;
+
+                waveSequence = WaveSequence::LeftArm;
+            }
+
+            break;
+        }
+
+        case WaveSequence::LeftArm:
+        {
+            if (tingo.GetLeftArmWaveState() == ArmWaveState::Waving)
+            {
+                waveDurationTimer += dt;
+
+                if (waveDurationTimer >= 2.0f)
+                {
+                    state.waveState = TingoState::WaveState::Inactive;
+                    waveSequence = WaveSequence::WaitingForLeftArm;
+                }
+            }
+
+            break;
+        }
+
+        case WaveSequence::WaitingForLeftArm:
+        {
+            if (tingo.GetLeftArmWaveState() == ArmWaveState::None)
+            {
+                idleWaveTimer = 0.0f;
+                waveDurationTimer = 0.0f;
+
+                waveSequence = WaveSequence::Waiting;
+            }
+
+            break;
+        }
+
+        default:
+            break;
+    }
+}
+
+void TingoBrain::AdvanceBlink(float dt)
+{
+    switch (blinkSequence)
+    {
         case BlinkSequence::WaitingBetweenBlinks:
+        {
             blinkTimer += dt;
 
-            if(blinkTimer > nextBlinkTimer)
+            if (blinkTimer > nextBlinkTimer)
             {
                 state.blinkState = TingoState::BlinkState::Blinking;
                 blinkSequence = BlinkSequence::Blinking;
+
                 blinkTimer = 0.0f;
                 nextBlinkTimer = GetRandomValue(2, 6);
-            }       
+            }
+
             break;
-        
+        }
+
         case BlinkSequence::Blinking:
-            if
-            (
-                tingo.GetLeftEyeState() == EyeState::Inactive &&
-                tingo.GetRightEyeState() == EyeState::Inactive
+        {
+            if (
+                tingo.GetLeftEyeState() == EyeState::Open &&
+                tingo.GetRightEyeState() == EyeState::Open
             )
             {
                 state.blinkState = TingoState::BlinkState::Inactive;
                 blinkSequence = BlinkSequence::WaitingBetweenBlinks;
+
                 blinkTimer = 0.0f;
             }
 
             break;
+        }
 
         default:
             break;
-        }
     }
+}
+
+void TingoBrain::AdvanceSleep(float dt)
+{
+    switch (sleepSequence)
+    {
+        case SleepSequence::Inactive:
+        {
+            sleepSequence = SleepSequence::PreparingToSleep;
+            break;
+        }
+
+        case SleepSequence::PreparingToSleep:
+        {
+            state.eyeStateBrain = TingoState::EyeStateBrain::Open;
+
+            sleepSequence = SleepSequence::WaitingForLimbs;
+            break;
+        }
+
+        case SleepSequence::WaitingForLimbs:
+        {
+            AdvanceIdleWave(dt);
+            AdvanceBlink(dt);
+
+            if 
+            (
+                tingo.GetRightArmWaveState() == ArmWaveState::None &&
+                tingo.GetLeftArmWaveState() == ArmWaveState::None
+            )
+            {
+                state.waveState = TingoState::WaveState::Inactive;
+                state.blinkState = TingoState::BlinkState::Inactive;
+                state.eyeStateBrain = TingoState::EyeStateBrain::Close;
+                sleepSequence = SleepSequence::ClosingEyes;
+            }
+
+            break;
+        }
+
+        case SleepSequence::ClosingEyes:
+        {
+            if (
+                tingo.GetLeftEyeState() == EyeState::Closed &&
+                tingo.GetRightEyeState() == EyeState::Closed
+            )
+            {
+                sleepTimer = 0.0f;
+                sleepSequence = SleepSequence::Sleeping;
+            }
+
+            break;
+        }
+
+        case SleepSequence::Sleeping:
+        {
+            sleepTimer += dt;
+
+            if (sleepTimer > 10.0f)
+            {
+                sleepSequence = SleepSequence::WakingUp;
+                sleepTimer = 0.0f;
+            }
+
+            break;
+        }        
+
+        case SleepSequence::WakingUp:
+        {
+            state.eyeStateBrain = TingoState::EyeStateBrain::Open;
+            
+            if 
+            (
+                tingo.GetLeftEyeState() == EyeState::Open &&
+                tingo.GetRightEyeState() == EyeState::Open
+            )
+            {
+                sleepSequence = SleepSequence::Finished;
+            }
+            
+            break;
+        }
+
+        case SleepSequence::Finished:
+        {
+            // Reset the wave sequence.
+            state.waveState = TingoState::WaveState::Inactive;
+            waveSequence = WaveSequence::Waiting;
+            waveDurationTimer = 0.0f;
+            idleWaveTimer = 0.0f;
+
+            // Reset the blink sequence.
+            state.blinkState = TingoState::BlinkState::Inactive;
+            blinkSequence = BlinkSequence::WaitingBetweenBlinks;
+            blinkTimer = 0.0f;
+            nextBlinkTimer = GetRandomValue(2, 6);
+
+            // Return to idle.
+            idleTimer = 0.0f;
+            state.brainState = TingoState::BrainState::Idle;
+            sleepSequence = SleepSequence::Inactive;
+
+            break;
+        }
+
+    default:
+        break;
+    }
+}
