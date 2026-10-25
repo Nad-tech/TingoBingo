@@ -234,7 +234,7 @@ void GameWorld::Draw()
     EndMode3D();
 
     DrawOrientationGizmo();
-    DrawGesturesStates();
+    //DrawGesturesStates();
 }
 
 void GameWorld::Shutdown()

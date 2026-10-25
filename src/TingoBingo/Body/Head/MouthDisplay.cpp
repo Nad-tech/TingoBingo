@@ -80,9 +80,9 @@ void MouthDisplay::Update(float dt)
 {
     animation.Update(dt);
 
-    AdvanceSpeakAnimation();
-
     SetMouthFrame(animation.GetFrame());
+
+    AdvanceSpeakAnimation();
 }
 
 void MouthDisplay::Draw()
@@ -194,6 +194,14 @@ void MouthDisplay::AdvanceSpeakAnimation()
     else
     {
         animation.Stop();
-        animation.SetFrame(0);
+
+        if (state.brainState == TingoState::BrainState::Sleeping)
+        {
+            SetMouthFrame(1);
+        }
+        else
+        {
+            SetMouthFrame(0);
+        }
     }
 }

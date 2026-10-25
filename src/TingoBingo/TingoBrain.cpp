@@ -25,13 +25,28 @@ void TingoBrain::Initialise()
     sleepSequence = SleepSequence::Inactive;
     state.eyeStateBrain = TingoState::EyeStateBrain::Open;
     sleepTimer = 0.0f;
+    snoreTimer = 0.0f;
+    nextSnoreTimer = GetRandomValue(3, 6);
 
     state.speaking = false;
+
+    randomPhraseTimer = GetRandomValue(10, 20);
 }
 
 void TingoBrain::Update(float dt)
 {
     speechController.Update();
+
+    randomPhraseTimer -= dt;
+
+    if(randomPhraseTimer <= 0)
+    {
+        if(!state.speaking)
+        {
+            Speak(ChooseRandomPhrase());
+            randomPhraseTimer = GetRandomValue(10, 20);
+        }
+    }
 
     if(speechController.SpeechFinished())
     {
@@ -52,7 +67,7 @@ void TingoBrain::Update(float dt)
 
             idleTimer += dt;
 
-            if (idleTimer > 10.0f)
+            if (idleTimer > 30.0f)
             {
                 Speak("I am going to sleep");
                 state.brainState = TingoState::BrainState::Sleeping;
@@ -281,8 +296,20 @@ void TingoBrain::AdvanceSleep(float dt)
         case SleepSequence::Sleeping:
         {
             sleepTimer += dt;
+            snoreTimer += dt;
 
-            if (sleepTimer > 10.0f)
+            if(snoreTimer >= nextSnoreTimer)
+            {
+                if(!state.speaking) 
+                { 
+                    Speak("Snore");
+                }
+
+                snoreTimer = 0.0f;
+                nextSnoreTimer = GetRandomValue(3, 6);
+            }
+
+            if (sleepTimer > 30.0f)
             {
                 sleepSequence = SleepSequence::WakingUp;
                 sleepTimer = 0.0f;
@@ -344,4 +371,12 @@ void TingoBrain::AdvanceGreeting(float dt)
 void TingoBrain::Speak(std::string text)
 {
     speechController.Speak(text);
+}
+
+std::string TingoBrain::ChooseRandomPhrase()
+{
+    int size = phrases.idlePhrases.size();
+    int index = GetRandomValue(0, size - 1);
+
+    return phrases.idlePhrases[index];
 }

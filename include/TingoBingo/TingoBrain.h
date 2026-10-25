@@ -2,6 +2,7 @@
 #include "TingoBingo/TingoState.h"
 #include "SpeechController.h"
 #include <string>
+#include "Phrases.h"
 
 
 class Tingo;
@@ -61,9 +62,15 @@ private:
     SleepSequence sleepSequence;
     void AdvanceSleep(float dt);
     float sleepTimer;
+    float snoreTimer;
+    float nextSnoreTimer;
 
     void AdvanceGreeting(float dt);
 
     SpeechController speechController;
     void Speak(std::string text);
+
+    Phrases phrases;
+    std::string ChooseRandomPhrase();
+    float randomPhraseTimer;
 };
