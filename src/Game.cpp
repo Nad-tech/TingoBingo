@@ -5,6 +5,8 @@ void Game::Initialise()
 {
     InitWindow(10, 10, "TingoBingo 3D");
 
+    InitAudioDevice();
+
     int monitor = GetCurrentMonitor();
     int width = GetMonitorWidth(monitor);
     int height = GetMonitorHeight(monitor);
@@ -46,6 +48,8 @@ void Game::Run()
 void Game::Shutdown()
 {
     world.Shutdown();
+
+    CloseAudioDevice();
 
     CloseWindow();
 }

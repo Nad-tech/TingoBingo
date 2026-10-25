@@ -1,9 +1,15 @@
 #include "TingoBingo/Body/Head/MouthDisplay.h"
 #include "raymath.h"
+#include <iostream>
 
-MouthDisplay::MouthDisplay(TingoAssets& assets, TingoDimensions& dimensions) :
+MouthDisplay::MouthDisplay(
+    TingoAssets& assets, 
+    TingoDimensions& dimensions,
+    TingoState& state
+) :
     assets(assets),
-    dimensions(dimensions)
+    dimensions(dimensions),
+    state(state)
 {}
 
 void MouthDisplay::Initialise()
@@ -31,7 +37,7 @@ void MouthDisplay::Initialise()
         dimensions.mouthSpriteSheet.rows *
         dimensions.mouthSpriteSheet.cols;
     
-    float frameDuration = 0.1f;
+    float frameDuration = 0.4f;
 
         animation.Initialise
     (
@@ -73,6 +79,10 @@ void MouthDisplay::Initialise()
 void MouthDisplay::Update(float dt)
 {
     animation.Update(dt);
+
+    AdvanceSpeakAnimation();
+
+    SetMouthFrame(animation.GetFrame());
 }
 
 void MouthDisplay::Draw()
@@ -122,8 +132,6 @@ void MouthDisplay::SetTransform(MyTransform3D parentTransform)
 
 void MouthDisplay::SetMouthFrame(int frame)
 {
-    animation.SetFrame(frame);
-
     int col = frame % dimensions.mouthSpriteSheet.cols;
     int row = frame / dimensions.mouthSpriteSheet.cols;
 
@@ -172,4 +180,20 @@ void MouthDisplay::SetMouthFrame(int frame)
 void MouthDisplay::ShutDown()
 {
     UnloadModel(mouthPlane);
+}
+
+void MouthDisplay::AdvanceSpeakAnimation()
+{
+    if (state.speaking)
+    {
+        if (!animation.IsPlaying())
+        {
+            animation.Play(1, 2, AnimationPriority::Idle);
+        }
+    }
+    else
+    {
+        animation.Stop();
+        animation.SetFrame(0);
+    }
 }

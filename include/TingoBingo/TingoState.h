@@ -6,7 +6,8 @@ public:
     enum class BrainState
     {
         Idle,
-        Sleeping
+        Sleeping,
+        Greeting
     } brainState;
 
     enum class WaveState
@@ -27,4 +28,6 @@ public:
         Open,
         Close
     }eyeStateBrain;
+
+    bool speaking;
 };

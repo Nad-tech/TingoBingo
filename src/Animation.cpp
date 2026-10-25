@@ -109,6 +109,7 @@ void Animation::Reset()
 void Animation::SetFrame(int newFrame)
 {
     frame = newFrame % totalFrames;
+    frameTimer = 0.0f;
 }
 
 // Move to the previous frame.

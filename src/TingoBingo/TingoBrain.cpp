@@ -25,10 +25,24 @@ void TingoBrain::Initialise()
     sleepSequence = SleepSequence::Inactive;
     state.eyeStateBrain = TingoState::EyeStateBrain::Open;
     sleepTimer = 0.0f;
+
+    state.speaking = false;
 }
 
 void TingoBrain::Update(float dt)
 {
+    speechController.Update();
+
+    if(speechController.SpeechFinished())
+    {
+        state.speaking = false;
+    }
+    else
+    {
+        state.speaking = true;
+    }
+
+
     switch (state.brainState)
     {
         case TingoState::BrainState::Idle:
@@ -40,6 +54,7 @@ void TingoBrain::Update(float dt)
 
             if (idleTimer > 10.0f)
             {
+                Speak("I am going to sleep");
                 state.brainState = TingoState::BrainState::Sleeping;
 
                 idleTimer = 0.0f;
@@ -52,6 +67,12 @@ void TingoBrain::Update(float dt)
         case TingoState::BrainState::Sleeping:
         {
             AdvanceSleep(dt);
+            break;
+        }
+
+        case TingoState::BrainState::Greeting:
+        {
+            AdvanceGreeting(dt);
             break;
         }
 
@@ -305,10 +326,22 @@ void TingoBrain::AdvanceSleep(float dt)
             state.brainState = TingoState::BrainState::Idle;
             sleepSequence = SleepSequence::Inactive;
 
+            Speak("I am waking up");
+
             break;
         }
 
     default:
         break;
     }
+}
+
+void TingoBrain::AdvanceGreeting(float dt)
+{
+    (void)dt;
+}
+
+void TingoBrain::Speak(std::string text)
+{
+    speechController.Speak(text);
 }

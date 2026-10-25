@@ -11,7 +11,7 @@ Head::Head
     assets(assets),
     dimensions(dimensions),
     state(state),
-    mouthDisplay(assets, dimensions),
+    mouthDisplay(assets, dimensions, state),
     leftEye(assets, dimensions, state, "left"),
     rightEye(assets, dimensions, state, "right"),
     nose(assets, dimensions),

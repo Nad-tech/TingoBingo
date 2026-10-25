@@ -436,6 +436,194 @@ struct ScreenDimensions
 
 
 =====================================
+.\include\SpeechController.h
+=====================================
+
+#pragma once
+
+#include <string>
+#include <atomic>
+#include <thread>
+#include "raylib.h"
+
+
+//====================================================
+// SpeechController
+//
+// Manages Tingo's speech generation and audio playback.
+//
+// Speech generation is performed on a worker thread
+// using Piper/FFmpeg, while Raylib audio operations
+// are handled on the main thread.
+//
+// Speech lifecycle:
+//
+//     Idle → Generating → Playing → Idle
+//
+// Generating = Piper/FFmpeg are creating the WAV file.
+// Playing    = Raylib is playing the generated WAV.
+// Idle       = No speech is currently active.
+//====================================================
+
+class SpeechController
+{
+public:
+
+    //================================================
+    // State
+    //
+    // Represents the current stage of the speech
+    // lifecycle.
+    //================================================
+
+    enum class State
+    {
+        Idle,
+        Generating,
+        Playing
+    };
+
+
+    //================================================
+    // Update
+    //
+    // Runs on the main thread.
+    //
+    // Checks whether the worker thread has generated
+    // the WAV file and, if so, loads and plays it
+    // through Raylib.
+    //
+    // Also detects when Raylib has finished playing
+    // the speech.
+    //================================================
+
+    void Update();
+
+
+    //================================================
+    // Speak
+    //
+    // Starts a new speech request.
+    //
+    // Speech generation is performed on a worker
+    // thread so Piper/FFmpeg do not block the
+    // main game loop.
+    //================================================
+
+    void Speak(const std::string& text);
+
+
+    //================================================
+    // Destructor
+    //
+    // Requests the speech worker to stop and joins
+    // the worker thread before the controller is
+    // destroyed.
+    //================================================
+
+    ~SpeechController();
+
+
+    //================================================
+    // SoundLoaded
+    //
+    // Returns true when the generated speech WAV
+    // is currently loaded into a Raylib Sound.
+    //================================================
+
+    bool SoundLoaded();
+
+
+    //================================================
+    // SpeechFinished
+    //
+    // Returns true when the complete speech lifecycle
+    // has finished.
+    //
+    // This remains false while speech is generating
+    // or playing, and becomes true once playback has
+    // finished and the controller returns to Idle.
+    //================================================
+
+    bool SpeechFinished();
+
+
+private:
+
+    // Current stage of the speech lifecycle.
+    State state = State::Idle;
+
+
+    //================================================
+    // Worker Thread Communication
+    //================================================
+
+    // Set by the main thread when shutdown has been
+    // requested.
+    //
+    // The speech worker checks this flag while
+    // generating speech and stops when requested.
+    std::atomic<bool> stopRequested{false};
+
+
+    // Set by the worker thread when Speech::Speak()
+    // has successfully generated the WAV file.
+    //
+    // The main thread checks this flag in Update().
+    std::atomic<bool> wavReady{false};
+
+
+    // Worker thread responsible for speech generation.
+    std::thread speechThread;
+
+
+    //================================================
+    // Raylib Audio
+    //================================================
+
+    // The generated speech audio loaded by Raylib.
+    Sound speechSound{};
+
+
+    // True while speechSound contains a loaded
+    // Raylib Sound.
+    bool soundLoaded = false;
+
+
+    // Tracks whether the complete speech request has
+    // finished.
+    //
+    // false = generating or playing
+    // true  = speech has completely finished
+    //
+    // This is separate from SoundIsPlaying() because
+    // speech can be not playing while it is still
+    // being generated.
+    bool speechFinished = true;
+};
+
+
+=====================================
+.\include\SpeechGenerator.h
+=====================================
+
+#pragma once
+
+#include <string>
+#include <atomic>
+
+class SpeechGenerator
+{
+public:
+    static bool GenerateSpeech
+    (
+        const std::string& text,  
+        const std::atomic<bool>& stopRequested
+    );
+};
+
+
+=====================================
 .\include\TingoBingo\Body\Arm\ArmWaveState.h
 =====================================
 
@@ -981,7 +1169,9 @@ private:
 enum class EyeState
 {
     Open,
-    Close
+    Closed,
+    Opening,
+    Closing
 };
 
 
@@ -1058,11 +1248,16 @@ private:
 #include "TingoBingo/TingoDimensions.h"
 #include "TingoBingo/TingoAssets.h"
 #include "Animation.h"
+#include "TingoBingo/TingoState.h"
 
 class MouthDisplay
 {
 public:
-    MouthDisplay(TingoAssets& assets, TingoDimensions& dimensions);
+    MouthDisplay(
+        TingoAssets& assets, 
+        TingoDimensions& dimensions,
+        TingoState& state
+    );
 
     void Initialise();
     
@@ -1077,6 +1272,8 @@ public:
 private:
     TingoAssets& assets;
     TingoDimensions& dimensions;
+    TingoState& state;
+
 
     Vector3 positionOffset;
     
@@ -1087,6 +1284,8 @@ private:
     Model mouthPlane{};
     MyTransform3D mouthPlaneTransform{};
     Vector3 mouthPlaneOffset;
+
+    void AdvanceSpeakAnimation();
 };
 
 
@@ -1423,6 +1622,9 @@ public:
     ArmWaveState GetLeftArmWaveState() const;
     ArmWaveState GetRightArmWaveState() const;
 
+    EyeState GetLeftEyeState() const;
+    EyeState GetRightEyeState() const;
+
 private:
     MyTransform3D transform;
     TingoAssets &assets;
@@ -1513,6 +1715,9 @@ public:
 
 #pragma once
 #include "TingoBingo/TingoState.h"
+#include "SpeechController.h"
+#include <string>
+
 
 class Tingo;
 class TingoBrain
@@ -1526,6 +1731,23 @@ public:
         WaitingBetweenArms,
         LeftArm,
         WaitingForLeftArm
+    };
+
+    enum class BlinkSequence
+    {
+        Blinking,
+        WaitingBetweenBlinks
+    };
+
+    enum class SleepSequence
+    {
+        Inactive,
+        PreparingToSleep,
+        WaitingForLimbs,
+        ClosingEyes,
+        Sleeping,
+        WakingUp,
+        Finished
     };
 
     TingoBrain(Tingo& tingo, TingoState& state);
@@ -1542,16 +1764,23 @@ private:
     float waveDurationTimer;
     float idleTimer;
 
-    float sleepTimer;
-    float sleepingTimer;
-
     WaveSequence waveSequence;
     void AdvanceIdleWave(float dt);
-    bool IsWaveComplete() const;
-    void AdvanceSleep(float dt);
+    
+    BlinkSequence blinkSequence;
+    void AdvanceBlink(float dt);
 
     float blinkTimer;
     float nextBlinkTimer;
+
+    SleepSequence sleepSequence;
+    void AdvanceSleep(float dt);
+    float sleepTimer;
+
+    void AdvanceGreeting(float dt);
+
+    SpeechController SpeechController;
+    void Speak(std::string text);
 };
 
 
@@ -1768,7 +1997,8 @@ public:
     enum class BrainState
     {
         Idle,
-        Sleeping
+        Sleeping,
+        Greeting
     } brainState;
 
     enum class WaveState
@@ -1780,12 +2010,17 @@ public:
 
     enum class BlinkState
     {
-        Enable,
-        Waiting,
-        Sleep
+        Inactive,
+        Blinking
     } blinkState;
 
-    bool blinkRequested = false;
+    enum class EyeStateBrain
+    {
+        Open,
+        Close
+    }eyeStateBrain;
+
+    bool speaking;
 };
 
 
@@ -1918,6 +2153,7 @@ void Animation::Reset()
 void Animation::SetFrame(int newFrame)
 {
     frame = newFrame % totalFrames;
+    frameTimer = 0.0f;
 }
 
 // Move to the previous frame.
@@ -2638,6 +2874,983 @@ int main()
     game.Shutdown();
 
     return 0;
+}
+
+
+=====================================
+.\src\SpeechController.cpp
+=====================================
+
+#include "SpeechController.h"
+#include "SpeechGenerator.h"
+#include <iostream>
+
+//====================================================
+// Update
+//
+// Runs on the main thread.
+//
+// Handles communication between the speech worker
+// thread and the Raylib audio system.
+//
+// The worker thread is responsible for generating
+// the WAV file.
+//
+// The main thread is responsible for loading and
+// playing the WAV through Raylib.
+//
+// Speech lifecycle:
+//
+//     Generating → Playing → Idle
+//
+// speechFinished remains false while speech is
+// generating or playing, and becomes true when
+// playback has completely finished.
+//====================================================
+
+void SpeechController::Update()
+{
+    //================================================
+    // WAV READY
+    //
+    // The worker thread sets wavReady to true when
+    // Speech::Speak() has successfully generated
+    // the WAV file.
+    //
+    // Because wavReady is atomic, it can safely be
+    // written by the worker thread and read by the
+    // main thread.
+    //================================================
+
+    if(wavReady)
+    {
+        // Reset the flag so the same WAV is not
+        // loaded and played again on the next frame.
+        wavReady = false;
+
+
+        // Load the generated WAV into a Raylib Sound.
+        //
+        // Raylib audio operations are performed on
+        // the main thread rather than the worker thread.
+        speechSound =
+            LoadSound("./assets/audio/voice/speech.wav");
+
+        soundLoaded = true;
+
+
+        // Start playing the generated speech.
+        PlaySound(speechSound);
+
+
+        // Speech generation is complete and the
+        // generated audio has now started playing.
+        state = State::Playing;
+
+
+        // The complete speech request is not finished
+        // yet because the sound is currently playing.
+        speechFinished = false;
+    }
+
+
+    //================================================
+    // PLAYBACK FINISHED
+    //
+    // Check whether speech is currently playing
+    // and Raylib has finished the sound.
+    //
+    // IsSoundPlaying() returns false once playback
+    // has completed.
+    //
+    // IsSoundPlaying() is a Raylib function that checks
+    // whether the Sound is currently being played.
+    //================================================
+
+    if(state == State::Playing &&
+       !IsSoundPlaying(speechSound))
+    {
+        // The audio has finished playing, so the
+        // Raylib Sound resource can now be released.
+        UnloadSound(speechSound);
+
+
+        // Keep track of the fact that there is no
+        // longer a loaded speech sound.
+        soundLoaded = false;
+
+
+        // The complete speech lifecycle has finished.
+        //
+        // Returning to Idle allows the controller to
+        // accept another speech request.
+        state = State::Idle;
+
+
+        // Tell the RobotBrain that the entire speech
+        // request has now finished.
+        speechFinished = true;
+    }
+}
+
+
+//====================================================
+// Speak
+//
+// Starts a new speech request.
+//
+// Speech generation is performed on a worker thread
+// so Piper and FFmpeg do not block the main game loop.
+//
+// The controller moves into the Generating state
+// immediately while the worker creates the WAV file.
+//====================================================
+
+void SpeechController::Speak(const std::string& text)
+{
+    //================================================
+    // CHECK WHETHER SPEECH CAN START
+    //
+    // A new speech request can only begin when the
+    // controller is Idle.
+    //
+    // This prevents another worker thread from being
+    // created while speech is already generating or
+    // playing.
+    //================================================
+
+    if (state != State::Idle)
+    {
+        return;
+    }
+
+
+    //================================================
+    // JOIN PREVIOUS WORKER
+    //
+    // A std::thread remains joinable even after the
+    // function running on it has finished.
+    //
+    // Join the previous worker before reusing the
+    // speechThread object.
+    //================================================
+
+    if(speechThread.joinable())
+    {
+        // Wait for the previous worker to finish and
+        // safely join it with the main thread.
+        speechThread.join();
+    }
+
+
+    //================================================
+    // START GENERATION
+    //================================================
+
+    // Tell the controller that speech generation is
+    // now in progress.
+    //
+    // This prevents another Speak() request from
+    // starting while the current request is active.
+    state = State::Generating;
+
+
+    // The speech request has started, so it cannot be
+    // considered finished while the WAV is generating.
+    //
+    // SpeechFinished must be set to false when a new speech
+    // request begins.
+    //
+    // Otherwise RobotBrain could see the initial true value
+    // while speech is still being generated and incorrectly
+    // assume that speech has already finished.
+    speechFinished = false;
+
+
+    //================================================
+    // CREATE WORKER THREAD
+    //================================================
+
+    // Create and start the worker thread.
+    //
+    // The lambda contains the code executed by the
+    // worker thread.
+    //
+    // [this, text] means:
+    //
+    // this
+    //     Gives the lambda access to this
+    //     SpeechController object.
+    //
+    // text
+    //     Makes a copy of the speech text so the
+    //     worker has its own copy to use.
+    speechThread = std::thread([this, text]()
+    {
+        //================================================
+        // GENERATE SPEECH
+        //
+        // Speech::Speak() runs Piper and FFmpeg on
+        // the worker thread.
+        //
+        // stopRequested is shared between the main
+        // thread and worker thread and allows the
+        // generation process to be cancelled.
+        //================================================
+
+        bool success =
+            SpeechGenerator::GenerateSpeech(text, stopRequested);
+
+        //================================================
+        // GENERATION RESULT
+        //================================================
+
+        if (success)
+        {
+            // The WAV has successfully been generated.
+            //
+            // Tell the main thread that it can now
+            // load and play the WAV.
+            wavReady = true;
+        }
+        else
+        {
+            // Speech generation failed or was cancelled.
+            //
+            // No audio will be played, so return the
+            // controller to the Idle state.
+            state = State::Idle;
+        }
+    });
+}
+
+
+//====================================================
+// Destructor
+//
+// Called when SpeechController is destroyed.
+//
+// Ensures the speech worker is safely stopped and
+// joined before the SpeechController object disappears.
+//====================================================
+
+SpeechController::~SpeechController()
+{
+    //================================================
+    // REQUEST WORKER SHUTDOWN
+    //================================================
+
+    // Tell Speech::Speak() that shutdown has been
+    // requested.
+    //
+    // Speech::Speak() periodically checks this flag
+    // while Piper and FFmpeg are running.
+    stopRequested = true;
+
+
+    //================================================
+    // JOIN WORKER
+    //================================================
+
+    // Check whether the worker thread still needs
+    // to be joined.
+    if (speechThread.joinable())
+    {
+        // Wait for the worker to finish before
+        // destroying the SpeechController.
+        //
+        // This prevents the worker from accessing
+        // the controller after it has been destroyed.
+        speechThread.join();
+    }
+}
+
+
+//====================================================
+// SoundLoaded
+//
+// Returns true while the generated speech WAV is
+// currently loaded as a Raylib Sound.
+//====================================================
+
+bool SpeechController::SoundLoaded()
+{
+    return soundLoaded;
+}
+
+
+//====================================================
+// SpeechFinished
+//
+// Returns true when the complete speech lifecycle
+// has finished.
+//
+// false:
+//     Speech is generating or playing.
+//
+// true:
+//     Playback has finished and the controller
+//     has returned to Idle.
+//
+// This is deliberately separate from checking whether
+// the sound is playing because speech can be temporarily
+// "not playing" while the WAV is still being generated.
+//====================================================
+
+bool SpeechController::SpeechFinished()
+{
+    return speechFinished;
+}
+
+
+=====================================
+.\src\SpeechGenerator.cpp
+=====================================
+
+//====================================================
+// Speech.cpp
+//
+// Generates speech audio using Piper and FFmpeg.
+//
+// Piper receives text through a Windows stdin pipe.
+// This avoids shell execution and means special
+// characters in the spoken text are not interpreted
+// by the command shell.
+//
+// Piper creates speech_raw.wav.
+//
+// FFmpeg then applies the selected audio effects
+// and creates the final speech.wav.
+//
+// All project paths are relative to the application's
+// current working directory, so the project does not
+// depend on a specific developer's machine path.
+//====================================================
+
+#include "SpeechGenerator.h"
+
+#include <filesystem>
+#include <iostream>
+
+#include "windows.h"
+
+
+//====================================================
+// Helper: CloseProcessHandles
+//
+// Safely closes the handles returned by
+// CreateProcessA().
+//
+// The process itself has already finished or has
+// been terminated before this function is called.
+//====================================================
+
+static void CloseProcessHandles(PROCESS_INFORMATION& process)
+{
+    if (process.hProcess)
+    {
+        CloseHandle(process.hProcess);
+        process.hProcess = nullptr;
+    }
+
+    if (process.hThread)
+    {
+        CloseHandle(process.hThread);
+        process.hThread = nullptr;
+    }
+}
+
+
+//====================================================
+// Speak
+//
+// Generates a processed speech WAV file.
+//
+// Returns:
+//
+//     true  - Piper and FFmpeg succeeded.
+//
+//     false - Something failed or shutdown was
+//             requested.
+//====================================================
+
+bool SpeechGenerator::GenerateSpeech
+(
+    const std::string& text,
+    const std::atomic<bool>& stopRequested
+)
+{
+    //================================================
+    // PROJECT PATHS
+    //================================================
+
+    // Use the application's current working directory
+    // as the project root.
+    //
+    // This replaces paths such as:
+    //
+    // Example of the old machine-specific path:
+    // C:/dev/raylib-projects/TingoBingo_1.0/
+    //
+    // with paths relative to the project.
+    const std::filesystem::path projectRoot =
+        std::filesystem::current_path();
+
+    const std::filesystem::path piperPath =
+        projectRoot /
+        "tools" /
+        "piper" /
+        "piper.exe";
+
+    const std::filesystem::path piperModelPath =
+        projectRoot /
+        "tools" /
+        "piper" /
+        "en_GB-alan-medium.onnx";
+
+    const std::filesystem::path ffmpegPath =
+        projectRoot /
+        "tools" /
+        "ffmpeg" /
+        "bin" /
+        "ffmpeg.exe";
+
+    const std::filesystem::path rawSpeechPath =
+        projectRoot /
+        "assets" /
+        "audio" /
+        "voice" /
+        "speech_raw.wav";
+
+    const std::filesystem::path speechPath =
+        projectRoot /
+        "assets" /
+        "audio" /
+        "voice" /
+        "speech.wav";
+
+
+    //================================================
+    // VERIFY REQUIRED FILES
+    //================================================
+
+    // Check that Piper exists before trying to launch it.
+    if (!std::filesystem::exists(piperPath))
+    {
+        std::cout
+            << "Piper executable not found: "
+            << piperPath.string()
+            << "\n";
+
+        return false;
+    }
+
+
+    // Check that the Piper voice model exists.
+    if (!std::filesystem::exists(piperModelPath))
+    {
+        std::cout
+            << "Piper model not found: "
+            << piperModelPath.string()
+            << "\n";
+
+        return false;
+    }
+
+
+    // Check that FFmpeg exists.
+    if (!std::filesystem::exists(ffmpegPath))
+    {
+        std::cout
+            << "FFmpeg executable not found: "
+            << ffmpegPath.string()
+            << "\n";
+
+        return false;
+    }
+
+
+    //================================================
+    // PIPER INPUT PIPE
+    //================================================
+
+    // Create a Windows pipe that will become Piper's
+    // standard input.
+    //
+    // Our program writes text into:
+    //
+    //     piperStdInWrite
+    //
+    // Piper reads that text from:
+    //
+    //     piperStdInRead
+    SECURITY_ATTRIBUTES securityAttributes{};
+
+    securityAttributes.nLength =
+        sizeof(securityAttributes);
+
+    securityAttributes.bInheritHandle = TRUE;
+
+    securityAttributes.lpSecurityDescriptor =
+        nullptr;
+
+
+    HANDLE piperStdInRead = nullptr;
+    HANDLE piperStdInWrite = nullptr;
+
+
+    if (!CreatePipe(
+            &piperStdInRead,
+            &piperStdInWrite,
+            &securityAttributes,
+            0))
+    {
+        std::cout
+            << "Failed to create Piper stdin pipe. Error: "
+            << GetLastError()
+            << "\n";
+
+        return false;
+    }
+
+
+    // The parent process needs the write handle,
+    // but Piper only needs the read handle.
+    //
+    // Prevent Piper from inheriting the write handle.
+    //
+    // This is important because otherwise Piper could
+    // keep its own copy of the write side open.
+    if (!SetHandleInformation(
+            piperStdInWrite,
+            HANDLE_FLAG_INHERIT,
+            0))
+    {
+        std::cout
+            << "Failed to configure Piper stdin pipe. Error: "
+            << GetLastError()
+            << "\n";
+
+        CloseHandle(piperStdInRead);
+        CloseHandle(piperStdInWrite);
+
+        return false;
+    }
+
+
+    //================================================
+    // START PIPER
+    //================================================
+
+    STARTUPINFOA piperStartupInfo{};
+    PROCESS_INFORMATION piperProcess{};
+
+    piperStartupInfo.cb =
+        sizeof(piperStartupInfo);
+
+
+    // Tell Windows that Piper should use the handles
+    // supplied below for standard input/output/error.
+    piperStartupInfo.dwFlags |=
+        STARTF_USESTDHANDLES;
+
+
+    // Piper reads its text from our pipe.
+    piperStartupInfo.hStdInput =
+        piperStdInRead;
+
+
+    // Keep Piper's output/error behaviour normal.
+    piperStartupInfo.hStdOutput =
+        GetStdHandle(STD_OUTPUT_HANDLE);
+
+    piperStartupInfo.hStdError =
+        GetStdHandle(STD_ERROR_HANDLE);
+
+
+    // Build Piper's command line.
+    //
+    // Notice that the user's text is NOT part of this
+    // command line.
+    //
+    // That means characters such as:
+    //
+    //     "
+    //     &
+    //     |
+    //     <
+    //     >
+    //
+    // cannot be interpreted as shell commands.
+    //
+    // The text will be sent through stdin instead.
+    std::string piperCommand =
+        "\"" + piperPath.string() + "\" "
+        "--model \"" + piperModelPath.string() + "\" "
+        "--output_file \"" + rawSpeechPath.string() + "\"";
+
+
+    // CreateProcessA() may modify the command-line
+    // buffer, so commandLine must be a mutable string.
+    if (!CreateProcessA(
+            nullptr,
+            piperCommand.data(),
+            nullptr,
+            nullptr,
+            TRUE,
+            CREATE_NO_WINDOW,
+            nullptr,
+            projectRoot.string().c_str(),
+            &piperStartupInfo,
+            &piperProcess))
+    {
+        std::cout
+            << "Failed to launch Piper. Error: "
+            << GetLastError()
+            << "\n";
+
+        CloseHandle(piperStdInRead);
+        CloseHandle(piperStdInWrite);
+
+        return false;
+    }
+
+
+    // Piper now owns the read side of the pipe.
+    // The parent no longer needs it.
+    CloseHandle(piperStdInRead);
+    piperStdInRead = nullptr;
+
+
+    //================================================
+    // SEND TEXT TO PIPER
+    //================================================
+
+    // Add a newline so Piper receives the text as a
+    // complete line, equivalent to the old:
+    //
+    // echo "text"
+    //
+    // approach.
+    std::string input =
+        text + "\n";
+
+
+    DWORD bytesWritten = 0;
+
+
+    if (!WriteFile(
+            piperStdInWrite,
+            input.c_str(),
+            static_cast<DWORD>(input.size()),
+            &bytesWritten,
+            nullptr))
+    {
+        std::cout
+            << "Failed to send text to Piper. Error: "
+            << GetLastError()
+            << "\n";
+
+        CloseHandle(piperStdInWrite);
+        piperStdInWrite = nullptr;
+
+        TerminateProcess(
+            piperProcess.hProcess,
+            1
+        );
+
+        CloseProcessHandles(piperProcess);
+
+        return false;
+    }
+
+
+    // Make sure the entire input was written.
+    if (bytesWritten != input.size())
+    {
+        std::cout
+            << "Piper stdin write was incomplete.\n";
+
+        CloseHandle(piperStdInWrite);
+        piperStdInWrite = nullptr;
+
+        TerminateProcess(
+            piperProcess.hProcess,
+            1
+        );
+
+        CloseProcessHandles(piperProcess);
+
+        return false;
+    }
+
+
+    // Closing the write side tells Piper:
+    //
+    // "There is no more input."
+    //
+    // Piper can now finish processing the text.
+    CloseHandle(piperStdInWrite);
+    piperStdInWrite = nullptr;
+
+
+    //================================================
+    // WAIT FOR PIPER
+    //================================================
+
+    // Don't use INFINITE here.
+    //
+    // Instead, check every 50 ms so the worker can
+    // respond to a shutdown request.
+    DWORD waitResult =
+        WAIT_TIMEOUT;
+
+
+    while (waitResult == WAIT_TIMEOUT)
+    {
+        if (stopRequested)
+        {
+            TerminateProcess(
+                piperProcess.hProcess,
+                1
+            );
+
+            CloseProcessHandles(piperProcess);
+
+            return false;
+        }
+
+
+        waitResult =
+            WaitForSingleObject(
+                piperProcess.hProcess,
+                50
+            );
+    }
+
+
+    // If Windows reported a wait error, treat it as
+    // a failed speech generation.
+    if (waitResult != WAIT_OBJECT_0)
+    {
+        std::cout
+            << "Failed while waiting for Piper. Error: "
+            << GetLastError()
+            << "\n";
+
+        CloseProcessHandles(piperProcess);
+
+        return false;
+    }
+
+
+    //================================================
+    // CHECK PIPER RESULT
+    //================================================
+
+    DWORD piperExitCode = 0;
+
+    if (!GetExitCodeProcess(
+            piperProcess.hProcess,
+            &piperExitCode))
+    {
+        std::cout
+            << "Failed to get Piper exit code. Error: "
+            << GetLastError()
+            << "\n";
+
+        CloseProcessHandles(piperProcess);
+
+        return false;
+    }
+
+
+    if (piperExitCode != 0)
+    {
+        std::cout
+            << "Piper failed. Exit code: "
+            << piperExitCode
+            << "\n";
+
+        CloseProcessHandles(piperProcess);
+
+        return false;
+    }
+
+
+    // Piper succeeded.
+    CloseProcessHandles(piperProcess);
+
+
+    //================================================
+    // VERIFY PIPER OUTPUT
+    //================================================
+
+    // Make sure Piper actually created the WAV file
+    // before asking FFmpeg to process it.
+    if (!std::filesystem::exists(rawSpeechPath))
+    {
+        std::cout
+            << "Piper completed but did not create: "
+            << rawSpeechPath.string()
+            << "\n";
+
+        return false;
+    }
+
+
+    //================================================
+    // START FFMPEG
+    //================================================
+
+    STARTUPINFOA ffmpegStartupInfo{};
+    PROCESS_INFORMATION ffmpegProcess{};
+
+    ffmpegStartupInfo.cb =
+        sizeof(ffmpegStartupInfo);
+
+
+    // Build the FFmpeg command line using paths relative
+    // to the project location.
+    //
+    // No machine-specific C:\dev\... paths remain.
+    std::string ffmpegCommand =
+        "\"" + ffmpegPath.string() + "\" "
+        "-y "
+        "-i \"" + rawSpeechPath.string() + "\" "
+        "-af \"aecho=0.8:0.88:60:0.25,"
+        "highpass=f=250,"
+        "lowpass=f=3500,"
+        "acrusher=bits=12:mix=0.15\" "
+        "\"" + speechPath.string() + "\"";
+
+
+    if (!CreateProcessA(
+            nullptr,
+            ffmpegCommand.data(),
+            nullptr,
+            nullptr,
+            FALSE,
+            CREATE_NO_WINDOW,
+            nullptr,
+            projectRoot.string().c_str(),
+            &ffmpegStartupInfo,
+            &ffmpegProcess))
+    {
+        std::cout
+            << "Failed to launch FFmpeg. Error: "
+            << GetLastError()
+            << "\n";
+
+        return false;
+    }
+
+
+    //================================================
+    // WAIT FOR FFMPEG
+    //================================================
+
+    waitResult =
+        WAIT_TIMEOUT;
+
+
+    while (waitResult == WAIT_TIMEOUT)
+    {
+        if (stopRequested)
+        {
+            TerminateProcess(
+                ffmpegProcess.hProcess,
+                1
+            );
+
+            CloseProcessHandles(ffmpegProcess);
+
+            return false;
+        }
+
+
+        waitResult =
+            WaitForSingleObject(
+                ffmpegProcess.hProcess,
+                50
+            );
+    }
+
+
+    if (waitResult != WAIT_OBJECT_0)
+    {
+        std::cout
+            << "Failed while waiting for FFmpeg. Error: "
+            << GetLastError()
+            << "\n";
+
+        CloseProcessHandles(ffmpegProcess);
+
+        return false;
+    }
+
+
+    //================================================
+    // CHECK FFMPEG RESULT
+    //================================================
+
+    DWORD ffmpegExitCode = 0;
+
+    if (!GetExitCodeProcess(
+            ffmpegProcess.hProcess,
+            &ffmpegExitCode))
+    {
+        std::cout
+            << "Failed to get FFmpeg exit code. Error: "
+            << GetLastError()
+            << "\n";
+
+        CloseProcessHandles(ffmpegProcess);
+
+        return false;
+    }
+
+
+    if (ffmpegExitCode != 0)
+    {
+        std::cout
+            << "FFmpeg failed. Exit code: "
+            << ffmpegExitCode
+            << "\n";
+
+        CloseProcessHandles(ffmpegProcess);
+
+        return false;
+    }
+
+
+    // FFmpeg succeeded.
+    CloseProcessHandles(ffmpegProcess);
+
+
+    //================================================
+    // VERIFY FINAL OUTPUT
+    //================================================
+
+    // Make sure the final processed WAV actually exists
+    // before telling SpeechController that it is ready.
+    if (!std::filesystem::exists(speechPath))
+    {
+        std::cout
+            << "FFmpeg completed but did not create: "
+            << speechPath.string()
+            << "\n";
+
+        return false;
+    }
+
+
+    //================================================
+    // SUCCESS
+    //================================================
+
+
+    return true;
 }
 
 
@@ -3530,15 +4743,16 @@ void Ear::SetTransform(MyTransform3D parentTransform)
 =====================================
 
 #include "TingoBingo/Body/Head/Eye.h"
+
 #include "raymath.h"
 #include <iostream>
+
 #include "DebugPanel.h"
 
-Eye::Eye
-(
-    TingoAssets& assets, 
+Eye::Eye(
+    TingoAssets& assets,
     TingoDimensions& dimensions,
-    TingoState& state, 
+    TingoState& state,
     std::string side
 ) :
     assets(assets),
@@ -3546,27 +4760,29 @@ Eye::Eye
     state(state),
     side(side),
     pupil(assets, dimensions)
-{}
+{
+}
 
 void Eye::Initialise()
 {
     float Xoffset = 0.5f;
     float Yoffset = 0.3f + dimensions.head.height / 2.0f;
 
-    if(side == "left")
+    if (side == "left")
     {
         positionOffset = {
             Xoffset,
             Yoffset,
-            dimensions.head.length / 2.0f + dimensions.eye.length / 2.0f        
+            dimensions.head.length / 2.0f
+                + dimensions.eye.length / 2.0f
         };
     }
-    else if(side == "right")
+    else if (side == "right")
     {
         positionOffset = {
             -Xoffset,
             Yoffset,
-            dimensions.head.length / 2.0f        
+            dimensions.head.length / 2.0f
         };
     }
 
@@ -3580,8 +4796,6 @@ void Eye::Initialise()
 void Eye::Update(float dt)
 {
     AdvanceBlink(dt);
-
-    std::string state = "NULL";
 }
 
 void Eye::Draw()
@@ -3614,57 +4828,81 @@ void Eye::SetTransform(MyTransform3D parentTransform)
     pupil.SetTransform(transform);
 }
 
-
 void Eye::AdvanceBlink(float dt)
 {
     const float speed = 10.0f;
     const float minScale = 0.1f;
     const float maxScale = 1.0f;
 
-    switch (state.blinkState)
+    if (state.eyeStateBrain == TingoState::EyeStateBrain::Close)
     {
-    case TingoState::BlinkState::Enable:
-        if()
-    
-        switch (eyeState)
+        if (eyeState != EyeState::Closed)
         {
-        case EyeState::Open:
-            localScale.y += dt * speed;
+            eyeState = EyeState::Closing;
 
-            if(localScale.y >= maxScale)
-            {    
-                localScale.y = maxScale;
-                eyeState = EyeState::Close;
-            }
-            break;
-
-        case EyeState::Close:
             localScale.y -= dt * speed;
 
-            if(localScale.y <= minScale)
+            if (localScale.y <= minScale)
             {
                 localScale.y = minScale;
-                eyeState = EyeState::Open;
+                eyeState = EyeState::Closed;
             }
-            break;
-        default:
-            break;
         }
-        break;
-    
-    case TingoState::BlinkState::Sleep:
-        if(localScale.y > minScale)
+    }
+    else if (state.eyeStateBrain == TingoState::EyeStateBrain::Open)
+    {
+        if (state.blinkState == TingoState::BlinkState::Blinking)
         {
-            localScale.y -= dt * speed;
+            switch (eyeState)
+            {
+                case EyeState::Open:
+                    eyeState = EyeState::Closing;
+                    break;
 
-            if(localScale.y <= minScale)
-                localScale.y = minScale;
+                case EyeState::Closing:
+                    localScale.y -= dt * speed;
+
+                    if (localScale.y <= minScale)
+                    {
+                        localScale.y = minScale;
+                        eyeState = EyeState::Opening;
+                    }
+                    break;
+
+                case EyeState::Closed:
+                    eyeState = EyeState::Opening;
+                    break;
+
+                case EyeState::Opening:
+                    localScale.y += dt * speed;
+
+                    if (localScale.y >= maxScale)
+                    {
+                        localScale.y = maxScale;
+                        eyeState = EyeState::Open;
+                    }
+                    break;
+            }
         }
-        eyeState = EyeState::Close;
-        break;
+        else
+        {
+            if (eyeState == EyeState::Closed)
+            {
+                eyeState = EyeState::Opening;
+            }
 
-    default:
-        break;
+            if (eyeState == EyeState::Opening ||
+                eyeState == EyeState::Closing)
+            {
+                localScale.y += dt * speed;
+
+                if (localScale.y >= maxScale)
+                {
+                    localScale.y = maxScale;
+                    eyeState = EyeState::Open;
+                }
+            }
+        }
     }
 
     SetTransform(tempParentTransform);
@@ -3766,7 +5004,7 @@ Head::Head
     assets(assets),
     dimensions(dimensions),
     state(state),
-    mouthDisplay(assets, dimensions),
+    mouthDisplay(assets, dimensions, state),
     leftEye(assets, dimensions, state, "left"),
     rightEye(assets, dimensions, state, "right"),
     nose(assets, dimensions),
@@ -3864,10 +5102,16 @@ EyeState Head::GetRightEyeState() const
 
 #include "TingoBingo/Body/Head/MouthDisplay.h"
 #include "raymath.h"
+#include <iostream>
 
-MouthDisplay::MouthDisplay(TingoAssets& assets, TingoDimensions& dimensions) :
+MouthDisplay::MouthDisplay(
+    TingoAssets& assets, 
+    TingoDimensions& dimensions,
+    TingoState& state
+) :
     assets(assets),
-    dimensions(dimensions)
+    dimensions(dimensions),
+    state(state)
 {}
 
 void MouthDisplay::Initialise()
@@ -3895,7 +5139,7 @@ void MouthDisplay::Initialise()
         dimensions.mouthSpriteSheet.rows *
         dimensions.mouthSpriteSheet.cols;
     
-    float frameDuration = 0.1f;
+    float frameDuration = 0.4f;
 
         animation.Initialise
     (
@@ -3937,6 +5181,10 @@ void MouthDisplay::Initialise()
 void MouthDisplay::Update(float dt)
 {
     animation.Update(dt);
+
+    AdvanceSpeakAnimation();
+
+    SetMouthFrame(animation.GetFrame());
 }
 
 void MouthDisplay::Draw()
@@ -3986,8 +5234,6 @@ void MouthDisplay::SetTransform(MyTransform3D parentTransform)
 
 void MouthDisplay::SetMouthFrame(int frame)
 {
-    animation.SetFrame(frame);
-
     int col = frame % dimensions.mouthSpriteSheet.cols;
     int row = frame / dimensions.mouthSpriteSheet.cols;
 
@@ -4036,6 +5282,22 @@ void MouthDisplay::SetMouthFrame(int frame)
 void MouthDisplay::ShutDown()
 {
     UnloadModel(mouthPlane);
+}
+
+void MouthDisplay::AdvanceSpeakAnimation()
+{
+    if (state.speaking)
+    {
+        if (!animation.IsPlaying())
+        {
+            animation.Play(1, 2, AnimationPriority::Idle);
+        }
+    }
+    else
+    {
+        animation.Stop();
+        animation.SetFrame(0);
+    }
 }
 
 
@@ -4621,6 +5883,16 @@ ArmWaveState Tingo::GetRightArmWaveState() const
     return body.GetRightArmWaveState();
 }
 
+EyeState Tingo::GetLeftEyeState() const
+{
+    return body.GetLeftEyeState();
+}
+
+EyeState Tingo::GetRightEyeState() const
+{
+    return body.GetRightEyeState();
+}
+
 
 =====================================
 .\src\TingoBingo\TingoAssets.cpp
@@ -4913,70 +6185,84 @@ void TingoAssets::ShutDown()
 TingoBrain::TingoBrain(Tingo& tingo, TingoState& state) :
     tingo(tingo),
     state(state)
-{}
+{
+}
 
 void TingoBrain::Initialise()
 {
     state.brainState = TingoState::BrainState::Idle;
-    state.waveState = TingoState::WaveState::Inactive;
-    state.blinkState = TingoState::BlinkState::Enable;
-    
-    waveSequence = WaveSequence::Waiting;
-
-    idleWaveTimer = 0.0f;
     idleTimer = 0.0f;
-    sleepTimer = 0.0f;
-    waveDurationTimer = 0.0f;
 
+    state.waveState = TingoState::WaveState::Inactive;
+    waveSequence = WaveSequence::Waiting;
+    waveDurationTimer = 0.0f;
+    idleWaveTimer = 0.0f;
+
+    state.blinkState = TingoState::BlinkState::Inactive;
+    blinkSequence = BlinkSequence::WaitingBetweenBlinks;
     blinkTimer = 0.0f;
     nextBlinkTimer = GetRandomValue(2, 6);
+
+    sleepSequence = SleepSequence::Inactive;
+    state.eyeStateBrain = TingoState::EyeStateBrain::Open;
+    sleepTimer = 0.0f;
+
+    state.speaking = false;
 }
 
 void TingoBrain::Update(float dt)
 {
-    blinkTimer += dt;
-
-    if(blinkTimer >= nextBlinkTimer)
+    if(SpeechController.SpeechFinished())
     {
-        state.blinkRequested = true;
-        blinkTimer = 0.0f;
-        nextBlinkTimer = GetRandomValue(2, 6);
+        state.speaking = false;
     }
+    else
+    {
+        state.speaking = true;
+    }
+
 
     switch (state.brainState)
     {
-    case TingoState::BrainState::Idle:
-        AdvanceIdleWave(dt);
-        idleTimer += dt;
-        if(idleTimer > 10)
+        case TingoState::BrainState::Idle:
         {
-            state.brainState = TingoState::BrainState::Sleeping;
-            state.waveState = TingoState::WaveState::Inactive;
-            state.blinkState = TingoState::BlinkState::Sleep;
-            idleTimer = 0.0f;
-            idleWaveTimer = 0.0f;
+            AdvanceIdleWave(dt);
+            AdvanceBlink(dt);
+
+            idleTimer += dt;
+
+            if (idleTimer > 10.0f)
+            {
+                Speak("Im going to sleep");
+                state.brainState = TingoState::BrainState::Sleeping;
+
+                idleTimer = 0.0f;
+                idleWaveTimer = 0.0f;
+            }
+
+            break;
         }
-        break;
-    
-    case TingoState::BrainState::Sleeping:
-        AdvanceSleep(dt);
-        sleepTimer += dt;
-        if(sleepTimer > 10)
+
+        case TingoState::BrainState::Sleeping:
         {
-            state.brainState = TingoState::BrainState::Idle;
-            state.blinkState = TingoState::BlinkState::Enable;
-            sleepTimer = 0.0f;
+            Speak("Im waking up");
+            AdvanceSleep(dt);
+            break;
         }
-        break;
-    
-    default:
-        break;
-    }    
+
+        case TingoState::BrainState::Greeting:
+        {
+            AdvanceGreeting(dt);
+            break;
+        }
+
+        default:
+            break;
+    }
 }
 
 void TingoBrain::Draw()
 {
-
 }
 
 void TingoBrain::AdvanceIdleWave(float dt)
@@ -4991,10 +6277,13 @@ void TingoBrain::AdvanceIdleWave(float dt)
             if (idleWaveTimer >= 5.0f)
             {
                 state.waveState = TingoState::WaveState::WaveRight;
+
                 waveDurationTimer = 0.0f;
                 idleWaveTimer = 0.0f;
+
                 waveSequence = WaveSequence::RightArm;
             }
+
             break;
         }
 
@@ -5010,6 +6299,7 @@ void TingoBrain::AdvanceIdleWave(float dt)
                     waveSequence = WaveSequence::WaitingForRightArm;
                 }
             }
+
             break;
         }
 
@@ -5020,6 +6310,7 @@ void TingoBrain::AdvanceIdleWave(float dt)
                 idleWaveTimer = 0.0f;
                 waveSequence = WaveSequence::WaitingBetweenArms;
             }
+
             break;
         }
 
@@ -5030,10 +6321,13 @@ void TingoBrain::AdvanceIdleWave(float dt)
             if (idleWaveTimer >= 2.0f)
             {
                 state.waveState = TingoState::WaveState::WaveLeft;
+
                 waveDurationTimer = 0.0f;
                 idleWaveTimer = 0.0f;
+
                 waveSequence = WaveSequence::LeftArm;
             }
+
             break;
         }
 
@@ -5049,6 +6343,7 @@ void TingoBrain::AdvanceIdleWave(float dt)
                     waveSequence = WaveSequence::WaitingForLeftArm;
                 }
             }
+
             break;
         }
 
@@ -5058,44 +6353,175 @@ void TingoBrain::AdvanceIdleWave(float dt)
             {
                 idleWaveTimer = 0.0f;
                 waveDurationTimer = 0.0f;
+
                 waveSequence = WaveSequence::Waiting;
             }
+
             break;
         }
+
+        default:
+            break;
+    }
+}
+
+void TingoBrain::AdvanceBlink(float dt)
+{
+    switch (blinkSequence)
+    {
+        case BlinkSequence::WaitingBetweenBlinks:
+        {
+            blinkTimer += dt;
+
+            if (blinkTimer > nextBlinkTimer)
+            {
+                state.blinkState = TingoState::BlinkState::Blinking;
+                blinkSequence = BlinkSequence::Blinking;
+
+                blinkTimer = 0.0f;
+                nextBlinkTimer = GetRandomValue(2, 6);
+            }
+
+            break;
+        }
+
+        case BlinkSequence::Blinking:
+        {
+            if (
+                tingo.GetLeftEyeState() == EyeState::Open &&
+                tingo.GetRightEyeState() == EyeState::Open
+            )
+            {
+                state.blinkState = TingoState::BlinkState::Inactive;
+                blinkSequence = BlinkSequence::WaitingBetweenBlinks;
+
+                blinkTimer = 0.0f;
+            }
+
+            break;
+        }
+
+        default:
+            break;
     }
 }
 
 void TingoBrain::AdvanceSleep(float dt)
 {
-    (void)dt;
-    switch (state.blinkState)
+    switch (sleepSequence)
     {
-    case TingoState::BlinkState::Sleep:
-        /* code */
-        break;
-    
-    
+        case SleepSequence::Inactive:
+        {
+            sleepSequence = SleepSequence::PreparingToSleep;
+            break;
+        }
+
+        case SleepSequence::PreparingToSleep:
+        {
+            state.eyeStateBrain = TingoState::EyeStateBrain::Open;
+
+            sleepSequence = SleepSequence::WaitingForLimbs;
+            break;
+        }
+
+        case SleepSequence::WaitingForLimbs:
+        {
+            AdvanceIdleWave(dt);
+            AdvanceBlink(dt);
+
+            if 
+            (
+                tingo.GetRightArmWaveState() == ArmWaveState::None &&
+                tingo.GetLeftArmWaveState() == ArmWaveState::None
+            )
+            {
+                state.waveState = TingoState::WaveState::Inactive;
+                state.blinkState = TingoState::BlinkState::Inactive;
+                state.eyeStateBrain = TingoState::EyeStateBrain::Close;
+                sleepSequence = SleepSequence::ClosingEyes;
+            }
+
+            break;
+        }
+
+        case SleepSequence::ClosingEyes:
+        {
+            if (
+                tingo.GetLeftEyeState() == EyeState::Closed &&
+                tingo.GetRightEyeState() == EyeState::Closed
+            )
+            {
+                sleepTimer = 0.0f;
+                sleepSequence = SleepSequence::Sleeping;
+            }
+
+            break;
+        }
+
+        case SleepSequence::Sleeping:
+        {
+            sleepTimer += dt;
+
+            if (sleepTimer > 10.0f)
+            {
+                sleepSequence = SleepSequence::WakingUp;
+                sleepTimer = 0.0f;
+            }
+
+            break;
+        }        
+
+        case SleepSequence::WakingUp:
+        {
+            state.eyeStateBrain = TingoState::EyeStateBrain::Open;
+            
+            if 
+            (
+                tingo.GetLeftEyeState() == EyeState::Open &&
+                tingo.GetRightEyeState() == EyeState::Open
+            )
+            {
+                sleepSequence = SleepSequence::Finished;
+            }
+            
+            break;
+        }
+
+        case SleepSequence::Finished:
+        {
+            // Reset the wave sequence.
+            state.waveState = TingoState::WaveState::Inactive;
+            waveSequence = WaveSequence::Waiting;
+            waveDurationTimer = 0.0f;
+            idleWaveTimer = 0.0f;
+
+            // Reset the blink sequence.
+            state.blinkState = TingoState::BlinkState::Inactive;
+            blinkSequence = BlinkSequence::WaitingBetweenBlinks;
+            blinkTimer = 0.0f;
+            nextBlinkTimer = GetRandomValue(2, 6);
+
+            // Return to idle.
+            idleTimer = 0.0f;
+            state.brainState = TingoState::BrainState::Idle;
+            sleepSequence = SleepSequence::Inactive;
+
+            break;
+        }
+
     default:
         break;
     }
 }
 
-bool TingoBrain::IsWaveComplete() const
+void TingoBrain::AdvanceGreeting(float dt)
 {
-    switch (state.waveState)
-    {
-        case TingoState::WaveState::WaveRight:
-            return tingo.GetRightArmWaveState() == ArmWaveState::None;
+    (void)dt;
+}
 
-        case TingoState::WaveState::WaveLeft:
-            return tingo.GetLeftArmWaveState() == ArmWaveState::None;
-
-        case TingoState::WaveState::Inactive:
-            return true;
-
-        default:
-            return false;
-    }
+void TingoBrain::Speak(std::string text)
+{
+    SpeechController.Speak(text);
 }
 
 

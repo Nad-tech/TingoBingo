@@ -1,5 +1,8 @@
 #pragma once
 #include "TingoBingo/TingoState.h"
+#include "SpeechController.h"
+#include <string>
+
 
 class Tingo;
 class TingoBrain
@@ -58,4 +61,9 @@ private:
     SleepSequence sleepSequence;
     void AdvanceSleep(float dt);
     float sleepTimer;
+
+    void AdvanceGreeting(float dt);
+
+    SpeechController speechController;
+    void Speak(std::string text);
 };

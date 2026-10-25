@@ -4,15 +4,31 @@
 │   ├── launch.json
 │   ├── tasks.json
 ├── assets/
+│   ├── audio/
+│   │   ├── voice/
+│   │   │   ├── speech.wav
+│   │   │   ├── speech_raw.wav
+│   ├── images/
+│   │   ├── background/
+│   │   │   ├── space.jpg
+│   │   ├── tingo/
+│   │   │   ├── mouthSpriteSheet.png
 │   ├── models/
 │   │   ├── tingo/
+│   │   │   ├── Antenna.glb
 │   │   │   ├── Blender/
+│   │   │   │   ├── Antenna.blend
+│   │   │   │   ├── Antenna.blend1
 │   │   │   │   ├── Body.blend
 │   │   │   │   ├── Body.blend1
+│   │   │   │   ├── Ear.blend
+│   │   │   │   ├── Ear.blend1
 │   │   │   │   ├── Elbow.blend
 │   │   │   │   ├── Elbow.blend1
 │   │   │   │   ├── Eye.blend
 │   │   │   │   ├── Eye.blend1
+│   │   │   │   ├── EyeBrow.blend
+│   │   │   │   ├── EyeBrow.blend1
 │   │   │   │   ├── Finger.blend
 │   │   │   │   ├── Finger.blend1
 │   │   │   │   ├── Foot.blend
@@ -20,7 +36,9 @@
 │   │   │   │   ├── ForeArm.blend
 │   │   │   │   ├── ForeArm.blend1
 │   │   │   │   ├── Hand.blend
+│   │   │   │   ├── Hand.blend1
 │   │   │   │   ├── Head.blend
+│   │   │   │   ├── Head.blend1
 │   │   │   │   ├── Knee.blend
 │   │   │   │   ├── Knee.blend1
 │   │   │   │   ├── Leg.blend
@@ -29,18 +47,25 @@
 │   │   │   │   ├── MouthDisplay.blend1
 │   │   │   │   ├── Neck.blend
 │   │   │   │   ├── Neck.blend1
+│   │   │   │   ├── Nose.blend
+│   │   │   │   ├── Nose.blend1
 │   │   │   │   ├── Pelvis.blend
+│   │   │   │   ├── Pelvis.blend1
 │   │   │   │   ├── Pupil.blend
 │   │   │   │   ├── Pupil.blend1
 │   │   │   │   ├── Shin.blend
+│   │   │   │   ├── Shin.blend1
 │   │   │   │   ├── Shoulder.blend
 │   │   │   │   ├── Shoulder.blend1
 │   │   │   │   ├── Thigh.blend
+│   │   │   │   ├── Thigh.blend1
 │   │   │   │   ├── UpperArm.blend
 │   │   │   │   ├── UpperArm.blend1
 │   │   │   ├── Body.glb
+│   │   │   ├── Ear.glb
 │   │   │   ├── Elbow.glb
 │   │   │   ├── Eye.glb
+│   │   │   ├── EyeBrow.glb
 │   │   │   ├── Finger.glb
 │   │   │   ├── Foot.glb
 │   │   │   ├── ForeArm.glb
@@ -49,13 +74,21 @@
 │   │   │   ├── Knee.glb
 │   │   │   ├── MouthDisplay.glb
 │   │   │   ├── Neck.glb
+│   │   │   ├── Nose.glb
 │   │   │   ├── Pelvis.glb
 │   │   │   ├── Pupil.glb
 │   │   │   ├── Shin.glb
 │   │   │   ├── Shoulder.glb
 │   │   │   ├── Thigh.glb
 │   │   │   ├── UpperArm.glb
+│   ├── shaders/
+│   │   ├── lighting.fs
+│   │   ├── lighting.vs
 ├── build/
+│   ├── Animation.d
+│   ├── Animation.o
+│   ├── DebugPanel.d
+│   ├── DebugPanel.o
 │   ├── Game.d
 │   ├── Game.o
 │   ├── GameWorld.d
@@ -64,6 +97,10 @@
 │   ├── libraylib.dll
 │   ├── main.d
 │   ├── main.o
+│   ├── SpeechController.d
+│   ├── SpeechController.o
+│   ├── SpeechGenerator.d
+│   ├── SpeechGenerator.o
 │   ├── TingoBingo/
 │   │   ├── Body/
 │   │   │   ├── Arm/
@@ -84,12 +121,20 @@
 │   │   │   ├── BodyShape.d
 │   │   │   ├── BodyShape.o
 │   │   │   ├── Head/
+│   │   │   │   ├── Antenna.d
+│   │   │   │   ├── Antenna.o
+│   │   │   │   ├── Ear.d
+│   │   │   │   ├── Ear.o
 │   │   │   │   ├── Eye.d
 │   │   │   │   ├── Eye.o
+│   │   │   │   ├── EyeBrow.d
+│   │   │   │   ├── EyeBrow.o
 │   │   │   │   ├── Head.d
 │   │   │   │   ├── Head.o
 │   │   │   │   ├── MouthDisplay.d
 │   │   │   │   ├── MouthDisplay.o
+│   │   │   │   ├── Nose.d
+│   │   │   │   ├── Nose.o
 │   │   │   │   ├── Pupil.d
 │   │   │   │   ├── Pupil.o
 │   │   │   ├── Leg/
@@ -111,19 +156,26 @@
 │   │   ├── Tingo.o
 │   │   ├── TingoAssets.d
 │   │   ├── TingoAssets.o
+│   │   ├── TingoBrain.d
+│   │   ├── TingoBrain.o
 │   │   ├── TingoDimensions.d
 │   │   ├── TingoDimensions.o
 │   ├── TingoBingo_3D_V1.exe
 ├── Build.sh
 ├── FileStructure.txt
 ├── include/
+│   ├── Animation.h
+│   ├── DebugPanel.h
 │   ├── Game.h
 │   ├── GameWorld.h
 │   ├── MyTransform3D.h
 │   ├── ScreenDimensions.h
+│   ├── SpeechController.h
+│   ├── SpeechGenerator.h
 │   ├── TingoBingo/
 │   │   ├── Body/
 │   │   │   ├── Arm/
+│   │   │   │   ├── ArmWaveState.h
 │   │   │   │   ├── Elbow.h
 │   │   │   │   ├── Finger.h
 │   │   │   │   ├── ForeArm.h
@@ -132,9 +184,14 @@
 │   │   │   │   ├── UpperArm.h
 │   │   │   ├── Body.h
 │   │   │   ├── Head/
+│   │   │   │   ├── Antenna.h
+│   │   │   │   ├── Ear.h
 │   │   │   │   ├── Eye.h
+│   │   │   │   ├── EyeBrow.h
+│   │   │   │   ├── EyeState.h
 │   │   │   │   ├── Head.h
 │   │   │   │   ├── MouthDisplay.h
+│   │   │   │   ├── Nose.h
 │   │   │   │   ├── Pupil.h
 │   │   │   ├── Leg/
 │   │   │   │   ├── Foot.h
@@ -145,17 +202,25 @@
 │   │   │   ├── Pelvis.h
 │   │   ├── Tingo.h
 │   │   ├── TingoAssets.h
+│   │   ├── TingoBrain.h
 │   │   ├── TingoDimensions.h
+│   │   ├── TingoState.h
+│   ├── Vector4Int.h
 ├── Makefile
 ├── ProjectDump.txt
+├── README.md
 ├── scripts/
 │   ├── build.sh
 │   ├── buildProjectDump.sh
 │   ├── buildProjectTree.sh
 ├── src/
+│   ├── Animation.cpp
+│   ├── DebugPanel.cpp
 │   ├── Game.cpp
 │   ├── GameWorld.cpp
 │   ├── main.cpp
+│   ├── SpeechController.cpp
+│   ├── SpeechGenerator.cpp
 │   ├── TingoBingo/
 │   │   ├── Body/
 │   │   │   ├── Arm/
@@ -167,9 +232,13 @@
 │   │   │   │   ├── UpperArm.cpp
 │   │   │   ├── Body.cpp
 │   │   │   ├── Head/
+│   │   │   │   ├── Antenna.cpp
+│   │   │   │   ├── Ear.cpp
 │   │   │   │   ├── Eye.cpp
+│   │   │   │   ├── EyeBrow.cpp
 │   │   │   │   ├── Head.cpp
 │   │   │   │   ├── MouthDisplay.cpp
+│   │   │   │   ├── Nose.cpp
 │   │   │   │   ├── Pupil.cpp
 │   │   │   ├── Leg/
 │   │   │   │   ├── Foot.cpp
@@ -180,7 +249,460 @@
 │   │   │   ├── Pelvis.cpp
 │   │   ├── Tingo.cpp
 │   │   ├── TingoAssets.cpp
+│   │   ├── TingoBrain.cpp
 │   │   ├── TingoDimensions.cpp
+├── tools/
+│   ├── ffmpeg/
+│   │   ├── bin/
+│   │   │   ├── ffmpeg.exe
+│   │   │   ├── ffplay.exe
+│   │   │   ├── ffprobe.exe
+│   │   ├── doc/
+│   │   │   ├── bootstrap.min.css
+│   │   │   ├── community.html
+│   │   │   ├── default.css
+│   │   │   ├── developer.html
+│   │   │   ├── drawvg-reference.html
+│   │   │   ├── faq.html
+│   │   │   ├── fate.html
+│   │   │   ├── ffmpeg-all.html
+│   │   │   ├── ffmpeg-bitstream-filters.html
+│   │   │   ├── ffmpeg-codecs.html
+│   │   │   ├── ffmpeg-devices.html
+│   │   │   ├── ffmpeg-filters.html
+│   │   │   ├── ffmpeg-formats.html
+│   │   │   ├── ffmpeg-protocols.html
+│   │   │   ├── ffmpeg-resampler.html
+│   │   │   ├── ffmpeg-scaler.html
+│   │   │   ├── ffmpeg-utils.html
+│   │   │   ├── ffmpeg.html
+│   │   │   ├── ffplay-all.html
+│   │   │   ├── ffplay.html
+│   │   │   ├── ffprobe-all.html
+│   │   │   ├── ffprobe.html
+│   │   │   ├── general.html
+│   │   │   ├── git-howto.html
+│   │   │   ├── libavcodec.html
+│   │   │   ├── libavdevice.html
+│   │   │   ├── libavfilter.html
+│   │   │   ├── libavformat.html
+│   │   │   ├── libavutil.html
+│   │   │   ├── libswresample.html
+│   │   │   ├── libswscale.html
+│   │   │   ├── mailing-list-faq.html
+│   │   │   ├── nut.html
+│   │   │   ├── platform.html
+│   │   │   ├── style.min.css
+│   │   ├── LICENSE
+│   │   ├── presets/
+│   │   │   ├── libvpx-1080p.ffpreset
+│   │   │   ├── libvpx-1080p50_60.ffpreset
+│   │   │   ├── libvpx-360p.ffpreset
+│   │   │   ├── libvpx-720p.ffpreset
+│   │   │   ├── libvpx-720p50_60.ffpreset
+│   │   ├── README.txt
+│   ├── piper/
+│   │   ├── en_GB-alan-medium.onnx
+│   │   ├── en_GB-alan-medium.onnx.json
+│   │   ├── espeak-ng-data/
+│   │   │   ├── af_dict
+│   │   │   ├── am_dict
+│   │   │   ├── an_dict
+│   │   │   ├── ar_dict
+│   │   │   ├── as_dict
+│   │   │   ├── az_dict
+│   │   │   ├── ba_dict
+│   │   │   ├── be_dict
+│   │   │   ├── bg_dict
+│   │   │   ├── bn_dict
+│   │   │   ├── bpy_dict
+│   │   │   ├── bs_dict
+│   │   │   ├── ca_dict
+│   │   │   ├── chr_dict
+│   │   │   ├── cmn_dict
+│   │   │   ├── cs_dict
+│   │   │   ├── cv_dict
+│   │   │   ├── cy_dict
+│   │   │   ├── da_dict
+│   │   │   ├── de_dict
+│   │   │   ├── el_dict
+│   │   │   ├── en_dict
+│   │   │   ├── eo_dict
+│   │   │   ├── es_dict
+│   │   │   ├── et_dict
+│   │   │   ├── eu_dict
+│   │   │   ├── fa_dict
+│   │   │   ├── fi_dict
+│   │   │   ├── fr_dict
+│   │   │   ├── ga_dict
+│   │   │   ├── gd_dict
+│   │   │   ├── gn_dict
+│   │   │   ├── grc_dict
+│   │   │   ├── gu_dict
+│   │   │   ├── hak_dict
+│   │   │   ├── haw_dict
+│   │   │   ├── he_dict
+│   │   │   ├── hi_dict
+│   │   │   ├── hr_dict
+│   │   │   ├── ht_dict
+│   │   │   ├── hu_dict
+│   │   │   ├── hy_dict
+│   │   │   ├── ia_dict
+│   │   │   ├── id_dict
+│   │   │   ├── intonations
+│   │   │   ├── io_dict
+│   │   │   ├── is_dict
+│   │   │   ├── it_dict
+│   │   │   ├── ja_dict
+│   │   │   ├── jbo_dict
+│   │   │   ├── ka_dict
+│   │   │   ├── kk_dict
+│   │   │   ├── kl_dict
+│   │   │   ├── kn_dict
+│   │   │   ├── kok_dict
+│   │   │   ├── ko_dict
+│   │   │   ├── ku_dict
+│   │   │   ├── ky_dict
+│   │   │   ├── lang/
+│   │   │   │   ├── aav/
+│   │   │   │   │   ├── vi
+│   │   │   │   │   ├── vi-VN-x-central
+│   │   │   │   │   ├── vi-VN-x-south
+│   │   │   │   ├── art/
+│   │   │   │   │   ├── eo
+│   │   │   │   │   ├── ia
+│   │   │   │   │   ├── io
+│   │   │   │   │   ├── jbo
+│   │   │   │   │   ├── lfn
+│   │   │   │   │   ├── piqd
+│   │   │   │   │   ├── py
+│   │   │   │   │   ├── qdb
+│   │   │   │   │   ├── qya
+│   │   │   │   │   ├── sjn
+│   │   │   │   ├── azc/
+│   │   │   │   │   ├── nci
+│   │   │   │   ├── bat/
+│   │   │   │   │   ├── lt
+│   │   │   │   │   ├── ltg
+│   │   │   │   │   ├── lv
+│   │   │   │   ├── bnt/
+│   │   │   │   │   ├── sw
+│   │   │   │   │   ├── tn
+│   │   │   │   ├── ccs/
+│   │   │   │   │   ├── ka
+│   │   │   │   ├── cel/
+│   │   │   │   │   ├── cy
+│   │   │   │   │   ├── ga
+│   │   │   │   │   ├── gd
+│   │   │   │   ├── cus/
+│   │   │   │   │   ├── om
+│   │   │   │   ├── dra/
+│   │   │   │   │   ├── kn
+│   │   │   │   │   ├── ml
+│   │   │   │   │   ├── ta
+│   │   │   │   │   ├── te
+│   │   │   │   ├── esx/
+│   │   │   │   │   ├── kl
+│   │   │   │   ├── eu
+│   │   │   │   ├── gmq/
+│   │   │   │   │   ├── da
+│   │   │   │   │   ├── is
+│   │   │   │   │   ├── nb
+│   │   │   │   │   ├── sv
+│   │   │   │   ├── gmw/
+│   │   │   │   │   ├── af
+│   │   │   │   │   ├── de
+│   │   │   │   │   ├── en
+│   │   │   │   │   ├── en-029
+│   │   │   │   │   ├── en-GB-scotland
+│   │   │   │   │   ├── en-GB-x-gbclan
+│   │   │   │   │   ├── en-GB-x-gbcwmd
+│   │   │   │   │   ├── en-GB-x-rp
+│   │   │   │   │   ├── en-US
+│   │   │   │   │   ├── en-US-nyc
+│   │   │   │   │   ├── lb
+│   │   │   │   │   ├── nl
+│   │   │   │   ├── grk/
+│   │   │   │   │   ├── el
+│   │   │   │   │   ├── grc
+│   │   │   │   ├── inc/
+│   │   │   │   │   ├── as
+│   │   │   │   │   ├── bn
+│   │   │   │   │   ├── bpy
+│   │   │   │   │   ├── gu
+│   │   │   │   │   ├── hi
+│   │   │   │   │   ├── kok
+│   │   │   │   │   ├── mr
+│   │   │   │   │   ├── ne
+│   │   │   │   │   ├── or
+│   │   │   │   │   ├── pa
+│   │   │   │   │   ├── sd
+│   │   │   │   │   ├── si
+│   │   │   │   │   ├── ur
+│   │   │   │   ├── ine/
+│   │   │   │   │   ├── hy
+│   │   │   │   │   ├── hyw
+│   │   │   │   │   ├── sq
+│   │   │   │   ├── ira/
+│   │   │   │   │   ├── fa
+│   │   │   │   │   ├── fa-Latn
+│   │   │   │   │   ├── ku
+│   │   │   │   ├── iro/
+│   │   │   │   │   ├── chr
+│   │   │   │   ├── itc/
+│   │   │   │   │   ├── la
+│   │   │   │   ├── jpx/
+│   │   │   │   │   ├── ja
+│   │   │   │   ├── ko
+│   │   │   │   ├── map/
+│   │   │   │   │   ├── haw
+│   │   │   │   ├── miz/
+│   │   │   │   │   ├── mto
+│   │   │   │   ├── myn/
+│   │   │   │   │   ├── quc
+│   │   │   │   ├── poz/
+│   │   │   │   │   ├── id
+│   │   │   │   │   ├── mi
+│   │   │   │   │   ├── ms
+│   │   │   │   ├── qu
+│   │   │   │   ├── roa/
+│   │   │   │   │   ├── an
+│   │   │   │   │   ├── ca
+│   │   │   │   │   ├── es
+│   │   │   │   │   ├── es-419
+│   │   │   │   │   ├── fr
+│   │   │   │   │   ├── fr-BE
+│   │   │   │   │   ├── fr-CH
+│   │   │   │   │   ├── ht
+│   │   │   │   │   ├── it
+│   │   │   │   │   ├── pap
+│   │   │   │   │   ├── pt
+│   │   │   │   │   ├── pt-BR
+│   │   │   │   │   ├── ro
+│   │   │   │   ├── sai/
+│   │   │   │   │   ├── gn
+│   │   │   │   ├── sem/
+│   │   │   │   │   ├── am
+│   │   │   │   │   ├── ar
+│   │   │   │   │   ├── he
+│   │   │   │   │   ├── mt
+│   │   │   │   ├── sit/
+│   │   │   │   │   ├── cmn
+│   │   │   │   │   ├── cmn-Latn-pinyin
+│   │   │   │   │   ├── hak
+│   │   │   │   │   ├── my
+│   │   │   │   │   ├── yue
+│   │   │   │   │   ├── yue-Latn-jyutping
+│   │   │   │   ├── tai/
+│   │   │   │   │   ├── shn
+│   │   │   │   │   ├── th
+│   │   │   │   ├── trk/
+│   │   │   │   │   ├── az
+│   │   │   │   │   ├── ba
+│   │   │   │   │   ├── cv
+│   │   │   │   │   ├── kk
+│   │   │   │   │   ├── ky
+│   │   │   │   │   ├── nog
+│   │   │   │   │   ├── tk
+│   │   │   │   │   ├── tr
+│   │   │   │   │   ├── tt
+│   │   │   │   │   ├── ug
+│   │   │   │   │   ├── uz
+│   │   │   │   ├── urj/
+│   │   │   │   │   ├── et
+│   │   │   │   │   ├── fi
+│   │   │   │   │   ├── hu
+│   │   │   │   │   ├── smj
+│   │   │   │   ├── zle/
+│   │   │   │   │   ├── be
+│   │   │   │   │   ├── ru
+│   │   │   │   │   ├── ru-cl
+│   │   │   │   │   ├── ru-LV
+│   │   │   │   │   ├── uk
+│   │   │   │   ├── zls/
+│   │   │   │   │   ├── bg
+│   │   │   │   │   ├── bs
+│   │   │   │   │   ├── hr
+│   │   │   │   │   ├── mk
+│   │   │   │   │   ├── sl
+│   │   │   │   │   ├── sr
+│   │   │   │   ├── zlw/
+│   │   │   │   │   ├── cs
+│   │   │   │   │   ├── pl
+│   │   │   │   │   ├── sk
+│   │   │   ├── la_dict
+│   │   │   ├── lb_dict
+│   │   │   ├── lfn_dict
+│   │   │   ├── lt_dict
+│   │   │   ├── lv_dict
+│   │   │   ├── mi_dict
+│   │   │   ├── mk_dict
+│   │   │   ├── ml_dict
+│   │   │   ├── mr_dict
+│   │   │   ├── ms_dict
+│   │   │   ├── mto_dict
+│   │   │   ├── mt_dict
+│   │   │   ├── my_dict
+│   │   │   ├── nci_dict
+│   │   │   ├── ne_dict
+│   │   │   ├── nl_dict
+│   │   │   ├── nog_dict
+│   │   │   ├── no_dict
+│   │   │   ├── om_dict
+│   │   │   ├── or_dict
+│   │   │   ├── pap_dict
+│   │   │   ├── pa_dict
+│   │   │   ├── phondata
+│   │   │   ├── phondata-manifest
+│   │   │   ├── phonindex
+│   │   │   ├── phontab
+│   │   │   ├── piqd_dict
+│   │   │   ├── pl_dict
+│   │   │   ├── pt_dict
+│   │   │   ├── py_dict
+│   │   │   ├── qdb_dict
+│   │   │   ├── quc_dict
+│   │   │   ├── qu_dict
+│   │   │   ├── qya_dict
+│   │   │   ├── ro_dict
+│   │   │   ├── ru_dict
+│   │   │   ├── sd_dict
+│   │   │   ├── shn_dict
+│   │   │   ├── si_dict
+│   │   │   ├── sjn_dict
+│   │   │   ├── sk_dict
+│   │   │   ├── sl_dict
+│   │   │   ├── smj_dict
+│   │   │   ├── sq_dict
+│   │   │   ├── sr_dict
+│   │   │   ├── sv_dict
+│   │   │   ├── sw_dict
+│   │   │   ├── ta_dict
+│   │   │   ├── te_dict
+│   │   │   ├── th_dict
+│   │   │   ├── tk_dict
+│   │   │   ├── tn_dict
+│   │   │   ├── tr_dict
+│   │   │   ├── tt_dict
+│   │   │   ├── ug_dict
+│   │   │   ├── uk_dict
+│   │   │   ├── ur_dict
+│   │   │   ├── uz_dict
+│   │   │   ├── vi_dict
+│   │   │   ├── voices/
+│   │   │   │   ├── !v/
+│   │   │   │   │   ├── adam
+│   │   │   │   │   ├── Alex
+│   │   │   │   │   ├── Alicia
+│   │   │   │   │   ├── Andrea
+│   │   │   │   │   ├── Andy
+│   │   │   │   │   ├── anika
+│   │   │   │   │   ├── anikaRobot
+│   │   │   │   │   ├── Annie
+│   │   │   │   │   ├── announcer
+│   │   │   │   │   ├── antonio
+│   │   │   │   │   ├── AnxiousAndy
+│   │   │   │   │   ├── aunty
+│   │   │   │   │   ├── belinda
+│   │   │   │   │   ├── benjamin
+│   │   │   │   │   ├── boris
+│   │   │   │   │   ├── caleb
+│   │   │   │   │   ├── croak
+│   │   │   │   │   ├── david
+│   │   │   │   │   ├── Demonic
+│   │   │   │   │   ├── Denis
+│   │   │   │   │   ├── Diogo
+│   │   │   │   │   ├── ed
+│   │   │   │   │   ├── edward
+│   │   │   │   │   ├── edward2
+│   │   │   │   │   ├── f1
+│   │   │   │   │   ├── f2
+│   │   │   │   │   ├── f3
+│   │   │   │   │   ├── f4
+│   │   │   │   │   ├── f5
+│   │   │   │   │   ├── fast
+│   │   │   │   │   ├── Gene
+│   │   │   │   │   ├── Gene2
+│   │   │   │   │   ├── grandma
+│   │   │   │   │   ├── grandpa
+│   │   │   │   │   ├── gustave
+│   │   │   │   │   ├── Henrique
+│   │   │   │   │   ├── Hugo
+│   │   │   │   │   ├── ian
+│   │   │   │   │   ├── iven
+│   │   │   │   │   ├── iven2
+│   │   │   │   │   ├── iven3
+│   │   │   │   │   ├── iven4
+│   │   │   │   │   ├── Jacky
+│   │   │   │   │   ├── john
+│   │   │   │   │   ├── kaukovalta
+│   │   │   │   │   ├── klatt
+│   │   │   │   │   ├── klatt2
+│   │   │   │   │   ├── klatt3
+│   │   │   │   │   ├── klatt4
+│   │   │   │   │   ├── klatt5
+│   │   │   │   │   ├── klatt6
+│   │   │   │   │   ├── Lee
+│   │   │   │   │   ├── linda
+│   │   │   │   │   ├── m1
+│   │   │   │   │   ├── m2
+│   │   │   │   │   ├── m3
+│   │   │   │   │   ├── m4
+│   │   │   │   │   ├── m5
+│   │   │   │   │   ├── m6
+│   │   │   │   │   ├── m7
+│   │   │   │   │   ├── m8
+│   │   │   │   │   ├── marcelo
+│   │   │   │   │   ├── Marco
+│   │   │   │   │   ├── Mario
+│   │   │   │   │   ├── max
+│   │   │   │   │   ├── Michael
+│   │   │   │   │   ├── michel
+│   │   │   │   │   ├── miguel
+│   │   │   │   │   ├── Mike
+│   │   │   │   │   ├── mike2
+│   │   │   │   │   ├── Mr serious
+│   │   │   │   │   ├── Nguyen
+│   │   │   │   │   ├── norbert
+│   │   │   │   │   ├── pablo
+│   │   │   │   │   ├── paul
+│   │   │   │   │   ├── pedro
+│   │   │   │   │   ├── quincy
+│   │   │   │   │   ├── Reed
+│   │   │   │   │   ├── RicishayMax
+│   │   │   │   │   ├── RicishayMax2
+│   │   │   │   │   ├── RicishayMax3
+│   │   │   │   │   ├── rob
+│   │   │   │   │   ├── robert
+│   │   │   │   │   ├── robosoft
+│   │   │   │   │   ├── robosoft2
+│   │   │   │   │   ├── robosoft3
+│   │   │   │   │   ├── robosoft4
+│   │   │   │   │   ├── robosoft5
+│   │   │   │   │   ├── robosoft6
+│   │   │   │   │   ├── robosoft7
+│   │   │   │   │   ├── robosoft8
+│   │   │   │   │   ├── sandro
+│   │   │   │   │   ├── shelby
+│   │   │   │   │   ├── steph
+│   │   │   │   │   ├── steph2
+│   │   │   │   │   ├── steph3
+│   │   │   │   │   ├── Storm
+│   │   │   │   │   ├── travis
+│   │   │   │   │   ├── Tweaky
+│   │   │   │   │   ├── UniRobot
+│   │   │   │   │   ├── victor
+│   │   │   │   │   ├── whisper
+│   │   │   │   │   ├── whisperf
+│   │   │   │   │   ├── zac
+│   │   │   ├── yue_dict
+│   │   ├── espeak-ng.dll
+│   │   ├── libtashkeel_model.ort
+│   │   ├── onnxruntime.dll
+│   │   ├── onnxruntime_providers_shared.dll
+│   │   ├── piper.exe
+│   │   ├── piper_phonemize.dll
+│   │   ├── pkgconfig/
 ├── utilities/
 │   ├── projectDump.cpp
 │   ├── projectDump.exe
