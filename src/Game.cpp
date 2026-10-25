@@ -27,8 +27,6 @@ void Game::Run()
 {
     while (!WindowShouldClose())
     {
-        HandleInput();
-
         float dt = GetFrameTime();
 
         world.Update(dt);
@@ -80,9 +78,3 @@ void Game::DrawLegend()
     textX += columnWidth;
 	DrawText("Wave left: 2", textX, textY, 14, RAYWHITE);
 }
-
-void Game::HandleInput()
-{
-    
-}
-

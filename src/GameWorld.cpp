@@ -75,17 +75,13 @@ void GameWorld::Initialise(ScreenDimensions& screenDimensions)
 
 void GameWorld::Update(float dt)
 {
+    HandleInput(dt);
+
     // Allow free movement around the 3D world.
     UpdateCamera(&camera, CAMERA_FREE);
 
     assets.UpdateLighting(camera.position);
 
-    // dirFlag ? initialTransform.rotationAngle += dt * 80 : initialTransform.rotationAngle -= dt * 80;
-     
-    // if(initialTransform.rotationAngle <= 0.0) dirFlag = true;
-    // if(initialTransform.rotationAngle >= 720.0) dirFlag = false;    
-
-    tingo.SetTransform(initialTransform);
     tingo.Update(dt);
 }
 
@@ -257,6 +253,8 @@ void GameWorld::DrawGesturesStates()
             stateName = "Idle"; break;
         case TingoState::BrainState::Sleeping: 
             stateName = "Sleeping"; break;
+        case TingoState::BrainState::Greeting:
+            stateName = "Greeting"; break;
     }
 
     DrawText("TINGO STATE", x, y, 16, YELLOW);
@@ -302,3 +300,27 @@ void GameWorld::DrawGesturesStates()
     );
 }
 
+void GameWorld::HandleInput(float dt)
+{
+    const float moveSpeed = 3.0f;
+
+    Vector3 direction = { 0.0f, 0.0f, 0.0f };
+
+    if (IsKeyDown(KEY_O))    direction.z -= 1.0f;
+    if (IsKeyDown(KEY_L))  direction.z += 1.0f;
+    if (IsKeyDown(KEY_K))  direction.x -= 1.0f;
+    if (IsKeyDown(KEY_SEMICOLON)) direction.x += 1.0f;
+    if (IsKeyDown(KEY_R)) direction.y += 1.0f;
+    if (IsKeyDown(KEY_F)) direction.y -= 1.0f;
+
+    if (Vector3Length(direction) > 0.0f)
+    {
+        direction = Vector3Normalize(direction);
+
+        tingo.GetTransform().position.x += direction.x * moveSpeed * dt;
+        tingo.GetTransform().position.z += direction.z * moveSpeed * dt;
+        tingo.GetTransform().position.y += direction.y * moveSpeed * dt;
+    }
+
+    tingo.SetTransform(tingo.GetTransform());
+}

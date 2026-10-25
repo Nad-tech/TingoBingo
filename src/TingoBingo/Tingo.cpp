@@ -62,3 +62,8 @@ EyeState Tingo::GetRightEyeState() const
 {
     return body.GetRightEyeState();
 }
+
+MyTransform3D& Tingo::GetTransform()
+{
+    return transform;
+}

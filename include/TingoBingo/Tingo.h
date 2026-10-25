@@ -28,6 +28,8 @@ public:
     EyeState GetLeftEyeState() const;
     EyeState GetRightEyeState() const;
 
+    MyTransform3D& GetTransform();
+
 private:
     MyTransform3D transform;
     TingoAssets &assets;

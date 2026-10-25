@@ -31,4 +31,6 @@ private:
 
     void DrawOrientationGizmo();
     void DrawGesturesStates();
+
+    void HandleInput(float dt);
 };

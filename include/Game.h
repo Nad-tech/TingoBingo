@@ -13,7 +13,6 @@ public:
 private:
     GameWorld world;
     ScreenDimensions screenDimensions;
-
-    void HandleInput();
+    
     void DrawLegend();
 };
