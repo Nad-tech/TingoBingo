@@ -101,3 +101,9 @@ EyeState Head::GetRightEyeState() const
 {
     return rightEye.GetEyeState();
 }
+
+void Head::SetGazeTarget(Vector2 target)
+{
+    leftEye.SetGazeTarget(target);
+    rightEye.SetGazeTarget(target);
+}

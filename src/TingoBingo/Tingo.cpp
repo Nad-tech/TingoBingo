@@ -67,3 +67,8 @@ MyTransform3D& Tingo::GetTransform()
 {
     return transform;
 }
+
+void Tingo::SetGazeTarget(Vector2 target)
+{
+    body.SetGazeTarget(target);
+}

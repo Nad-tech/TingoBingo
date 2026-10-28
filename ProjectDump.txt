@@ -287,8 +287,7 @@ public:
 private:
     GameWorld world;
     ScreenDimensions screenDimensions;
-
-    void HandleInput();
+    
     void DrawLegend();
 };
 
@@ -324,12 +323,15 @@ private:
     TingoAssets assets;
     TingoDimensions dimensions;
     Tingo tingo;
+
     MyTransform3D initialTransform; 
     ScreenDimensions screenDimensions;
     Texture2D spaceBackground{};
 
     void DrawOrientationGizmo();
     void DrawGesturesStates();
+
+    void HandleInput(float dt);
 };
 
 
@@ -1592,6 +1594,33 @@ private:
 
 
 =====================================
+.\include\TingoBingo\Phrases.h
+=====================================
+
+#pragma once
+#include <string>
+#include <vector>
+
+struct Phrases
+{
+    std::string greeting = "Hello. My name is Tingo Bingo, what is your name";
+    
+    std::vector<std::string> idlePhrases = {
+        "beep beep i am a robot",
+        "lets play",
+        "spiders are cool",
+        "diggers dig big holes",
+        "my favourite colour is green",
+        "homer says dough",
+        "praying mantis eat bugs",
+        "bananas bananas and pajamas",
+        "your dad is the best",
+        "Guitar guitar pajarms pajarms"
+    };
+};
+
+
+=====================================
 .\include\TingoBingo\Tingo.h
 =====================================
 
@@ -1624,6 +1653,8 @@ public:
 
     EyeState GetLeftEyeState() const;
     EyeState GetRightEyeState() const;
+
+    MyTransform3D& GetTransform();
 
 private:
     MyTransform3D transform;
@@ -1717,6 +1748,7 @@ public:
 #include "TingoBingo/TingoState.h"
 #include "SpeechController.h"
 #include <string>
+#include "Phrases.h"
 
 
 class Tingo;
@@ -1776,11 +1808,17 @@ private:
     SleepSequence sleepSequence;
     void AdvanceSleep(float dt);
     float sleepTimer;
+    float snoreTimer;
+    float nextSnoreTimer;
 
     void AdvanceGreeting(float dt);
 
-    SpeechController SpeechController;
+    SpeechController speechController;
     void Speak(std::string text);
+
+    Phrases phrases;
+    std::string ChooseRandomPhrase();
+    float randomPhraseTimer;
 };
 
 
@@ -2468,6 +2506,8 @@ void Game::Initialise()
 {
     InitWindow(10, 10, "TingoBingo 3D");
 
+    InitAudioDevice();
+
     int monitor = GetCurrentMonitor();
     int width = GetMonitorWidth(monitor);
     int height = GetMonitorHeight(monitor);
@@ -2488,8 +2528,6 @@ void Game::Run()
 {
     while (!WindowShouldClose())
     {
-        HandleInput();
-
         float dt = GetFrameTime();
 
         world.Update(dt);
@@ -2509,6 +2547,8 @@ void Game::Run()
 void Game::Shutdown()
 {
     world.Shutdown();
+
+    CloseAudioDevice();
 
     CloseWindow();
 }
@@ -2540,12 +2580,6 @@ void Game::DrawLegend()
 	DrawText("Wave left: 2", textX, textY, 14, RAYWHITE);
 }
 
-void Game::HandleInput()
-{
-    
-}
-
-
 
 =====================================
 .\src\GameWorld.cpp
@@ -2559,8 +2593,6 @@ void Game::HandleInput()
 GameWorld::GameWorld() :
     tingo(assets, dimensions)
 {}
-
-inline bool dirFlag = true;
 
 void GameWorld::Initialise(ScreenDimensions& screenDimensions)
 {
@@ -2628,17 +2660,13 @@ void GameWorld::Initialise(ScreenDimensions& screenDimensions)
 
 void GameWorld::Update(float dt)
 {
+    HandleInput(dt);
+
     // Allow free movement around the 3D world.
     UpdateCamera(&camera, CAMERA_FREE);
 
     assets.UpdateLighting(camera.position);
 
-    // dirFlag ? initialTransform.rotationAngle += dt * 80 : initialTransform.rotationAngle -= dt * 80;
-     
-    // if(initialTransform.rotationAngle <= 0.0) dirFlag = true;
-    // if(initialTransform.rotationAngle >= 720.0) dirFlag = false;    
-
-    tingo.SetTransform(initialTransform);
     tingo.Update(dt);
 }
 
@@ -2787,7 +2815,7 @@ void GameWorld::Draw()
     EndMode3D();
 
     DrawOrientationGizmo();
-    DrawGesturesStates();
+    //DrawGesturesStates();
 }
 
 void GameWorld::Shutdown()
@@ -2810,6 +2838,8 @@ void GameWorld::DrawGesturesStates()
             stateName = "Idle"; break;
         case TingoState::BrainState::Sleeping: 
             stateName = "Sleeping"; break;
+        case TingoState::BrainState::Greeting:
+            stateName = "Greeting"; break;
     }
 
     DrawText("TINGO STATE", x, y, 16, YELLOW);
@@ -2855,6 +2885,30 @@ void GameWorld::DrawGesturesStates()
     );
 }
 
+void GameWorld::HandleInput(float dt)
+{
+    const float moveSpeed = 3.0f;
+
+    Vector3 direction = { 0.0f, 0.0f, 0.0f };
+
+    if (IsKeyDown(KEY_O))    direction.z -= 1.0f;
+    if (IsKeyDown(KEY_L))  direction.z += 1.0f;
+    if (IsKeyDown(KEY_K))  direction.x -= 1.0f;
+    if (IsKeyDown(KEY_SEMICOLON)) direction.x += 1.0f;
+    if (IsKeyDown(KEY_R)) direction.y += 1.0f;
+    if (IsKeyDown(KEY_F)) direction.y -= 1.0f;
+
+    if (Vector3Length(direction) > 0.0f)
+    {
+        direction = Vector3Normalize(direction);
+
+        tingo.GetTransform().position.x += direction.x * moveSpeed * dt;
+        tingo.GetTransform().position.z += direction.z * moveSpeed * dt;
+        tingo.GetTransform().position.y += direction.y * moveSpeed * dt;
+    }
+
+    tingo.SetTransform(tingo.GetTransform());
+}
 
 
 =====================================
@@ -2924,6 +2978,8 @@ void SpeechController::Update()
 
     if(wavReady)
     {
+        std::cout << "WAV ready - starting playback\n";
+
         // Reset the flag so the same WAV is not
         // loaded and played again on the next frame.
         wavReady = false;
@@ -2941,6 +2997,7 @@ void SpeechController::Update()
 
         // Start playing the generated speech.
         PlaySound(speechSound);
+        std::cout << "PlaySound called\n";
 
 
         // Speech generation is complete and the
@@ -3008,6 +3065,8 @@ void SpeechController::Update()
 
 void SpeechController::Speak(const std::string& text)
 {
+    std::cout << "Speak called: " << text << '\n';
+
     //================================================
     // CHECK WHETHER SPEECH CAN START
     //
@@ -5182,9 +5241,9 @@ void MouthDisplay::Update(float dt)
 {
     animation.Update(dt);
 
-    AdvanceSpeakAnimation();
-
     SetMouthFrame(animation.GetFrame());
+
+    AdvanceSpeakAnimation();
 }
 
 void MouthDisplay::Draw()
@@ -5296,7 +5355,15 @@ void MouthDisplay::AdvanceSpeakAnimation()
     else
     {
         animation.Stop();
-        animation.SetFrame(0);
+
+        if (state.brainState == TingoState::BrainState::Sleeping)
+        {
+            SetMouthFrame(1);
+        }
+        else
+        {
+            SetMouthFrame(0);
+        }
     }
 }
 
@@ -5893,6 +5960,11 @@ EyeState Tingo::GetRightEyeState() const
     return body.GetRightEyeState();
 }
 
+MyTransform3D& Tingo::GetTransform()
+{
+    return transform;
+}
+
 
 =====================================
 .\src\TingoBingo\TingoAssets.cpp
@@ -6206,13 +6278,30 @@ void TingoBrain::Initialise()
     sleepSequence = SleepSequence::Inactive;
     state.eyeStateBrain = TingoState::EyeStateBrain::Open;
     sleepTimer = 0.0f;
+    snoreTimer = 0.0f;
+    nextSnoreTimer = GetRandomValue(3, 6);
 
     state.speaking = false;
+
+    randomPhraseTimer = GetRandomValue(10, 20);
 }
 
 void TingoBrain::Update(float dt)
 {
-    if(SpeechController.SpeechFinished())
+    speechController.Update();
+
+    randomPhraseTimer -= dt;
+
+    if(randomPhraseTimer <= 0)
+    {
+        if(!state.speaking)
+        {
+            Speak(ChooseRandomPhrase());
+            randomPhraseTimer = GetRandomValue(10, 20);
+        }
+    }
+
+    if(speechController.SpeechFinished())
     {
         state.speaking = false;
     }
@@ -6231,9 +6320,9 @@ void TingoBrain::Update(float dt)
 
             idleTimer += dt;
 
-            if (idleTimer > 10.0f)
+            if (idleTimer > 30.0f)
             {
-                Speak("Im going to sleep");
+                Speak("I am going to sleep");
                 state.brainState = TingoState::BrainState::Sleeping;
 
                 idleTimer = 0.0f;
@@ -6245,7 +6334,6 @@ void TingoBrain::Update(float dt)
 
         case TingoState::BrainState::Sleeping:
         {
-            Speak("Im waking up");
             AdvanceSleep(dt);
             break;
         }
@@ -6461,8 +6549,20 @@ void TingoBrain::AdvanceSleep(float dt)
         case SleepSequence::Sleeping:
         {
             sleepTimer += dt;
+            snoreTimer += dt;
 
-            if (sleepTimer > 10.0f)
+            if(snoreTimer >= nextSnoreTimer)
+            {
+                if(!state.speaking) 
+                { 
+                    Speak("Snore");
+                }
+
+                snoreTimer = 0.0f;
+                nextSnoreTimer = GetRandomValue(3, 6);
+            }
+
+            if (sleepTimer > 30.0f)
             {
                 sleepSequence = SleepSequence::WakingUp;
                 sleepTimer = 0.0f;
@@ -6506,6 +6606,8 @@ void TingoBrain::AdvanceSleep(float dt)
             state.brainState = TingoState::BrainState::Idle;
             sleepSequence = SleepSequence::Inactive;
 
+            Speak("I am waking up");
+
             break;
         }
 
@@ -6521,7 +6623,15 @@ void TingoBrain::AdvanceGreeting(float dt)
 
 void TingoBrain::Speak(std::string text)
 {
-    SpeechController.Speak(text);
+    speechController.Speak(text);
+}
+
+std::string TingoBrain::ChooseRandomPhrase()
+{
+    int size = phrases.idlePhrases.size();
+    int index = GetRandomValue(0, size - 1);
+
+    return phrases.idlePhrases[index];
 }
 
 

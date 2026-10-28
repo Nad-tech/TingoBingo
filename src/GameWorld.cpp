@@ -7,8 +7,6 @@ GameWorld::GameWorld() :
     tingo(assets, dimensions)
 {}
 
-inline bool dirFlag = true;
-
 void GameWorld::Initialise(ScreenDimensions& screenDimensions)
 {
     DebugPanel::Instance().Initialise();
@@ -71,6 +69,14 @@ void GameWorld::Initialise(ScreenDimensions& screenDimensions)
 
     tingo.Initialise();
     tingo.SetTransform(initialTransform);
+
+    object.Initialise();
+    MyTransform3D initialObjectTransform;
+    initialObjectTransform.position = {-6.0f, 8.0f, 2.0f};
+    initialObjectTransform.rotationAngle = 0.0f;
+    initialObjectTransform.rotationAxis = {0.0f, 1.0f, 0.0f};
+    initialObjectTransform.scale = {1.0f, 1.0f, 1.0f};
+    object.SetTransform(initialObjectTransform);
 }
 
 void GameWorld::Update(float dt)
@@ -83,6 +89,8 @@ void GameWorld::Update(float dt)
     assets.UpdateLighting(camera.position);
 
     tingo.Update(dt);
+
+    object.Update(dt);
 }
 
 // Draw a screen-space widget showing the camera's orientation.
@@ -227,6 +235,8 @@ void GameWorld::Draw()
 
     //DebugPanel::Instance().Draw3D(camera);
 
+    object.Draw();
+
     EndMode3D();
 
     DrawOrientationGizmo();
@@ -237,6 +247,7 @@ void GameWorld::Shutdown()
 {
     tingo.ShutDown();
     DebugPanel::Instance().Shutdown();
+    object.ShutDown();
 }
 void GameWorld::DrawGesturesStates()
 {

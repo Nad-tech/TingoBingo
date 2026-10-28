@@ -34,6 +34,8 @@ public:
 
     EyeState GetLeftEyeState() const;
     EyeState GetRightEyeState() const;
+
+    void SetGazeTarget(Vector2 target);
     
 private:
     TingoAssets& assets;

@@ -30,6 +30,8 @@ public:
 
     MyTransform3D& GetTransform();
 
+    void SetGazeTarget(Vector2 target);
+
 private:
     MyTransform3D transform;
     TingoAssets &assets;

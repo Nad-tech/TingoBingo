@@ -27,6 +27,8 @@ public:
 
     EyeState GetEyeState() const;
 
+    void SetGazeTarget(Vector2 target);
+
 private:
     TingoAssets& assets;
     TingoDimensions& dimensions;

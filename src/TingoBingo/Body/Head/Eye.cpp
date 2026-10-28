@@ -51,6 +51,8 @@ void Eye::Initialise()
 
 void Eye::Update(float dt)
 {
+    pupil.Update(dt);
+
     AdvanceBlink(dt);
 }
 
@@ -65,7 +67,10 @@ void Eye::Draw()
         WHITE
     );
 
-    pupil.Draw();
+    if(transform.scale.y > 0.2f)
+    {
+        pupil.Draw();
+    }
 }
 
 void Eye::SetTransform(MyTransform3D parentTransform)
@@ -167,4 +172,9 @@ void Eye::AdvanceBlink(float dt)
 EyeState Eye::GetEyeState() const
 {
     return eyeState;
+}
+
+void Eye::SetGazeTarget(Vector2 target)
+{
+    pupil.SetGazeTarget(target);
 }

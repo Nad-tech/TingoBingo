@@ -7,6 +7,7 @@
 #include "ScreenDimensions.h"
 #include "TingoBingo/TingoState.h"
 #include "DebugPanel.h"
+#include "GameObjects/GameObject.h"
 
 class GameWorld
 {
@@ -25,6 +26,7 @@ private:
     TingoAssets assets;
     TingoDimensions dimensions;
     Tingo tingo;
+
     MyTransform3D initialTransform; 
     ScreenDimensions screenDimensions;
     Texture2D spaceBackground{};
@@ -33,4 +35,6 @@ private:
     void DrawGesturesStates();
 
     void HandleInput(float dt);
+
+    GameObject object;
 };

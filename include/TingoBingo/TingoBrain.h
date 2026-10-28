@@ -73,4 +73,9 @@ private:
     Phrases phrases;
     std::string ChooseRandomPhrase();
     float randomPhraseTimer;
+
+    float gazeTimer;
+    float nextGazeTimer;
+
+    void AdvanceIdleGaze(float dt);
 };

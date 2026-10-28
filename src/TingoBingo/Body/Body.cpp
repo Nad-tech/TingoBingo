@@ -86,3 +86,8 @@ EyeState Body::GetRightEyeState() const
 {
     return neck.GetRightEyeState();
 }
+
+void Body::SetGazeTarget(Vector2 target)
+{
+    neck.SetGazeTarget(target);
+}

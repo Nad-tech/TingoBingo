@@ -31,6 +31,9 @@ void TingoBrain::Initialise()
     state.speaking = false;
 
     randomPhraseTimer = GetRandomValue(10, 20);
+
+    gazeTimer = 0.0f;
+    nextGazeTimer = static_cast<float>(GetRandomValue(1, 3));
 }
 
 void TingoBrain::Update(float dt)
@@ -64,6 +67,7 @@ void TingoBrain::Update(float dt)
         {
             AdvanceIdleWave(dt);
             AdvanceBlink(dt);
+            AdvanceIdleGaze(dt);
 
             idleTimer += dt;
 
@@ -379,4 +383,25 @@ std::string TingoBrain::ChooseRandomPhrase()
     int index = GetRandomValue(0, size - 1);
 
     return phrases.idlePhrases[index];
+}
+
+void TingoBrain::AdvanceIdleGaze(float dt)
+{
+    gazeTimer += dt;
+
+    if (gazeTimer < nextGazeTimer)
+    {
+        return;
+    }
+
+    gazeTimer = 0.0f;
+
+    // Choose a new horizontal and vertical gaze target.
+    float x = GetRandomValue(-60, 60) / 100.0f;
+    float y = GetRandomValue(-60, 60) / 100.0f;
+
+    tingo.SetGazeTarget({x, y});
+
+    // Pause before choosing another direction.
+    nextGazeTimer = static_cast<float>(GetRandomValue(2, 5));
 }
