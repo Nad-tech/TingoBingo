@@ -37,5 +37,5 @@ private:
     void HandleInput(float dt);
 
     GameObjectAssets gameAssets;
-    GameObject object;
+    GameObject cube;
 };

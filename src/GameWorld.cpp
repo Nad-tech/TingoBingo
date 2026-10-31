@@ -5,7 +5,7 @@
 
 GameWorld::GameWorld() :
     tingo(tingoAssets, dimensions),
-    object(gameAssets)
+    cube(gameAssets.cube, "object", true)
 {}
 
 void GameWorld::Initialise(ScreenDimensions& screenDimensions)
@@ -70,7 +70,7 @@ void GameWorld::Initialise(ScreenDimensions& screenDimensions)
 
     gameAssets.Initialise();
    
-    object.Initialise();
+    cube.Initialise();
    
     MyTransform3D initialObjectTransform;
    
@@ -78,7 +78,7 @@ void GameWorld::Initialise(ScreenDimensions& screenDimensions)
     initialObjectTransform.rotationAngle = 0.0f;
     initialObjectTransform.rotationAxis = {0.0f, 1.0f, 0.0f};
     initialObjectTransform.scale = {1.0f, 1.0f, 1.0f};
-    object.SetTransform(initialObjectTransform);
+    cube.SetTransform(initialObjectTransform);
 }
 
 void GameWorld::Update(float dt)
@@ -93,7 +93,7 @@ void GameWorld::Update(float dt)
 
     tingo.Update(dt);
 
-    object.Update(dt);
+    cube.Update(dt);
 }
 
 // Draw a screen-space widget showing the camera's orientation.
@@ -236,7 +236,7 @@ void GameWorld::Draw()
 
     tingo.Draw();
 
-    object.Draw();
+    cube.Draw();
 
     EndMode3D();
 

@@ -2,11 +2,16 @@
 
 #include "MyTransform3D.h"
 #include "GameObjects/GameObjectAssets.h"
+#include <string>
 
 class GameObject
 {
 public:
-    GameObject(GameObjectAssets& gameAssets);
+    GameObject(
+        Model& object, 
+        std::string name,
+        bool interactable    
+    );
 
     void Initialise();
     
@@ -15,8 +20,15 @@ public:
 
     void SetTransform(MyTransform3D transform);
 
+    Vector3 GetPosition() const;
+    BoundingBox GetBoundingBox() const;
+    std::string GetName() const;
+    bool IsInteractable() const;
+
 private:
-    GameObjectAssets& gameAssets;
+    Model& object;
+    std::string name;
+    bool interactable;
     
     MyTransform3D transform;
 };

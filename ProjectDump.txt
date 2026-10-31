@@ -188,6 +188,77 @@ private:
 
 
 =====================================
+.\include\GameObjects\GameObject.h
+=====================================
+
+#pragma once
+
+#include "MyTransform3D.h"
+#include "GameObjects/GameObjectAssets.h"
+#include <string>
+
+class GameObject
+{
+public:
+    GameObject(
+        Model& object, 
+        std::string name,
+        bool interactable    
+    );
+
+    void Initialise();
+    
+    void Update(float dt);
+    void Draw();
+
+    void SetTransform(MyTransform3D transform);
+
+    Vector3 GetPosition() const;
+    BoundingBox GetBoundingBox() const;
+    std::string GetName() const;
+    bool IsInteractable() const;
+
+private:
+    Model& object;
+    std::string name;
+    bool interactable;
+    
+    MyTransform3D transform;
+};
+
+
+=====================================
+.\include\GameObjects\GameObjectAssets.h
+=====================================
+
+#pragma once
+
+#include "raylib.h"
+#include "Vector4Int.h"
+
+class GameObjectAssets {
+public:
+    void Initialise();
+    void ShutDown();
+
+    Vector3 GetCubeDimensions();
+    
+    Model cube{};
+    
+    // Shared lighting shader.
+    Shader lightingShader{};
+
+    // Shader uniform locations.
+    int lightDirectionLoc = -1;
+    int ambientLoc = -1;
+    int viewPositionLoc = -1;
+
+    // Update the lighting using the current camera position.
+    void UpdateLighting(Vector3 cameraPosition);
+};
+
+
+=====================================
 .\include\GameWorld.h
 =====================================
 
@@ -199,6 +270,8 @@ private:
 #include "TingoBingo/TingoAssets.h"
 #include "ScreenDimensions.h"
 #include "TingoBingo/TingoState.h"
+#include "GameObjects/GameObject.h"
+#include "GameObjects/GameObjectAssets.h"
 
 class GameWorld
 {
@@ -210,11 +283,11 @@ public:
     void Update(float dt);
     void Draw();
     
-    void Shutdown();
+    void ShutDown();
 
 private:
     Camera3D camera{};
-    TingoAssets assets;
+    TingoAssets tingoAssets;
     TingoDimensions dimensions;
     Tingo tingo;
 
@@ -226,6 +299,9 @@ private:
     void DrawGesturesStates();
 
     void HandleInput(float dt);
+
+    GameObjectAssets gameAssets;
+    GameObject cube;
 };
 
 
@@ -872,6 +948,8 @@ public:
 
     EyeState GetLeftEyeState() const;
     EyeState GetRightEyeState() const;
+
+    void SetGazeTarget(Vector2 target);
     
 private:
     TingoAssets& assets;
@@ -994,6 +1072,8 @@ public:
 
     EyeState GetEyeState() const;
 
+    void SetGazeTarget(Vector2 target);
+
 private:
     TingoAssets& assets;
     TingoDimensions& dimensions;
@@ -1107,6 +1187,8 @@ public:
 
     EyeState GetLeftEyeState() const;
     EyeState GetRightEyeState() const;
+
+    void SetGazeTarget(Vector2 target);
 
 private:
     TingoAssets& assets;
@@ -1230,22 +1312,35 @@ private:
 class Pupil
 {
 public:
-    Pupil(TingoAssets& assets, TingoDimensions& dimensions);
+Pupil(TingoAssets& assets, TingoDimensions& dimensions);
 
-    void Initialise();
-    
-    void Update(float dt);
-    void Draw();
+void Initialise();
 
-    void SetTransform(MyTransform3D parentTransform);
+void Update(float dt);
+void Draw();
+
+void SetTransform(MyTransform3D parentTransform);
+
+void SetGazeTarget(Vector2 target);
 
 private:
-    TingoAssets& assets;
-    TingoDimensions& dimensions;
+TingoAssets& assets;
+TingoDimensions& dimensions;
 
-    Vector3 positionOffset;
-    
-    MyTransform3D transform;
+Vector3 positionOffset;
+
+// Current and desired pupil positions within the eye.
+Vector2 gazeOffset = {0.0f, 0.0f};
+Vector2 targetGazeOffset = {0.0f, 0.0f};
+
+// Controls how quickly the pupil moves towards its target.
+float gazeSpeed;
+
+// Limits pupil movement to keep it inside the eye.
+float maxGazeX = 0.0f;
+float maxGazeY = 0.0f;
+
+MyTransform3D transform;
 };
 
 
@@ -1435,6 +1530,8 @@ public:
     EyeState GetLeftEyeState() const;
     EyeState GetRightEyeState() const;
 
+    void SetGazeTarget(Vector2 target);
+
 private:
     TingoAssets& assets;
     TingoDimensions& dimensions;
@@ -1549,6 +1646,8 @@ public:
     EyeState GetRightEyeState() const;
 
     MyTransform3D& GetTransform();
+
+    void SetGazeTarget(Vector2 target);
 
 private:
     MyTransform3D transform;
@@ -1713,6 +1812,11 @@ private:
     Phrases phrases;
     std::string ChooseRandomPhrase();
     float randomPhraseTimer;
+
+    float gazeTimer;
+    float nextGazeTimer;
+
+    void AdvanceIdleGaze(float dt);
 };
 
 
@@ -2207,7 +2311,7 @@ void Game::Run()
 
 void Game::Shutdown()
 {
-    world.Shutdown();
+    world.ShutDown();
 
     CloseAudioDevice();
 
@@ -2243,6 +2347,189 @@ void Game::DrawLegend()
 
 
 =====================================
+.\src\GameObjects\GameObject.cpp
+=====================================
+
+#include "GameObjects/GameObject.h"
+
+GameObject::GameObject(
+    Model& object, 
+    std::string name,
+    bool interactable) :
+    object(object),
+    name(name),
+    interactable(interactable)
+{}
+
+void GameObject::Initialise()
+{
+    
+}
+
+void GameObject::Update(float dt)
+{
+    (void)dt;
+}
+
+void GameObject::Draw()
+{
+    DrawModelEx(
+        object,
+        transform.position,
+        transform.rotationAxis,
+        transform.rotationAngle,
+        transform.scale,
+        WHITE
+    );
+}
+
+void GameObject::SetTransform(MyTransform3D transform)
+{
+    this->transform = transform;
+}
+
+Vector3 GameObject::GetPosition() const
+{
+    return transform.position;
+}
+
+BoundingBox GameObject::GetBoundingBox() const
+{
+    BoundingBox bounds = GetModelBoundingBox(object);
+
+    bounds.min = Vector3Add(
+        Vector3Multiply(bounds.min, transform.scale),
+        transform.position
+    );
+
+    bounds.max = Vector3Add(
+        Vector3Multiply(bounds.max, transform.scale),
+        transform.position
+    );
+
+    return bounds;
+}
+
+std::string GameObject::GetName() const
+{
+    return name;
+}
+
+bool GameObject::IsInteractable() const 
+{
+    return interactable;
+}
+
+
+=====================================
+.\src\GameObjects\GameObjectAssets.cpp
+=====================================
+
+#include "GameObjects/GameObjectAssets.h"
+#include "raymath.h"
+
+inline Vector3 GetDimensions(Model model)
+{
+    BoundingBox bounds = GetModelBoundingBox(model);
+    Vector3 dimensions = Vector3Subtract(bounds.max, bounds.min);
+    return dimensions;
+}
+
+void GameObjectAssets::Initialise()
+{
+    cube = LoadModel("assets/models/gameobjects/cube.glb");
+    
+    // Load the lighting shaders.
+    lightingShader = LoadShader(
+        "assets/shaders/lighting.vs",
+        "assets/shaders/lighting.fs"
+    );
+
+    // Set the shader locations used by raylib.
+    lightingShader.locs[SHADER_LOC_VECTOR_VIEW] =
+        GetShaderLocation(lightingShader, "viewPos");
+
+    // Set our custom uniform locations.
+    lightDirectionLoc =
+        GetShaderLocation(lightingShader, "lightDirection");
+
+    ambientLoc =
+        GetShaderLocation(lightingShader, "ambient");
+
+    viewPositionLoc =
+        GetShaderLocation(lightingShader, "viewPos");
+
+    // Configure the directional light.
+    //
+    // The vector represents the direction in which light rays travel.
+    // The shader reverses this direction when calculating illumination.
+    float lightDirection[3] = {
+        0.5f,
+        -0.6f,
+        -1.0f
+    };
+
+    SetShaderValue(
+        lightingShader,
+        lightDirectionLoc,
+        lightDirection,
+        SHADER_UNIFORM_VEC3
+    );
+
+    // Low-level ambient illumination keeps shadows readable.
+    float ambient[3] = {
+        0.40f,
+        0.40f,
+        0.40f
+    };
+
+    SetShaderValue(
+        lightingShader,
+        ambientLoc,
+        ambient,
+        SHADER_UNIFORM_VEC3
+    );
+
+        // Collect all the models that should use the lighting shader.
+    Model* models[] = {
+        &cube
+    };
+
+    // Assign the shader to every material in every model.
+    for (Model* model : models)
+    {
+        for (int i = 0; i < model->materialCount; i++)
+        {
+            model->materials[i].shader = lightingShader;
+        }
+    }
+}
+
+void GameObjectAssets::UpdateLighting(Vector3 cameraPosition)
+{
+    SetShaderValue(
+        lightingShader,
+        viewPositionLoc,
+        &cameraPosition,
+        SHADER_UNIFORM_VEC3
+    );
+}
+
+Vector3 GameObjectAssets::GetCubeDimensions()
+{
+    return GetDimensions(cube);
+}
+
+
+void GameObjectAssets::ShutDown()
+{
+    UnloadModel(cube);
+    
+    UnloadShader(lightingShader);
+}
+
+
+=====================================
 .\src\GameWorld.cpp
 =====================================
 
@@ -2252,12 +2539,12 @@ void Game::DrawLegend()
 #include "TingoBingo/TingoDimensions.h"
 
 GameWorld::GameWorld() :
-    tingo(assets, dimensions)
+    tingo(tingoAssets, dimensions),
+    cube(gameAssets.cube, "object", true)
 {}
 
 void GameWorld::Initialise(ScreenDimensions& screenDimensions)
 {
-
     spaceBackground = LoadTexture("assets/images/background/space.jpg");
 
     this->screenDimensions = screenDimensions;
@@ -2269,31 +2556,32 @@ void GameWorld::Initialise(ScreenDimensions& screenDimensions)
     camera.fovy = 45.0f;                   // Vertical field of view in degrees
     camera.projection = CAMERA_PERSPECTIVE;// Objects farther away appear smaller
 
-    assets.Initialise();
+    tingoAssets.Initialise();
+    
     dimensions.Initialise
     (
-        assets.GetBodyDimensions(),
-        assets.GetPelvisDimensions(),
-        assets.GetThighDimensions(),
-        assets.GetKneeDimensions(),
-        assets.GetShinDimensions(),
-        assets.GetFootDimensions(),
-        assets.GetNeckDimensions(),
-        assets.GetShoulderDimensions(),
-        assets.GetHeadDimensions(),
-        assets.GetUpperArmDimensions(),
-        assets.GetForeArmDimensions(),
-        assets.GetElbowDimensions(),
-        assets.GetHandDimensions(),
-        assets.GetFingerDimensions(),
-        assets.GetMouthDisplayDimensions(),
-        assets.GetEyeDimesnsions(),
-        assets.GetPupilDimensions(),
-        assets.GetNoseDimensions(),
-        assets.GetEyeBrowDimensions(),
-        assets.GetEarDimensions(),
-        assets.GetAntennaDimensions(),
-        assets.GetSpriteSheetDimensions()   
+        tingoAssets.GetBodyDimensions(),
+        tingoAssets.GetPelvisDimensions(),
+        tingoAssets.GetThighDimensions(),
+        tingoAssets.GetKneeDimensions(),
+        tingoAssets.GetShinDimensions(),
+        tingoAssets.GetFootDimensions(),
+        tingoAssets.GetNeckDimensions(),
+        tingoAssets.GetShoulderDimensions(),
+        tingoAssets.GetHeadDimensions(),
+        tingoAssets.GetUpperArmDimensions(),
+        tingoAssets.GetForeArmDimensions(),
+        tingoAssets.GetElbowDimensions(),
+        tingoAssets.GetHandDimensions(),
+        tingoAssets.GetFingerDimensions(),
+        tingoAssets.GetMouthDisplayDimensions(),
+        tingoAssets.GetEyeDimesnsions(),
+        tingoAssets.GetPupilDimensions(),
+        tingoAssets.GetNoseDimensions(),
+        tingoAssets.GetEyeBrowDimensions(),
+        tingoAssets.GetEarDimensions(),
+        tingoAssets.GetAntennaDimensions(),
+        tingoAssets.GetSpriteSheetDimensions()   
     );
 
     initialTransform.position = {
@@ -2312,7 +2600,20 @@ void GameWorld::Initialise(ScreenDimensions& screenDimensions)
     initialTransform.scale = dimensions.globalScale;
 
     tingo.Initialise();
+    
     tingo.SetTransform(initialTransform);
+
+    gameAssets.Initialise();
+   
+    cube.Initialise();
+   
+    MyTransform3D initialObjectTransform;
+   
+    initialObjectTransform.position = {-6.0f, 8.0f, 2.0f};
+    initialObjectTransform.rotationAngle = 0.0f;
+    initialObjectTransform.rotationAxis = {0.0f, 1.0f, 0.0f};
+    initialObjectTransform.scale = {1.0f, 1.0f, 1.0f};
+    cube.SetTransform(initialObjectTransform);
 }
 
 void GameWorld::Update(float dt)
@@ -2322,9 +2623,12 @@ void GameWorld::Update(float dt)
     // Allow free movement around the 3D world.
     UpdateCamera(&camera, CAMERA_FREE);
 
-    assets.UpdateLighting(camera.position);
+    tingoAssets.UpdateLighting(camera.position);
+    gameAssets.UpdateLighting(camera.position);
 
     tingo.Update(dt);
+
+    cube.Update(dt);
 }
 
 // Draw a screen-space widget showing the camera's orientation.
@@ -2467,6 +2771,7 @@ void GameWorld::Draw()
 
     tingo.Draw();
 
+    cube.Draw();
 
     EndMode3D();
 
@@ -2474,10 +2779,13 @@ void GameWorld::Draw()
     //DrawGesturesStates();
 }
 
-void GameWorld::Shutdown()
+void GameWorld::ShutDown()
 {
     tingo.ShutDown();
+    tingoAssets.ShutDown();
+    gameAssets.ShutDown();
 }
+
 void GameWorld::DrawGesturesStates()
 {
     int x = 12;
@@ -4060,7 +4368,6 @@ ArmWaveState Shoulder::GetWaveState() const
 #include "TingoBingo/Body/Arm/UpperArm.h"
 #include "raymath.h"
 
-
 UpperArm::UpperArm
 (
     TingoAssets& assets, 
@@ -4322,6 +4629,11 @@ EyeState Body::GetRightEyeState() const
     return neck.GetRightEyeState();
 }
 
+void Body::SetGazeTarget(Vector2 target)
+{
+    neck.SetGazeTarget(target);
+}
+
 
 =====================================
 .\src\TingoBingo\Body\Head\Antenna.cpp
@@ -4460,7 +4772,6 @@ void Ear::SetTransform(MyTransform3D parentTransform)
 #include "raymath.h"
 #include <iostream>
 
-
 Eye::Eye(
     TingoAssets& assets,
     TingoDimensions& dimensions,
@@ -4507,6 +4818,8 @@ void Eye::Initialise()
 
 void Eye::Update(float dt)
 {
+    pupil.Update(dt);
+
     AdvanceBlink(dt);
 }
 
@@ -4521,7 +4834,10 @@ void Eye::Draw()
         WHITE
     );
 
-    pupil.Draw();
+    if(transform.scale.y > 0.2f)
+    {
+        pupil.Draw();
+    }
 }
 
 void Eye::SetTransform(MyTransform3D parentTransform)
@@ -4623,6 +4939,11 @@ void Eye::AdvanceBlink(float dt)
 EyeState Eye::GetEyeState() const
 {
     return eyeState;
+}
+
+void Eye::SetGazeTarget(Vector2 target)
+{
+    pupil.SetGazeTarget(target);
 }
 
 
@@ -4805,6 +5126,12 @@ EyeState Head::GetLeftEyeState() const
 EyeState Head::GetRightEyeState() const
 {
     return rightEye.GetEyeState();
+}
+
+void Head::SetGazeTarget(Vector2 target)
+{
+    leftEye.SetGazeTarget(target);
+    rightEye.SetGazeTarget(target);
 }
 
 
@@ -5091,15 +5418,40 @@ Pupil::Pupil(TingoAssets& assets, TingoDimensions& dimensions) :
 void Pupil::Initialise()
 {
     positionOffset = {
-        0.0f, 
-        0.0f, 
-        dimensions.eye.length / 2.0f + dimensions.pupil.length / 2.0f
+        0.0f,
+        0.0f,
+        dimensions.eye.length / 2.0f
+        + dimensions.pupil.length / 2.0f
     };
+
+    gazeSpeed = 0.9f;
+
+    // Leave room for the pupil to move without leaving the eye.
+    const float safetyMargin = 0.7f;
+
+    maxGazeX = (
+        dimensions.eye.width - dimensions.pupil.width
+    ) / 2.0f * safetyMargin;
+
+    maxGazeY = (
+        dimensions.eye.height - dimensions.pupil.height
+    ) / 2.0f * safetyMargin;
+
+    gazeOffset = {0.0f, 0.0f};
+    targetGazeOffset = {0.0f, 0.0f};
 }
 
 void Pupil::Update(float dt)
 {
-    (void)dt;
+    // Exponential smoothing makes movement consistent
+    // across different frame rates.
+    float smoothing = 1.0f - expf(-gazeSpeed * dt);
+
+    gazeOffset.x +=
+        (targetGazeOffset.x - gazeOffset.x) * smoothing;
+
+    gazeOffset.y +=
+        (targetGazeOffset.y - gazeOffset.y) * smoothing;
 }
 
 void Pupil::Draw()
@@ -5118,12 +5470,32 @@ void Pupil::SetTransform(MyTransform3D parentTransform)
 {
     MyTransform3D localTransform{};
 
-    localTransform.position = positionOffset;
+    localTransform.position = {
+        positionOffset.x + gazeOffset.x,
+        positionOffset.y + gazeOffset.y,
+        positionOffset.z
+    };
+
     localTransform.rotationAxis = {1.0f, 0.0f, 0.0f};
     localTransform.rotationAngle = 0.0f;
     localTransform.scale = {1.0f, 1.0f, 1.0f};
 
     transform = MakeChildTransform(parentTransform, localTransform);
+}
+
+void Pupil::SetGazeTarget(Vector2 target)
+{
+    targetGazeOffset.x = Clamp(
+        target.x,
+        -maxGazeX,
+        maxGazeX
+    );
+
+    targetGazeOffset.y = Clamp(
+        target.y,
+        -maxGazeY,
+        maxGazeY
+    );
 }
 
 
@@ -5471,6 +5843,11 @@ EyeState Neck::GetRightEyeState() const {
     return head.GetRightEyeState();
 }
 
+void Neck::SetGazeTarget(Vector2 target)
+{
+    head.SetGazeTarget(target);
+}
+
 
 =====================================
 .\src\TingoBingo\Body\Pelvis.cpp
@@ -5616,6 +5993,11 @@ EyeState Tingo::GetRightEyeState() const
 MyTransform3D& Tingo::GetTransform()
 {
     return transform;
+}
+
+void Tingo::SetGazeTarget(Vector2 target)
+{
+    body.SetGazeTarget(target);
 }
 
 
@@ -5937,6 +6319,9 @@ void TingoBrain::Initialise()
     state.speaking = false;
 
     randomPhraseTimer = GetRandomValue(10, 20);
+
+    gazeTimer = 0.0f;
+    nextGazeTimer = static_cast<float>(GetRandomValue(1, 3));
 }
 
 void TingoBrain::Update(float dt)
@@ -5970,6 +6355,7 @@ void TingoBrain::Update(float dt)
         {
             AdvanceIdleWave(dt);
             AdvanceBlink(dt);
+            AdvanceIdleGaze(dt);
 
             idleTimer += dt;
 
@@ -6285,6 +6671,27 @@ std::string TingoBrain::ChooseRandomPhrase()
     int index = GetRandomValue(0, size - 1);
 
     return phrases.idlePhrases[index];
+}
+
+void TingoBrain::AdvanceIdleGaze(float dt)
+{
+    gazeTimer += dt;
+
+    if (gazeTimer < nextGazeTimer)
+    {
+        return;
+    }
+
+    gazeTimer = 0.0f;
+
+    // Choose a new horizontal and vertical gaze target.
+    float x = GetRandomValue(-60, 60) / 100.0f;
+    float y = GetRandomValue(-60, 60) / 100.0f;
+
+    tingo.SetGazeTarget({x, y});
+
+    // Pause before choosing another direction.
+    nextGazeTimer = static_cast<float>(GetRandomValue(2, 5));
 }
 
 

@@ -10,7 +10,7 @@ inline Vector3 GetDimensions(Model model)
 
 void GameObjectAssets::Initialise()
 {
-    object = LoadModel("assets/models/gameobjects/object.glb");
+    cube = LoadModel("assets/models/gameobjects/cube.glb");
     
     // Load the lighting shaders.
     lightingShader = LoadShader(
@@ -65,7 +65,7 @@ void GameObjectAssets::Initialise()
 
         // Collect all the models that should use the lighting shader.
     Model* models[] = {
-        &object
+        &cube
     };
 
     // Assign the shader to every material in every model.
@@ -88,15 +88,15 @@ void GameObjectAssets::UpdateLighting(Vector3 cameraPosition)
     );
 }
 
-Vector3 GameObjectAssets::GetObjectDimensions()
+Vector3 GameObjectAssets::GetCubeDimensions()
 {
-    return GetDimensions(object);
+    return GetDimensions(cube);
 }
 
 
 void GameObjectAssets::ShutDown()
 {
-    UnloadModel(object);
+    UnloadModel(cube);
     
     UnloadShader(lightingShader);
 }

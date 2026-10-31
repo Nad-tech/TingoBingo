@@ -8,9 +8,9 @@ public:
     void Initialise();
     void ShutDown();
 
-    Vector3 GetObjectDimensions();
+    Vector3 GetCubeDimensions();
     
-    Model object{};
+    Model cube{};
     
     // Shared lighting shader.
     Shader lightingShader{};
