@@ -1,8 +1,6 @@
 #include "TingoBingo/Body/Arm/UpperArm.h"
 #include "raymath.h"
 
-#include "DebugPanel.h"
-
 UpperArm::UpperArm
 (
     TingoAssets& assets, 

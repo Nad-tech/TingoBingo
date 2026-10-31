@@ -164,111 +164,6 @@ private:
 
 
 =====================================
-.\include\DebugPanel.h
-=====================================
-
-#pragma once
-
-#include "raylib.h"
-
-#include <string>
-#include <vector>
-
-// A world-space debug panel for Raylib 3D scenes.
-//
-// Usage:
-//   DebugPanel::Instance().Initialise();
-//   DebugPanel::Instance().SetPosition({0.0f, 4.0f, 0.0f});
-//   DebugPanel::Instance().Print("Blinking", true);
-//   DebugPanel::Instance().Print("Eye scale", 0.42f);
-//   ...
-//   DebugPanel::Instance().Draw3D(camera); // inside BeginMode3D()/EndMode3D()
-//   DebugPanel::Instance().Shutdown();     // before closing the window
-//
-// The panel uses a RenderTexture2D to draw normal 2D text, then displays
-// that texture on a camera-facing 3D quad. Print() updates an existing label
-// rather than adding duplicate rows.
-
-class DebugPanel
-{
-public:
-    // Returns the one shared DebugPanel instance. Any class can use this
-    // without receiving a DebugPanel reference through its constructor.
-    static DebugPanel& Instance();
-
-    ~DebugPanel();
-
-    // This is a singleton: prevent accidental copies or extra instances.
-    DebugPanel(const DebugPanel&) = delete;
-    DebugPanel& operator=(const DebugPanel&) = delete;
-    DebugPanel(DebugPanel&&) = delete;
-    DebugPanel& operator=(DebugPanel&&) = delete;
-
-    // Call after InitWindow(), before using Print() or Draw3D().
-    void Initialise();
-    void Shutdown();
-
-    void SetPosition(Vector3 position);
-    Vector3 GetPosition() const;
-
-    void SetWorldSize(float width, float height);
-    void SetTextStyle(int fontSize, int lineSpacing, Color textColour);
-
-    void SetVisible(bool visible);
-    bool IsVisible() const;
-
-    // Set or update a row. Supported types: string, const char*, float,
-    // double, int, unsigned int, bool, Vector2, and Vector3.
-    void Print(const std::string& label, const std::string& value);
-    void Print(const std::string& label, const char* value);
-    void Print(const std::string& label, float value);
-    void Print(const std::string& label, double value);
-    void Print(const std::string& label, int value);
-    void Print(const std::string& label, unsigned int value);
-    void Print(const std::string& label, bool value);
-    void Print(const std::string& label, Vector2 value);
-    void Print(const std::string& label, Vector3 value);
-
-    void Clear();
-
-    // Call inside BeginMode3D(camera) / EndMode3D().
-    void Draw3D(const Camera3D& camera);
-
-private:
-    DebugPanel() = default;
-
-    struct Entry
-    {
-        std::string label;
-        std::string value;
-    };
-
-    std::vector<Entry> entries;
-
-    RenderTexture2D renderTexture{};
-    bool initialised = false;
-    bool visible = true;
-
-    Vector3 position = { 0.0f, 3.0f, 0.0f };
-    float worldWidth = 2.8f;
-    float worldHeight = 1.6f;
-
-    int textureWidth = 1024;
-    int textureHeight = 512;
-    int fontSize = 60;
-    int lineSpacing = 36;
-    int padding = 18;
-
-    Color textColour = LIME;
-    Color panelColour = { 12, 18, 24, 220 };
-    Color borderColour = { 90, 180, 130, 255 };
-
-    void SetValue(const std::string& label, const std::string& value);
-    void RefreshTexture();
-};
-
-
-=====================================
 .\include\Game.h
 =====================================
 
@@ -304,7 +199,6 @@ private:
 #include "TingoBingo/TingoAssets.h"
 #include "ScreenDimensions.h"
 #include "TingoBingo/TingoState.h"
-#include "DebugPanel.h"
 
 class GameWorld
 {
@@ -2263,239 +2157,6 @@ void Animation::Stop()
 
 
 =====================================
-.\src\DebugPanel.cpp
-=====================================
-
-#include "DebugPanel.h"
-
-#include <iomanip>
-#include <sstream>
-
-DebugPanel& DebugPanel::Instance()
-{
-    // Created on first use and shared by every caller.
-    static DebugPanel instance;
-    return instance;
-}
-
-DebugPanel::~DebugPanel()
-{
-    // Raylib resources should be released while the Raylib window/context
-    // still exists. Prefer calling Shutdown() explicitly before CloseWindow().
-    // The destructor is a convenience for normal object lifetime ordering.
-    Shutdown();
-}
-
-void DebugPanel::Initialise()
-{
-    if (initialised || !IsWindowReady())
-        return;
-
-    renderTexture = LoadRenderTexture(textureWidth, textureHeight);
-    initialised = renderTexture.id != 0 && renderTexture.texture.id != 0;
-
-    if (initialised)
-    {
-        SetTextureFilter(renderTexture.texture, TEXTURE_FILTER_BILINEAR);
-        RefreshTexture();
-    }
-    else
-    {
-        if (renderTexture.id != 0)
-            UnloadRenderTexture(renderTexture);
-
-        renderTexture = {};
-        TraceLog(LOG_WARNING, "DebugPanel: render texture allocation failed");
-    }
-}
-
-void DebugPanel::Shutdown()
-{
-    if (initialised)
-    {
-        UnloadRenderTexture(renderTexture);
-        renderTexture = {};
-        initialised = false;
-    }
-}
-
-void DebugPanel::SetPosition(Vector3 newPosition)
-{
-    position = newPosition;
-}
-
-Vector3 DebugPanel::GetPosition() const
-{
-    return position;
-}
-
-void DebugPanel::SetWorldSize(float width, float height)
-{
-    worldWidth = width;
-    worldHeight = height;
-}
-
-void DebugPanel::SetTextStyle(int newFontSize, int newLineSpacing, Color newTextColour)
-{
-    fontSize = newFontSize > 0 ? newFontSize : 1;
-    lineSpacing = newLineSpacing > 0 ? newLineSpacing : 1;
-    textColour = newTextColour;
-    RefreshTexture();
-}
-
-void DebugPanel::SetVisible(bool newVisible)
-{
-    visible = newVisible;
-}
-
-bool DebugPanel::IsVisible() const
-{
-    return visible;
-}
-
-void DebugPanel::SetValue(const std::string& label, const std::string& value)
-{
-    for (Entry& entry : entries)
-    {
-        if (entry.label == label)
-        {
-            if (entry.value != value)
-            {
-                entry.value = value;
-                RefreshTexture();
-            }
-            return;
-        }
-    }
-
-    entries.push_back({ label, value });
-    RefreshTexture();
-}
-
-void DebugPanel::Print(const std::string& label, const std::string& value)
-{
-    SetValue(label, value);
-}
-
-void DebugPanel::Print(const std::string& label, const char* value)
-{
-    SetValue(label, value ? value : "(null)");
-}
-
-void DebugPanel::Print(const std::string& label, float value)
-{
-    std::ostringstream stream;
-    stream << std::fixed << std::setprecision(2) << value;
-    SetValue(label, stream.str());
-}
-
-void DebugPanel::Print(const std::string& label, double value)
-{
-    std::ostringstream stream;
-    stream << std::fixed << std::setprecision(2) << value;
-    SetValue(label, stream.str());
-}
-
-void DebugPanel::Print(const std::string& label, int value)
-{
-    SetValue(label, std::to_string(value));
-}
-
-void DebugPanel::Print(const std::string& label, unsigned int value)
-{
-    SetValue(label, std::to_string(value));
-}
-
-void DebugPanel::Print(const std::string& label, bool value)
-{
-    SetValue(label, value ? "true" : "false");
-}
-
-void DebugPanel::Print(const std::string& label, Vector2 value)
-{
-    std::ostringstream stream;
-    stream << std::fixed << std::setprecision(2)
-           << "(" << value.x << ", " << value.y << ")";
-    SetValue(label, stream.str());
-}
-
-void DebugPanel::Print(const std::string& label, Vector3 value)
-{
-    std::ostringstream stream;
-    stream << std::fixed << std::setprecision(2)
-           << "(" << value.x << ", " << value.y << ", " << value.z << ")";
-    SetValue(label, stream.str());
-}
-
-void DebugPanel::Clear()
-{
-    entries.clear();
-    RefreshTexture();
-}
-
-void DebugPanel::RefreshTexture()
-{
-    if (!initialised)
-        return;
-
-    BeginTextureMode(renderTexture);
-    ClearBackground(panelColour);
-
-    // Simple border around the panel.
-    DrawRectangleLinesEx(
-        { 1.0f, 1.0f, static_cast<float>(textureWidth - 2),
-          static_cast<float>(textureHeight - 2) },
-        3.0f,
-        borderColour
-    );
-
-    int y = padding;
-    const int availableBottom = textureHeight - padding;
-
-    for (const Entry& entry : entries)
-    {
-        if (y + fontSize > availableBottom)
-            break;
-
-        const std::string output = entry.label + ": " + entry.value;
-
-        DrawText(
-            output.c_str(),
-            padding,
-            y,
-            fontSize,
-            textColour
-        );
-
-        y += lineSpacing;
-    }
-
-    EndTextureMode();
-}
-
-void DebugPanel::Draw3D(const Camera3D& camera)
-{
-    if (!visible || !initialised)
-        return;
-
-    // raylib's billboard path builds the camera-facing quad and manages its
-    // texture and render state. A negative source height corrects the
-    // vertical inversion of RenderTexture2D textures.
-    DrawBillboardPro(
-        camera,
-        renderTexture.texture,
-        { 0.0f, 0.0f, static_cast<float>(textureWidth), -static_cast<float>(textureHeight) },
-        position,
-        { 0.0f, 1.0f, 0.0f },
-        { worldWidth, worldHeight },
-        { worldWidth * 0.5f, worldHeight * 0.5f },
-        0.0f,
-        WHITE
-    );
-}
-
-
-=====================================
 .\src\Game.cpp
 =====================================
 
@@ -2596,10 +2257,6 @@ GameWorld::GameWorld() :
 
 void GameWorld::Initialise(ScreenDimensions& screenDimensions)
 {
-    DebugPanel::Instance().Initialise();
-    DebugPanel::Instance().SetPosition({ -5.0f, 3.0f, 0.0f });
-    DebugPanel::Instance().SetWorldSize(4.0f, 4.0f);
-    DebugPanel::Instance().SetVisible(true);
 
     spaceBackground = LoadTexture("assets/images/background/space.jpg");
 
@@ -2810,7 +2467,6 @@ void GameWorld::Draw()
 
     tingo.Draw();
 
-    //DebugPanel::Instance().Draw3D(camera);
 
     EndMode3D();
 
@@ -2821,7 +2477,6 @@ void GameWorld::Draw()
 void GameWorld::Shutdown()
 {
     tingo.ShutDown();
-    DebugPanel::Instance().Shutdown();
 }
 void GameWorld::DrawGesturesStates()
 {
@@ -4405,7 +4060,6 @@ ArmWaveState Shoulder::GetWaveState() const
 #include "TingoBingo/Body/Arm/UpperArm.h"
 #include "raymath.h"
 
-#include "DebugPanel.h"
 
 UpperArm::UpperArm
 (
@@ -4806,7 +4460,6 @@ void Ear::SetTransform(MyTransform3D parentTransform)
 #include "raymath.h"
 #include <iostream>
 
-#include "DebugPanel.h"
 
 Eye::Eye(
     TingoAssets& assets,

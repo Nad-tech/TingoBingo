@@ -87,8 +87,6 @@
 ├── build/
 │   ├── Animation.d
 │   ├── Animation.o
-│   ├── DebugPanel.d
-│   ├── DebugPanel.o
 │   ├── Game.d
 │   ├── Game.o
 │   ├── GameWorld.d
@@ -165,7 +163,6 @@
 ├── FileStructure.txt
 ├── include/
 │   ├── Animation.h
-│   ├── DebugPanel.h
 │   ├── Game.h
 │   ├── GameWorld.h
 │   ├── MyTransform3D.h
@@ -215,7 +212,6 @@
 │   ├── buildProjectTree.sh
 ├── src/
 │   ├── Animation.cpp
-│   ├── DebugPanel.cpp
 │   ├── Game.cpp
 │   ├── GameWorld.cpp
 │   ├── main.cpp

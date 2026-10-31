@@ -4,16 +4,12 @@
 #include "TingoBingo/TingoDimensions.h"
 
 GameWorld::GameWorld() :
-    tingo(assets, dimensions)
+    tingo(tingoAssets, dimensions),
+    object(gameAssets)
 {}
 
 void GameWorld::Initialise(ScreenDimensions& screenDimensions)
 {
-    DebugPanel::Instance().Initialise();
-    DebugPanel::Instance().SetPosition({ -5.0f, 3.0f, 0.0f });
-    DebugPanel::Instance().SetWorldSize(4.0f, 4.0f);
-    DebugPanel::Instance().SetVisible(true);
-
     spaceBackground = LoadTexture("assets/images/background/space.jpg");
 
     this->screenDimensions = screenDimensions;
@@ -25,31 +21,32 @@ void GameWorld::Initialise(ScreenDimensions& screenDimensions)
     camera.fovy = 45.0f;                   // Vertical field of view in degrees
     camera.projection = CAMERA_PERSPECTIVE;// Objects farther away appear smaller
 
-    assets.Initialise();
+    tingoAssets.Initialise();
+    
     dimensions.Initialise
     (
-        assets.GetBodyDimensions(),
-        assets.GetPelvisDimensions(),
-        assets.GetThighDimensions(),
-        assets.GetKneeDimensions(),
-        assets.GetShinDimensions(),
-        assets.GetFootDimensions(),
-        assets.GetNeckDimensions(),
-        assets.GetShoulderDimensions(),
-        assets.GetHeadDimensions(),
-        assets.GetUpperArmDimensions(),
-        assets.GetForeArmDimensions(),
-        assets.GetElbowDimensions(),
-        assets.GetHandDimensions(),
-        assets.GetFingerDimensions(),
-        assets.GetMouthDisplayDimensions(),
-        assets.GetEyeDimesnsions(),
-        assets.GetPupilDimensions(),
-        assets.GetNoseDimensions(),
-        assets.GetEyeBrowDimensions(),
-        assets.GetEarDimensions(),
-        assets.GetAntennaDimensions(),
-        assets.GetSpriteSheetDimensions()   
+        tingoAssets.GetBodyDimensions(),
+        tingoAssets.GetPelvisDimensions(),
+        tingoAssets.GetThighDimensions(),
+        tingoAssets.GetKneeDimensions(),
+        tingoAssets.GetShinDimensions(),
+        tingoAssets.GetFootDimensions(),
+        tingoAssets.GetNeckDimensions(),
+        tingoAssets.GetShoulderDimensions(),
+        tingoAssets.GetHeadDimensions(),
+        tingoAssets.GetUpperArmDimensions(),
+        tingoAssets.GetForeArmDimensions(),
+        tingoAssets.GetElbowDimensions(),
+        tingoAssets.GetHandDimensions(),
+        tingoAssets.GetFingerDimensions(),
+        tingoAssets.GetMouthDisplayDimensions(),
+        tingoAssets.GetEyeDimesnsions(),
+        tingoAssets.GetPupilDimensions(),
+        tingoAssets.GetNoseDimensions(),
+        tingoAssets.GetEyeBrowDimensions(),
+        tingoAssets.GetEarDimensions(),
+        tingoAssets.GetAntennaDimensions(),
+        tingoAssets.GetSpriteSheetDimensions()   
     );
 
     initialTransform.position = {
@@ -68,10 +65,15 @@ void GameWorld::Initialise(ScreenDimensions& screenDimensions)
     initialTransform.scale = dimensions.globalScale;
 
     tingo.Initialise();
+    
     tingo.SetTransform(initialTransform);
 
+    gameAssets.Initialise();
+   
     object.Initialise();
+   
     MyTransform3D initialObjectTransform;
+   
     initialObjectTransform.position = {-6.0f, 8.0f, 2.0f};
     initialObjectTransform.rotationAngle = 0.0f;
     initialObjectTransform.rotationAxis = {0.0f, 1.0f, 0.0f};
@@ -86,7 +88,8 @@ void GameWorld::Update(float dt)
     // Allow free movement around the 3D world.
     UpdateCamera(&camera, CAMERA_FREE);
 
-    assets.UpdateLighting(camera.position);
+    tingoAssets.UpdateLighting(camera.position);
+    gameAssets.UpdateLighting(camera.position);
 
     tingo.Update(dt);
 
@@ -233,8 +236,6 @@ void GameWorld::Draw()
 
     tingo.Draw();
 
-    //DebugPanel::Instance().Draw3D(camera);
-
     object.Draw();
 
     EndMode3D();
@@ -243,12 +244,13 @@ void GameWorld::Draw()
     //DrawGesturesStates();
 }
 
-void GameWorld::Shutdown()
+void GameWorld::ShutDown()
 {
     tingo.ShutDown();
-    DebugPanel::Instance().Shutdown();
-    object.ShutDown();
+    tingoAssets.ShutDown();
+    gameAssets.ShutDown();
 }
+
 void GameWorld::DrawGesturesStates()
 {
     int x = 12;

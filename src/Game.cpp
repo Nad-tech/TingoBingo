@@ -45,7 +45,7 @@ void Game::Run()
 
 void Game::Shutdown()
 {
-    world.Shutdown();
+    world.ShutDown();
 
     CloseAudioDevice();
 

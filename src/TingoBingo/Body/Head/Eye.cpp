@@ -3,8 +3,6 @@
 #include "raymath.h"
 #include <iostream>
 
-#include "DebugPanel.h"
-
 Eye::Eye(
     TingoAssets& assets,
     TingoDimensions& dimensions,

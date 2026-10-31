@@ -6,8 +6,8 @@
 #include "TingoBingo/TingoAssets.h"
 #include "ScreenDimensions.h"
 #include "TingoBingo/TingoState.h"
-#include "DebugPanel.h"
 #include "GameObjects/GameObject.h"
+#include "GameObjects/GameObjectAssets.h"
 
 class GameWorld
 {
@@ -19,11 +19,11 @@ public:
     void Update(float dt);
     void Draw();
     
-    void Shutdown();
+    void ShutDown();
 
 private:
     Camera3D camera{};
-    TingoAssets assets;
+    TingoAssets tingoAssets;
     TingoDimensions dimensions;
     Tingo tingo;
 
@@ -36,5 +36,6 @@ private:
 
     void HandleInput(float dt);
 
+    GameObjectAssets gameAssets;
     GameObject object;
 };

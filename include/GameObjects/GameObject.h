@@ -1,13 +1,12 @@
 #pragma once
 
 #include "MyTransform3D.h"
-#include "TingoBingo/TingoDimensions.h"
-#include "TingoBingo/TingoAssets.h"
+#include "GameObjects/GameObjectAssets.h"
 
 class GameObject
 {
 public:
-    GameObject();
+    GameObject(GameObjectAssets& gameAssets);
 
     void Initialise();
     
@@ -16,11 +15,8 @@ public:
 
     void SetTransform(MyTransform3D transform);
 
-    void ShutDown();
-
 private:
-
-    Model object;
+    GameObjectAssets& gameAssets;
     
     MyTransform3D transform;
 };
