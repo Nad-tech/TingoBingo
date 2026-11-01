@@ -79,6 +79,8 @@ void GameWorld::Initialise(ScreenDimensions& screenDimensions)
     initialObjectTransform.rotationAxis = {0.0f, 1.0f, 0.0f};
     initialObjectTransform.scale = {1.0f, 1.0f, 1.0f};
     cube.SetTransform(initialObjectTransform);
+
+    worldObjects.push_back(&cube);
 }
 
 void GameWorld::Update(float dt)
@@ -94,6 +96,12 @@ void GameWorld::Update(float dt)
     tingo.Update(dt);
 
     cube.Update(dt);
+
+    // Let Tingo inspect the world.
+    tingo.UpdateVision(
+        tingo.GetTransform().position,
+        worldObjects
+    );
 }
 
 // Draw a screen-space widget showing the camera's orientation.
@@ -188,51 +196,14 @@ void GameWorld::Draw()
 
     BeginMode3D(camera);
 
-    // Room dimensions.
-    const float roomWidth = 20.0f;
-    const float roomHeight = 8.0f;
-    const float roomDepth = 20.0f;
-
-    // Half-dimensions make positioning the walls easier.
-    const float halfWidth = roomWidth / 2.0f;
-    const float halfDepth = roomDepth / 2.0f;
-
     //Floor.
     DrawPlane(
         { 0.0f, 0.0f, 0.0f },
-        { roomWidth, roomDepth },
+        { 40, 40 },
         LIGHTGRAY
     );
 
-    // // Front wall: positive Z.
-    // /*DrawCube(
-    //     { 0.0f, roomHeight / 2.0f, halfDepth },
-    //     roomWidth, roomHeight, 0.2f,
-    //     GRAY
-    // );*/
-
-    // Back wall wall: negative Z.
-    DrawCube(
-        { 0.0f, roomHeight / 2.0f, -halfDepth },
-        roomWidth, roomHeight, 0.2f,
-        GRAY
-    );
-
-    // Left wall: negative X.
-    DrawCube(
-        { -halfWidth, roomHeight / 2.0f, 0.0f },
-        0.2f, roomHeight, roomDepth,
-        DARKGRAY
-    );
-
-    // Right wall: positive X.
-    DrawCube(
-        { halfWidth, roomHeight / 2.0f, 0.0f },
-        0.2f, roomHeight, roomDepth,
-        DARKGRAY
-    );
-
-    DrawGrid(100, 1.0f);
+    //DrawGrid(100, 1.0f);
 
     tingo.Draw();
 
@@ -242,6 +213,15 @@ void GameWorld::Draw()
 
     DrawOrientationGizmo();
     //DrawGesturesStates();
+
+    DrawText(
+        TextFormat("Visible objects: %i", 
+            static_cast<int>(tingo.GetVisibleObjects().size())),
+        100,
+        100,
+        20,
+        GREEN
+    );
 }
 
 void GameWorld::ShutDown()
@@ -317,23 +297,43 @@ void GameWorld::HandleInput(float dt)
 {
     const float moveSpeed = 3.0f;
 
-    Vector3 direction = { 0.0f, 0.0f, 0.0f };
+    Vector3 tingoDirection = { 0.0f, 0.0f, 0.0f };
 
-    if (IsKeyDown(KEY_O))    direction.z -= 1.0f;
-    if (IsKeyDown(KEY_L))  direction.z += 1.0f;
-    if (IsKeyDown(KEY_K))  direction.x -= 1.0f;
-    if (IsKeyDown(KEY_SEMICOLON)) direction.x += 1.0f;
-    if (IsKeyDown(KEY_R)) direction.y += 1.0f;
-    if (IsKeyDown(KEY_F)) direction.y -= 1.0f;
+    if (IsKeyDown(KEY_O))    tingoDirection.z -= 1.0f;
+    if (IsKeyDown(KEY_L))  tingoDirection.z += 1.0f;
+    if (IsKeyDown(KEY_K))  tingoDirection.x -= 1.0f;
+    if (IsKeyDown(KEY_SEMICOLON)) tingoDirection.x += 1.0f;
+    if (IsKeyDown(KEY_R)) tingoDirection.y += 1.0f;
+    if (IsKeyDown(KEY_F)) tingoDirection.y -= 1.0f;
 
-    if (Vector3Length(direction) > 0.0f)
+    if (Vector3Length(tingoDirection) > 0.0f)
     {
-        direction = Vector3Normalize(direction);
+        tingoDirection = Vector3Normalize(tingoDirection);
 
-        tingo.GetTransform().position.x += direction.x * moveSpeed * dt;
-        tingo.GetTransform().position.z += direction.z * moveSpeed * dt;
-        tingo.GetTransform().position.y += direction.y * moveSpeed * dt;
+        tingo.GetTransform().position.x += tingoDirection.x * moveSpeed * dt;
+        tingo.GetTransform().position.z += tingoDirection.z * moveSpeed * dt;
+        tingo.GetTransform().position.y += tingoDirection.y * moveSpeed * dt;
     }
 
     tingo.SetTransform(tingo.GetTransform());
+
+    Vector3 cubeDirection = { 0.0f, 0.0f, 0.0f };
+
+    if (IsKeyDown(KEY_H)) cubeDirection.z -= 1.0f;
+    if (IsKeyDown(KEY_Y)) cubeDirection.z += 1.0f;
+    if (IsKeyDown(KEY_G)) cubeDirection.x -= 1.0f;
+    if (IsKeyDown(KEY_J)) cubeDirection.x += 1.0f;
+    if (IsKeyDown(KEY_Z)) cubeDirection.y += 1.0f;
+    if (IsKeyDown(KEY_X)) cubeDirection.y -= 1.0f;
+
+    if (Vector3Length(cubeDirection) > 0.0f)
+    {
+        cubeDirection = Vector3Normalize(cubeDirection);
+
+        cube.GetTransform().position.x += cubeDirection.x * moveSpeed * dt;
+        cube.GetTransform().position.z += cubeDirection.z * moveSpeed * dt;
+        cube.GetTransform().position.y += cubeDirection.y * moveSpeed * dt;
+    }
+
+    cube.SetTransform(cube.GetTransform());
 }

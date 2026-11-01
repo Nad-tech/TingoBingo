@@ -8,6 +8,7 @@
 #include "TingoBingo/TingoState.h"
 #include "GameObjects/GameObject.h"
 #include "GameObjects/GameObjectAssets.h"
+#include <vector>
 
 class GameWorld
 {
@@ -38,4 +39,6 @@ private:
 
     GameObjectAssets gameAssets;
     GameObject cube;
+
+    std::vector<GameObject*> worldObjects;
 };

@@ -6,6 +6,7 @@
 #include "TingoAssets.h"
 #include "TingoBingo/TingoState.h"
 #include "TingoBingo/TingoBrain.h"
+#include "TingoBingo/TingoVision.h"
 
 class Tingo
 {
@@ -32,6 +33,13 @@ public:
 
     void SetGazeTarget(Vector2 target);
 
+    void UpdateVision(
+    Vector3 observerPosition,
+        const std::vector<GameObject*>& objects
+    );
+
+    const std::vector<GameObject*>& GetVisibleObjects() const;
+
 private:
     MyTransform3D transform;
     TingoAssets &assets;
@@ -39,4 +47,5 @@ private:
     TingoState state;
     Body body;
     TingoBrain tingoBrain;
+    TingoVision vision;
 };

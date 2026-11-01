@@ -14,6 +14,7 @@ void Tingo::Initialise()
 {
     body.Initialise();
     tingoBrain.Initialise();
+    vision.Initialise();
 }
 
 void Tingo::ShutDown()
@@ -30,6 +31,7 @@ void Tingo::Update(float dt)
 void Tingo::Draw()
 {
     body.Draw();
+    vision.Draw();
 }
 
 void Tingo::SetTransform(MyTransform3D initialTransform)
@@ -71,4 +73,17 @@ MyTransform3D& Tingo::GetTransform()
 void Tingo::SetGazeTarget(Vector2 target)
 {
     body.SetGazeTarget(target);
+}
+
+void Tingo::UpdateVision(
+    Vector3 observerPosition,
+    const std::vector<GameObject*>& objects
+)
+{
+    vision.Update(observerPosition, objects);
+}
+
+const std::vector<GameObject*>& Tingo::GetVisibleObjects() const
+{
+    return vision.GetVisibleObjects();
 }

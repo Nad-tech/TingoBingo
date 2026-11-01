@@ -67,3 +67,8 @@ bool GameObject::IsInteractable() const
 {
     return interactable;
 }
+
+MyTransform3D& GameObject::GetTransform()
+{
+    return transform;
+}

@@ -19,6 +19,7 @@ public:
     void Draw();
 
     void SetTransform(MyTransform3D transform);
+    MyTransform3D& GetTransform();
 
     Vector3 GetPosition() const;
     BoundingBox GetBoundingBox() const;
