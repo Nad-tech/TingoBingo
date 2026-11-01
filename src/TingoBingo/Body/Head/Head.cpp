@@ -46,6 +46,8 @@ void Head::Update(float dt)
     mouthDisplay.Update(dt);
     leftEye.Update(dt);
     rightEye.Update(dt);
+
+    localRotation += dt * 40;
 }
 
 void Head::Draw()
@@ -106,4 +108,35 @@ void Head::SetGazeTarget(Vector2 target)
 {
     leftEye.SetGazeTarget(target);
     rightEye.SetGazeTarget(target);
+}
+
+const MyTransform3D& Head::GetTransform() const
+{
+    return transform;
+}
+
+Vector3 Head::GetForwardDirection() const
+{
+    Quaternion rotation = QuaternionFromAxisAngle(
+        transform.rotationAxis,
+        transform.rotationAngle * DEG2RAD
+    );
+
+    return Vector3Normalize(
+        Vector3RotateByQuaternion(
+            { 0.0f, 0.0f, 1.0f },
+            rotation
+        )
+    );
+}
+
+Vector3 Head::GetVisionPosition() const
+{
+    Vector3 leftPosition = leftEye.GetTransform().position;
+    Vector3 rightPosition = rightEye.GetTransform().position;
+
+    return Vector3Scale(
+        Vector3Add(leftPosition, rightPosition),
+        0.5f
+    );
 }

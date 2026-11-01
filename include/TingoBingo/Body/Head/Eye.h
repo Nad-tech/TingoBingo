@@ -29,6 +29,8 @@ public:
 
     void SetGazeTarget(Vector2 target);
 
+    MyTransform3D GetTransform() const;
+
 private:
     TingoAssets& assets;
     TingoDimensions& dimensions;

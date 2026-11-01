@@ -14,17 +14,18 @@ void TingoVision::Initialise()
 
 void TingoVision::Update(
     Vector3 observerPosition,
+    Vector3 forwardDirection,
     const std::vector<GameObject*>& objects
 )
 {
     this->observerPosition = observerPosition;
+    this->forwardDirection = Vector3Normalize(forwardDirection);
 
     visibleObjects.clear();
 
     for (GameObject* object : objects)
     {
-        if (object == nullptr)
-            continue;
+        if (object == nullptr) continue;
 
         if (
             IsWithinRange(observerPosition, object->GetBoundingBox()) &&

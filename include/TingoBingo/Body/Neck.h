@@ -29,6 +29,9 @@ public:
 
     void SetGazeTarget(Vector2 target);
 
+    Vector3 GetVisionPosition() const;
+    Vector3 GetHeadForwardDirection() const;
+
 private:
     TingoAssets& assets;
     TingoDimensions& dimensions;

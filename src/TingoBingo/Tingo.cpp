@@ -22,10 +22,16 @@ void Tingo::ShutDown()
     assets.ShutDown();
 }
 
-void Tingo::Update(float dt)
+void Tingo::Update(float dt, const std::vector<GameObject*>& gameObjects)
 {
     tingoBrain.Update(dt);
     body.Update(dt);
+
+    vision.Update(
+        GetVisionPosition(),
+        GetHeadForwardDirection(),
+        gameObjects
+    );
 }
 
 void Tingo::Draw()
@@ -75,15 +81,26 @@ void Tingo::SetGazeTarget(Vector2 target)
     body.SetGazeTarget(target);
 }
 
-void Tingo::UpdateVision(
-    Vector3 observerPosition,
-    const std::vector<GameObject*>& objects
-)
+void Tingo::UpdateVision(const std::vector<GameObject*>& objects)
 {
-    vision.Update(observerPosition, objects);
+    vision.Update(
+        GetVisionPosition(),
+        GetHeadForwardDirection(),
+        objects
+    );
 }
 
 const std::vector<GameObject*>& Tingo::GetVisibleObjects() const
 {
     return vision.GetVisibleObjects();
+}
+
+Vector3 Tingo::GetVisionPosition() const
+{
+    return body.GetVisionPosition();
+}
+
+Vector3 Tingo::GetHeadForwardDirection() const
+{
+    return body.GetHeadForwardDirection();
 }

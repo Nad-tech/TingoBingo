@@ -33,6 +33,11 @@ public:
 
     void SetGazeTarget(Vector2 target);
 
+    const MyTransform3D& GetTransform() const;
+
+    Vector3 GetVisionPosition() const;
+    Vector3 GetForwardDirection() const;
+
 private:
     TingoAssets& assets;
     TingoDimensions& dimensions;

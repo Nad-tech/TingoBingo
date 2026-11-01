@@ -1,6 +1,10 @@
 #include "Game.h"
 #include "raylib.h"
 
+Game::Game() :
+    world(inputController)
+{}
+
 void Game::Initialise()
 {
     InitWindow(10, 10, "TingoBingo 3D");
@@ -20,6 +24,7 @@ void Game::Initialise()
     SetTargetFPS(60);
     DisableCursor();
 
+    inputController.Initialise();
     world.Initialise(screenDimensions);
 }
 
@@ -27,6 +32,8 @@ void Game::Run()
 {
     while (!WindowShouldClose())
     {
+        inputController.Update();
+
         float dt = GetFrameTime();
 
         world.Update(dt);
@@ -36,6 +43,29 @@ void Game::Run()
         ClearBackground(BLACK);
 
         world.Draw();
+
+        if (inputController.IsConnected())
+        {
+            DrawText("CONTROLLER CONNECTED", 20, 20, 20, GREEN);
+        }
+        else
+        {
+            DrawText("CONTROLLER DISCONNECTED", 20, 20, 20, RED);
+        }
+
+        DrawText(
+            TextFormat("Left X: %.2f  Y: %.2f",
+                inputController.GetLeftStickX(),
+                inputController.GetLeftStickY()),
+            20, 50, 20, WHITE
+        );
+
+        DrawText(
+            TextFormat("Right X: %.2f  Y: %.2f",
+                inputController.GetRightStickX(),
+                inputController.GetRightStickY()),
+            20, 80, 20, WHITE
+        );
 
         //DrawLegend();
 

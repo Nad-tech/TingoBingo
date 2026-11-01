@@ -12,6 +12,7 @@ public:
 
     void Update(
         Vector3 observerPosition,
+        Vector3 forwardDirection,
         const std::vector<GameObject*>& objects
     );
 

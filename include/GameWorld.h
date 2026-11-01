@@ -9,11 +9,12 @@
 #include "GameObjects/GameObject.h"
 #include "GameObjects/GameObjectAssets.h"
 #include <vector>
+#include "InputController.h"
 
 class GameWorld
 {
 public:
-    GameWorld();
+    GameWorld(InputController& inputController);
     
     void Initialise(ScreenDimensions& screenDimensions);
     
@@ -22,7 +23,10 @@ public:
     
     void ShutDown();
 
+    void HandleController(float dt);
+
 private:
+    InputController& inputController;
     Camera3D camera{};
     TingoAssets tingoAssets;
     TingoDimensions dimensions;

@@ -72,3 +72,13 @@ void Neck::SetGazeTarget(Vector2 target)
 {
     head.SetGazeTarget(target);
 }
+
+Vector3 Neck::GetVisionPosition() const
+{
+    return head.GetVisionPosition();
+}
+
+Vector3 Neck::GetHeadForwardDirection() const
+{
+    return head.GetForwardDirection();
+}

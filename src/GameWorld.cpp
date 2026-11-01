@@ -3,9 +3,11 @@
 #include "raymath.h"
 #include "TingoBingo/TingoDimensions.h"
 
-GameWorld::GameWorld() :
+GameWorld::GameWorld(InputController& inputController) :
+    inputController(inputController),
     tingo(tingoAssets, dimensions),
     cube(gameAssets.cube, "object", true)
+    
 {}
 
 void GameWorld::Initialise(ScreenDimensions& screenDimensions)
@@ -86,22 +88,17 @@ void GameWorld::Initialise(ScreenDimensions& screenDimensions)
 void GameWorld::Update(float dt)
 {
     HandleInput(dt);
+    HandleController(dt);
 
     // Allow free movement around the 3D world.
-    UpdateCamera(&camera, CAMERA_FREE);
+    //UpdateCamera(&camera, CAMERA_FREE);
 
     tingoAssets.UpdateLighting(camera.position);
     gameAssets.UpdateLighting(camera.position);
 
-    tingo.Update(dt);
+    tingo.Update(dt, worldObjects);
 
     cube.Update(dt);
-
-    // Let Tingo inspect the world.
-    tingo.UpdateVision(
-        tingo.GetTransform().position,
-        worldObjects
-    );
 }
 
 // Draw a screen-space widget showing the camera's orientation.
@@ -319,8 +316,8 @@ void GameWorld::HandleInput(float dt)
 
     Vector3 cubeDirection = { 0.0f, 0.0f, 0.0f };
 
-    if (IsKeyDown(KEY_H)) cubeDirection.z -= 1.0f;
-    if (IsKeyDown(KEY_Y)) cubeDirection.z += 1.0f;
+    if (IsKeyDown(KEY_Y)) cubeDirection.z -= 1.0f;
+    if (IsKeyDown(KEY_H)) cubeDirection.z += 1.0f;
     if (IsKeyDown(KEY_G)) cubeDirection.x -= 1.0f;
     if (IsKeyDown(KEY_J)) cubeDirection.x += 1.0f;
     if (IsKeyDown(KEY_Z)) cubeDirection.y += 1.0f;
@@ -336,4 +333,31 @@ void GameWorld::HandleInput(float dt)
     }
 
     cube.SetTransform(cube.GetTransform());
+}
+
+void GameWorld::HandleController(float dt)
+{
+    if (!inputController.IsConnected())
+        return;
+
+    const float moveSpeed = 3.0f;
+
+    float x = inputController.GetLeftStickX();
+    float z = inputController.GetLeftStickY();
+
+    // Dead zone
+    const float deadZone = 0.15f;
+
+    if (fabsf(x) < deadZone) x = 0.0f;
+    if (fabsf(z) < deadZone) z = 0.0f;
+
+    Vector3 direction = { x, 0.0f, z };
+
+    if (Vector3Length(direction) > 1.0f)
+        direction = Vector3Normalize(direction);
+
+    tingo.GetTransform().position.x += direction.x * moveSpeed * dt;
+    tingo.GetTransform().position.z += direction.z * moveSpeed * dt;
+
+    tingo.SetTransform(tingo.GetTransform());
 }

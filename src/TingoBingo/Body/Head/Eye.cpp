@@ -176,3 +176,8 @@ void Eye::SetGazeTarget(Vector2 target)
 {
     pupil.SetGazeTarget(target);
 }
+
+MyTransform3D Eye::GetTransform() const
+{
+    return transform;
+}

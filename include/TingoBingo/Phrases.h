@@ -16,6 +16,7 @@ struct Phrases
         "praying mantis eat bugs",
         "bananas bananas and pajamas",
         "your dad is the best",
-        "Guitar guitar pajarms pajarms"
+        "Guitar guitar pajarms pajarms",
+        "Apple Apple on the wall what is a mango too"
     };
 };

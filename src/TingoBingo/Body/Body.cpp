@@ -91,3 +91,13 @@ void Body::SetGazeTarget(Vector2 target)
 {
     neck.SetGazeTarget(target);
 }
+
+Vector3 Body::GetVisionPosition() const
+{
+    return neck.GetVisionPosition();
+}
+
+Vector3 Body::GetHeadForwardDirection() const
+{
+    return neck.GetHeadForwardDirection();
+}
