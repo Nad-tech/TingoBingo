@@ -3,6 +3,19 @@
 #include "raymath.h"
 #include "TingoBingo/TingoDimensions.h"
 
+static float LerpAngle(float current, float target, float amount)
+{
+    float difference = target - current;
+
+    while (difference > 180.0f)
+        difference -= 360.0f;
+
+    while (difference < -180.0f)
+        difference += 360.0f;
+
+    return current + difference * amount;
+}
+
 GameWorld::GameWorld(InputController& inputController) :
     inputController(inputController),
     tingo(tingoAssets, dimensions),
@@ -341,12 +354,11 @@ void GameWorld::HandleController(float dt)
         return;
 
     const float moveSpeed = 3.0f;
+    const float deadZone = 0.15f;
+    const float rotationSpeed = 5.0f;
 
     float x = inputController.GetLeftStickX();
     float z = inputController.GetLeftStickY();
-
-    // Dead zone
-    const float deadZone = 0.15f;
 
     if (fabsf(x) < deadZone) x = 0.0f;
     if (fabsf(z) < deadZone) z = 0.0f;
@@ -356,8 +368,26 @@ void GameWorld::HandleController(float dt)
     if (Vector3Length(direction) > 1.0f)
         direction = Vector3Normalize(direction);
 
-    tingo.GetTransform().position.x += direction.x * moveSpeed * dt;
-    tingo.GetTransform().position.z += direction.z * moveSpeed * dt;
+    if (Vector3Length(direction) > 0.0f)
+    {
+        // Move Tingo.
+        MyTransform3D& transform = tingo.GetTransform();
 
-    tingo.SetTransform(tingo.GetTransform());
+        transform.position.x += direction.x * moveSpeed * dt;
+        transform.position.z += direction.z * moveSpeed * dt;
+
+        // Calculate desired heading.
+        float targetAngle = atan2f(direction.x, direction.z) * RAD2DEG;
+
+        // Smoothly rotate.
+        transform.rotationAxis = { 0.0f, 1.0f, 0.0f };
+
+        transform.rotationAngle = LerpAngle(
+            transform.rotationAngle,
+            targetAngle,
+            rotationSpeed * dt
+        );
+
+        tingo.SetTransform(transform);
+    }
 }
