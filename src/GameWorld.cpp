@@ -362,6 +362,12 @@ void GameWorld::HandleController(float dt)
     float x = inputController.GetLeftStickX();
     float z = inputController.GetLeftStickY();
 
+    tingo.GetState().walkSpeedScale = Clamp(
+        sqrt(x * x + z * z),
+        0.0f,
+        1.0f
+    );
+
     if (fabsf(x) < deadZone) x = 0.0f;
     if (fabsf(z) < deadZone) z = 0.0f;
 
@@ -372,6 +378,8 @@ void GameWorld::HandleController(float dt)
 
     if (Vector3Length(direction) > 0.0f)
     {
+        tingo.GetState().walkState = TingoState::WalkState::Walking;
+
         // Move Tingo.
         MyTransform3D& transform = tingo.GetTransform();
 
@@ -391,6 +399,10 @@ void GameWorld::HandleController(float dt)
         );
 
         tingo.SetTransform(transform);
+    }
+    else 
+    {
+        tingo.GetState().walkState = TingoState::WalkState::Stopped;
     }
 
     //Head movement

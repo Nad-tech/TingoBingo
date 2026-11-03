@@ -27,6 +27,8 @@ public:
 
     ArmWaveState GetWaveState() const;
 
+    void SetLocalRotation(float angle);
+
 private:
     TingoAssets& assets;
     TingoDimensions& dimensions;

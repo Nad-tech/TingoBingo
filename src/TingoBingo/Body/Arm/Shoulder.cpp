@@ -62,7 +62,7 @@ void Shoulder::SetTransform(MyTransform3D parentTransform)
 
     localTransform.position = positionOffset;
     localTransform.rotationAxis = {1.0f, 0.0f, 0.0f};
-    localTransform.rotationAngle += localRotation;
+    localTransform.rotationAngle = localRotation;
     localTransform.scale = {1.0f, 1.0f, 1.0f};
 
     transform = MakeChildTransform(parentTransform, localTransform);
@@ -73,4 +73,9 @@ void Shoulder::SetTransform(MyTransform3D parentTransform)
 ArmWaveState Shoulder::GetWaveState() const
 {
     return upperArm.GetWaveState();
+}
+
+void Shoulder::SetLocalRotation(float angle)
+{
+    localRotation = angle;
 }

@@ -29,5 +29,14 @@ public:
         Close
     }eyeStateBrain;
 
+    enum class WalkState
+    {
+        Stopped,
+        Walking,
+        Running
+    }walkState = WalkState::Stopped;
+
+    float walkSpeedScale = 0.0f;
+
     bool speaking;
 };

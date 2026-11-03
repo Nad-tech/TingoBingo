@@ -9,7 +9,7 @@ Body::Body
     assets(assets),
     dimensions(dimensions),
     state(state),
-    pelvis(assets, dimensions),
+    pelvis(assets, dimensions, state),
     neck(assets, dimensions, state),
     leftShoulder(assets, dimensions, state, "left"),
     rightShoulder(assets, dimensions, state, "right")
@@ -23,10 +23,17 @@ void Body::Initialise()
     neck.Initialise();
     leftShoulder.Initialise();
     rightShoulder.Initialise();
+
+    maxThighSwing = 20.0f;
+    walkSpeed = 5.0f;
+    walkPhase = 0.0f;
+    thighReturnSpeed = walkSpeed;
 }
 
 void Body::Update(float dt)
 {
+    AdvanceWalk(dt);
+
     pelvis.Update(dt);
     neck.Update(dt);
     leftShoulder.Update(dt);
@@ -105,4 +112,46 @@ Vector3 Body::GetHeadForwardDirection() const
 Neck& Body::GetNeck()
 {
     return neck;
+}
+
+void Body::AdvanceWalk(float dt)
+{
+    if(state.walkState == TingoState::WalkState::Walking)
+    {
+        walkPhase += dt * walkSpeed * state.walkSpeedScale;
+
+        //Move legs
+        float leftThighAngle = sinf(walkPhase) * maxThighSwing;
+        float rightThighAngle = sinf(walkPhase + PI) * maxThighSwing;
+
+        pelvis.SetLeftThighLocalRotation(leftThighAngle);
+        pelvis.SetRightThighLocalRotation(rightThighAngle);
+
+        //Move arms opposing legs
+        leftShoulder.SetLocalRotation(rightThighAngle);
+        rightShoulder.SetLocalRotation(leftThighAngle);
+    }
+    else
+    {
+        float returnAmount = Clamp(
+            thighReturnSpeed * dt,
+            0.0f,
+            1.0f
+        );
+
+        float leftRotation = 
+            pelvis.GetLeftThighLocalRotation();
+
+        float rightRotation = 
+            pelvis.GetRightThighLocalRotation();
+
+        leftRotation = Lerp(leftRotation, 0.0f, returnAmount);
+        rightRotation = Lerp(rightRotation, 0.0f, returnAmount);
+
+        pelvis.SetLeftThighLocalRotation(leftRotation);
+        pelvis.SetRightThighLocalRotation(rightRotation);
+
+        leftShoulder.SetLocalRotation(rightRotation);
+        rightShoulder.SetLocalRotation(leftRotation);
+    }
 }

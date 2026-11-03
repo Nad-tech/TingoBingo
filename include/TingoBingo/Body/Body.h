@@ -43,6 +43,8 @@ public:
     Neck& GetNeck();
 
 private:
+    void AdvanceWalk(float dt); 
+
     TingoAssets& assets;
     TingoDimensions& dimensions;
     TingoState& state;
@@ -55,4 +57,11 @@ private:
     Neck neck;
     Shoulder leftShoulder;
     Shoulder rightShoulder;
+
+    float maxThighSwing;
+    float walkSpeed;
+    float walkPhase;
+    float thighReturnSpeed;
+
+    float maxShoulderSwing;
 };

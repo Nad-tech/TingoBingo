@@ -75,3 +75,13 @@ void Thigh::SetTransform(MyTransform3D parentTransform)
     
     knee.SetTransform(transform);
 }
+
+void Thigh::SetLocalRotation(float rotation)
+{
+    localRotation = rotation;
+}
+
+float Thigh::GetLocalRotation()
+{
+    return localRotation;
+}

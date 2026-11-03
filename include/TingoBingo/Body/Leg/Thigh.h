@@ -23,6 +23,9 @@ public:
 
     void SetTransform(MyTransform3D parentTransform);
 
+    void SetLocalRotation(float localRotation);
+    float GetLocalRotation();
+
 private:
     TingoAssets& assets;
     TingoDimensions& dimensions;

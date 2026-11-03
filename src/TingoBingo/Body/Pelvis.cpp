@@ -1,9 +1,15 @@
 #include "TingoBingo/Body/Pelvis.h"
 #include "raymath.h"
 
-Pelvis::Pelvis(TingoAssets& assets, TingoDimensions& dimensions) :
+Pelvis::Pelvis
+(
+    TingoAssets& assets, 
+    TingoDimensions& dimensions,
+    TingoState& state
+) :
     assets(assets),
     dimensions(dimensions),
+    state(state),
     leftThigh(assets, dimensions, "left"),
     rightThigh(assets, dimensions, "right")
 {}
@@ -18,17 +24,12 @@ void Pelvis::Initialise()
 
     leftThigh.Initialise();
     rightThigh.Initialise();
+
+    localRotation = 0.0f;
 }
 
 void Pelvis::Update(float dt)
 {
-    //dirFlag ? localRotation += dt * 80 : localRotation -= dt * 80;
-
-    if(localRotation <= -45) dirFlag = true;
-    if(localRotation >= 45) dirFlag = false;
-
-    SetTransform(tempParentTransform);
-
     leftThigh.Update(dt);
     rightThigh.Update(dt);
 }
@@ -56,11 +57,31 @@ void Pelvis::SetTransform(MyTransform3D parentTransform)
 
     localTransform.position = positionOffset;
     localTransform.rotationAxis = {0.0f, 1.0f, 0.0f};
-    localTransform.rotationAngle += localRotation;
+    localTransform.rotationAngle = localRotation;
     localTransform.scale = {1.0f, 1.0f, 1.0f};
 
     transform = MakeChildTransform(parentTransform, localTransform);
 
     leftThigh.SetTransform(transform);
     rightThigh.SetTransform(transform);
+}
+
+void Pelvis::SetLeftThighLocalRotation(float angle)
+{
+    leftThigh.SetLocalRotation(angle);
+}
+
+void Pelvis::SetRightThighLocalRotation(float angle)
+{
+    rightThigh.SetLocalRotation(angle);
+}
+
+float Pelvis::GetLeftThighLocalRotation()
+{
+    return leftThigh.GetLocalRotation();
+}
+
+float Pelvis::GetRightThighLocalRotation()
+{
+    return rightThigh.GetLocalRotation();
 }
