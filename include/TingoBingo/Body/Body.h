@@ -58,10 +58,8 @@ private:
     Shoulder leftShoulder;
     Shoulder rightShoulder;
 
-    float maxThighSwing;
-    float walkSpeed;
+    float maxLimbSwing;
+    float limbSpeed;
     float walkPhase;
-    float thighReturnSpeed;
-
-    float maxShoulderSwing;
+    float limbReturnSpeed;
 };

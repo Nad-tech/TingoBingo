@@ -24,10 +24,10 @@ void Body::Initialise()
     leftShoulder.Initialise();
     rightShoulder.Initialise();
 
-    maxThighSwing = 20.0f;
-    walkSpeed = 5.0f;
+    maxLimbSwing = 20.0f;
+    limbSpeed = 5.0f;
     walkPhase = 0.0f;
-    thighReturnSpeed = walkSpeed;
+    limbReturnSpeed = limbSpeed;
 }
 
 void Body::Update(float dt)
@@ -118,11 +118,11 @@ void Body::AdvanceWalk(float dt)
 {
     if(state.walkState == TingoState::WalkState::Walking)
     {
-        walkPhase += dt * walkSpeed * state.walkSpeedScale;
+        walkPhase += dt * limbSpeed * state.walkSpeedScale;
 
         //Move legs
-        float leftThighAngle = sinf(walkPhase) * maxThighSwing;
-        float rightThighAngle = sinf(walkPhase + PI) * maxThighSwing;
+        float leftThighAngle = sinf(walkPhase) * maxLimbSwing;
+        float rightThighAngle = sinf(walkPhase + PI) * maxLimbSwing;
 
         pelvis.SetLeftThighLocalRotation(leftThighAngle);
         pelvis.SetRightThighLocalRotation(rightThighAngle);
@@ -134,7 +134,7 @@ void Body::AdvanceWalk(float dt)
     else
     {
         float returnAmount = Clamp(
-            thighReturnSpeed * dt,
+            limbReturnSpeed * dt,
             0.0f,
             1.0f
         );

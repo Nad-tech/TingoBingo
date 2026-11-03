@@ -88,3 +88,8 @@ void Pupil::SetGazeTarget(Vector2 target)
         maxGazeY
     );
 }
+
+Vector2 Pupil::GetGazeOffset()
+{
+    return gazeOffset;
+}

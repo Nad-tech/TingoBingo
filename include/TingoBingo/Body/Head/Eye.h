@@ -31,6 +31,8 @@ public:
 
     MyTransform3D GetTransform() const;
 
+    Vector2 GetGazeOffset();
+
 private:
     TingoAssets& assets;
     TingoDimensions& dimensions;

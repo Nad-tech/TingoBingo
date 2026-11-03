@@ -181,3 +181,8 @@ MyTransform3D Eye::GetTransform() const
 {
     return transform;
 }
+
+Vector2 Eye::GetGazeOffset()
+{
+    return pupil.GetGazeOffset();
+}

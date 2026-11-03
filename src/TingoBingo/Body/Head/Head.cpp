@@ -47,7 +47,29 @@ void Head::Update(float dt)
     leftEye.Update(dt);
     rightEye.Update(dt);
 
-    //localRotation += dt * 40;
+    Vector2 leftGaze = leftEye.GetGazeOffset();
+    Vector2 rightGaze = rightEye.GetGazeOffset();
+
+    // Average the pupil positions.
+    Vector2 averageGaze = {
+        (leftGaze.x + rightGaze.x) * 0.5f,
+        (leftGaze.y + rightGaze.y) * 0.5f
+    };
+
+    // Convert pupil movement into head rotation.
+    float targetYaw = averageGaze.x * 50.0f;
+    float targetPitch = -averageGaze.y * 50.0f;
+
+    targetYaw = Clamp(targetYaw, -25.0f, 25.0f);
+    targetPitch = Clamp(targetPitch, -20.0f, 20.0f);
+
+    // Smoothly follow the gaze.
+    const float headFollowSpeed = 6.0f;
+
+    float smoothing = 1.0f - expf(-headFollowSpeed * dt);
+
+    localYaw += (targetYaw - localYaw) * smoothing;
+    localPitch += (targetPitch - localPitch) * smoothing;
 }
 
 void Head::Draw()
