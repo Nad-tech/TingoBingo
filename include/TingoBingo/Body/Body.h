@@ -40,6 +40,8 @@ public:
     Vector3 GetVisionPosition() const;
     Vector3 GetHeadForwardDirection() const;
     
+    Neck& GetNeck();
+
 private:
     TingoAssets& assets;
     TingoDimensions& dimensions;

@@ -17,6 +17,7 @@ struct Phrases
         "bananas bananas and pajamas",
         "your dad is the best",
         "Guitar guitar pajarms pajarms",
-        "Apple Apple on the wall what is a mango too"
+        "Apple Apple on the wall what is a mango too",
+        "knock knock whos there europe europe who i am a poo"
     };
 };

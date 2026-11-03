@@ -101,3 +101,8 @@ Vector3 Body::GetHeadForwardDirection() const
 {
     return neck.GetHeadForwardDirection();
 }
+
+Neck& Body::GetNeck()
+{
+    return neck;
+}

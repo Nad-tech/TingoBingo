@@ -357,6 +357,8 @@ void GameWorld::HandleController(float dt)
     const float deadZone = 0.15f;
     const float rotationSpeed = 5.0f;
 
+    //Tingo movement
+
     float x = inputController.GetLeftStickX();
     float z = inputController.GetLeftStickY();
 
@@ -390,4 +392,48 @@ void GameWorld::HandleController(float dt)
 
         tingo.SetTransform(transform);
     }
+
+    //Head movement
+
+    float headX = inputController.GetRightStickX();
+    float headY = inputController.GetRightStickY();
+
+    if (fabsf(headX) < deadZone)
+        headX = 0.0f;
+
+    if (fabsf(headY) < deadZone)
+        headY = 0.0f;
+
+    constexpr float headRotationSpeed = 90.0f;
+
+    constexpr float maxHeadYaw = 60.0f;
+    constexpr float maxHeadPitch = 30.0f;
+
+    Head& head = tingo.GetBody().GetNeck().GetHead();
+
+    // Horizontal rotation.
+    float yaw = head.GetLocalYaw();
+
+    yaw += headX * headRotationSpeed * dt;
+
+    yaw = Clamp(
+        yaw,
+        -maxHeadYaw,
+        maxHeadYaw
+    );
+
+    // Vertical rotation.
+    float pitch = head.GetLocalPitch();
+
+    // Negative Y input means the stick is pushed upwards.
+    pitch -= headY * headRotationSpeed * dt;
+
+    pitch = Clamp(
+        pitch,
+        -maxHeadPitch,
+        maxHeadPitch
+    );
+
+    head.SetLocalYaw(yaw);
+    head.SetLocalPitch(pitch);
 }

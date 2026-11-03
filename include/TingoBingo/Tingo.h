@@ -40,6 +40,8 @@ public:
     Vector3 GetVisionPosition() const;
     Vector3 GetHeadForwardDirection() const;
 
+    Body& GetBody();
+    
 private:
     MyTransform3D transform;
     TingoAssets &assets;

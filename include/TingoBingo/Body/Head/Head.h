@@ -27,16 +27,21 @@ public:
     void Draw();
 
     void SetTransform(MyTransform3D parentTransform);
+    const MyTransform3D& GetTransform() const;
 
     EyeState GetLeftEyeState() const;
     EyeState GetRightEyeState() const;
 
     void SetGazeTarget(Vector2 target);
 
-    const MyTransform3D& GetTransform() const;
-
     Vector3 GetVisionPosition() const;
     Vector3 GetForwardDirection() const;
+
+    void SetLocalYaw(float yaw);
+    float GetLocalYaw();
+
+    void SetLocalPitch(float pitch);
+    float GetLocalPitch();
 
 private:
     TingoAssets& assets;
@@ -57,7 +62,8 @@ private:
     Ear rightEar;
     Antenna antenna;
 
-    float localRotation = 0.0f;
+    float localYaw = 0.0f;
+    float localPitch = 0.0f;
 
     float blinkTimer = 0.0f;
     float nextBlink = 0.0f;

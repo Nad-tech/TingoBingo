@@ -104,3 +104,8 @@ Vector3 Tingo::GetHeadForwardDirection() const
 {
     return body.GetHeadForwardDirection();
 }
+
+Body& Tingo::GetBody()
+{
+    return body;
+}

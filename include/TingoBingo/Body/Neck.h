@@ -32,6 +32,8 @@ public:
     Vector3 GetVisionPosition() const;
     Vector3 GetHeadForwardDirection() const;
 
+    Head& GetHead();
+
 private:
     TingoAssets& assets;
     TingoDimensions& dimensions;

@@ -47,7 +47,7 @@ void Head::Update(float dt)
     leftEye.Update(dt);
     rightEye.Update(dt);
 
-    localRotation += dt * 40;
+    //localRotation += dt * 40;
 }
 
 void Head::Draw()
@@ -77,8 +77,35 @@ void Head::SetTransform(MyTransform3D parentTransform)
     MyTransform3D localTransform{};
 
     localTransform.position = positionOffset;
-    localTransform.rotationAxis = {0.0f, 1.0f, 0.0f};
-    localTransform.rotationAngle = localRotation;
+    
+    // Horizontal rotation (yaw).
+    Quaternion yaw = QuaternionFromAxisAngle(
+        {0.0f, 1.0f, 0.0f},
+        localYaw * DEG2RAD
+    );
+
+    // Vertical rotation (pitch).
+    Quaternion pitch = QuaternionFromAxisAngle(
+        {1.0f, 0.0f, 0.0f},
+        localPitch * DEG2RAD
+    );
+
+    // Combine the rotations.
+    Quaternion combinedRotation = QuaternionMultiply(yaw, pitch);
+
+    // Convert quaternion to axis-angle.
+    Vector3 axis;
+    float angle;
+
+    QuaternionToAxisAngle(
+        combinedRotation,
+        &axis,
+        &angle
+    );
+
+    localTransform.rotationAxis = axis;
+    localTransform.rotationAngle = angle * RAD2DEG;
+    
     localTransform.scale = {1.0f, 1.0f, 1.0f};
 
     transform = MakeChildTransform(parentTransform, localTransform);
@@ -139,4 +166,24 @@ Vector3 Head::GetVisionPosition() const
         Vector3Add(leftPosition, rightPosition),
         0.5f
     );
+}
+
+void Head::SetLocalYaw(float yaw)
+{
+    localYaw = yaw;
+}
+
+float Head::GetLocalYaw()
+{
+    return localYaw;
+}
+
+void Head::SetLocalPitch(float pitch)
+{
+    localPitch = pitch;
+}
+
+float Head::GetLocalPitch()
+{
+    return localPitch;
 }

@@ -82,3 +82,8 @@ Vector3 Neck::GetHeadForwardDirection() const
 {
     return head.GetForwardDirection();
 }
+
+Head& Neck::GetHead()
+{
+    return head;
+}
